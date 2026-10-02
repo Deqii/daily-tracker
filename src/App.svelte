@@ -1,5 +1,5 @@
 <script lang="ts">
-  let title: string = 'Daily Tracker';
+  let title = 'Daily Tracker';
 </script>
 
 <main>
