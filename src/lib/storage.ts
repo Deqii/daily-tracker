@@ -24,6 +24,7 @@ export const STORAGE_KEYS: Record<keyof StorageSchema, string> = {
   userState: 'daily-tracker:userState',
 };
 
+/** A missing or corrupted entry both read as `null`, so `initializeStorage` refills either. */
 export function read<K extends keyof StorageSchema>(key: K): StorageSchema[K] | null {
   const raw = window.localStorage.getItem(STORAGE_KEYS[key]);
 
@@ -31,7 +32,15 @@ export function read<K extends keyof StorageSchema>(key: K): StorageSchema[K] | 
     return null;
   }
 
-  return JSON.parse(raw) as StorageSchema[K];
+  let parsed: unknown;
+
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+
+  return isStoredValue(key, parsed) ? (parsed as StorageSchema[K]) : null;
 }
 
 export function write<K extends keyof StorageSchema>(key: K, value: StorageSchema[K]): void {
@@ -69,4 +78,19 @@ function writeIfAbsent<K extends keyof StorageSchema>(key: K, value: StorageSche
   if (read(key) === null) {
     write(key, value);
   }
+}
+
+function isStoredValue<K extends keyof StorageSchema>(
+  key: K,
+  value: unknown
+): value is StorageSchema[K] {
+  if (key === 'schemaVersion') {
+    return typeof value === 'number' && Number.isFinite(value);
+  }
+
+  if (key === 'userState') {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
+  return Array.isArray(value);
 }
