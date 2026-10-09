@@ -2,32 +2,79 @@
 
 ## Project
 
-Daily Tracker — a gamified habit tracker. Svelte + Vite + TypeScript + Tailwind, `localStorage` only, no backend for this phase. Read `PRD.md`, `design.md`, and `tasks.md` at the repo root before writing any code — they are the source of truth for mechanics, data model, and UI.
+Daily Tracker is a gamified habit tracker: Svelte 5 (runes) + Vite + TypeScript (strict) + Tailwind CSS v4. All data lives in `localStorage`. No backend, no auth, no API calls in this phase.
+
+Your job is to execute one existing GitHub issue at a time. You do not manage the backlog.
+
+Reply to the human in the language they write (Indonesian or English). Code, comments, commits, PRs, and docs are in English.
+
+## Source of truth
+
+Docs are human-owned and live in `docs/`. Read what the issue needs, not everything.
+
+| Work                 | Read                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| Any issue            | the issue (`gh issue view N`) and its entry in `docs/tasks.md`                       |
+| data, engine, stores | `docs/PRD.md` §2 (rules), §6 (data model), §7 (engine spec)                          |
+| UI                   | `docs/design.md` §2–4 (tokens, typography, components) and the section for that page |
+| A rule seems missing | `docs/decisions.md`                                                                  |
+
+Precedence when docs disagree: `PRD.md` > `decisions.md` > `tasks.md` > `design.md` for mechanics and data; `design.md` wins for visuals and UI copy. If two docs conflict, or a rule is written nowhere, stop and ask. Never guess mechanics (points, penalties, ranks, dates). Sample data in `design.md` is illustrative, not a fixture.
+
+Never edit `docs/`. If a doc is wrong or incomplete, say so in your report.
 
 ## Workflow
 
-GitHub issues are created manually, one per checklist line in `tasks.md` (see `create-issues.sh` for how they were generated). Never create, edit, or close an issue yourself — an issue closes only via "Closes #N" in a PR description. Your job is to execute existing issues, not to manage the backlog.
+- Work on exactly one issue: the number given in the prompt. If no number is given, ask. Never pick one yourself.
+- One issue = one branch = one PR. Never combine issues. A Milestone heading is an ordering label, not a unit of work.
+- Never create, edit, close, comment on, or label an issue. The human creates issues. An issue closes only through `Closes #N` in a merged PR.
+- Before starting: `git switch main && git pull --ff-only`. Check that the issues this one depends on are closed (the issue's "Blocked by", or the execution order in `docs/tasks.md`). If not, stop and report. If the issue already has an open PR or a branch, stop and report.
+- Branch: `<type>/<N>-<short-kebab-description>`, for example `feat/13-daily-rotation`. `<type>` is the Conventional Commit type of the issue title.
+- Implement only this issue's scope and acceptance criteria. If you must touch code outside it, stop and report instead of expanding scope.
+- Every `feat` and `fix` in `engine/`, `lib/`, or the data layer ships with unit tests for the code it adds (co-located `name.test.ts`).
+- Commits: Conventional Commits in English, imperative, subject at most 72 characters: `type(scope): description`. Type and scope come from the issue title. Add the footer `Refs #N`.
+- PR: the title equals the issue title (shortened to 72 characters if needed). The body follows `.github/pull_request_template.md` and ends with `Closes #N`. Open it with `gh pr create`. Do not merge.
+- After the PR is open, stop. Report in at most 5 lines: what changed, tests added, checks run, assumptions you had to make, anything skipped. Do not start another issue.
 
-- One issue = one unit of work = one branch = one PR. Never combine multiple issues into one PR.
-- Work on exactly one issue at a time: the number given in the prompt, or the lowest-numbered open issue if none is specified.
-- A Milestone heading in `tasks.md` is an ordering label, not a unit of work. Never treat a whole milestone as one PR, even if several of its issues are mentioned together in one message.
-- Check out the branch per the naming convention in the issue body, implement only that issue's scope, run lint and tests, commit using Conventional Commits referencing the issue number, open a PR with "Closes #N".
-- Once one PR is opened, stop. Do not move on to another issue automatically — wait for the next instruction.
-- If an issue's scope turns out to require touching code outside it, stop and report back instead of expanding scope silently.
+Allowed: `git`, `npm run *`, `gh issue view|list`, `gh pr create|view|list`.
+Never: `gh issue create|edit|close|comment|delete`, `gh pr merge|close`, `git push --force`, pushing to `main`, `--no-verify`, `git reset --hard` on shared branches.
 
 ## Commands
 
-To be filled in once Milestone 1 (project setup) is merged. Expected, pending confirmation once scaffolded:
+```
+npm ci                # install from the lockfile
+npm run dev           # Vite dev server
+npm run build         # production build
+npm run lint          # ESLint
+npm run format        # Prettier --write
+npm run check         # svelte-check (types and a11y warnings)
+npm run test          # Vitest, single run (not watch)
+```
 
-- Install: `npm install`
-- Dev server: `npm run dev`
-- Build: `npm run build`
-- Lint: `npm run lint`
-- Test: `npm run test`
+Definition of done: `lint`, `check`, `test`, and `build` all pass. If a script does not exist yet, say so in the PR. Do not skip it silently and do not invent it.
 
-## Code style
+## Code rules
 
-- TypeScript, strict mode.
-- Business logic (level, rank, points, penalties, rank-up gate) lives in `engine/` as plain, framework-free functions — keep it that way so it stays unit-testable without mounting a Svelte component.
-- Tailwind for styling. Use the design tokens in `design.md` (colors, rank accents, typography) rather than inventing new ad hoc values.
-- No backend, no API calls, no auth — all persistence goes through the `localStorage` helpers in the data layer (Milestone 2). Flag it instead of adding a server dependency if a task seems to need one.
+- TypeScript strict. No `any`, no unexplained `!`, exhaustive `switch` on unions.
+- Svelte 5 runes only: `$props`, `$state`, `$derived`, `$effect`, snippets, `onclick`. Never `export let`, `$:`, `<slot>`, `createEventDispatcher`, or `on:click`. App-level state uses Svelte stores in `stores/` (PRD §5). Local component state uses runes.
+- `engine/` is pure: plain functions, no Svelte, no DOM, no `localStorage`, no `Date.now()`, `new Date()`, or `Math.random()`. Time (`now`, `today`) and seeds are parameters. Return new objects; never mutate inputs.
+- Dates: a local day is `YYYY-MM-DD` built with `lib/date.ts`. Never use `toISOString()` for a local day. Timestamps are ISO 8601 with a UTC offset.
+- Persistence goes only through `lib/storage`. Handle write failures (PRD §2.2).
+- Styling: Tailwind v4. Colors, glow, and fonts come from the tokens in `docs/design.md` §2 (CSS variables in `src/app.css`). No hard-coded hex values in components.
+- UI text is exactly as written in `docs/design.md`. No emoji. Semantic HTML, visible focus, labels on inputs, `aria-label` on icon-only buttons, respect `prefers-reduced-motion`.
+- Charts (radar, line) are in-house SVG. No chart libraries. Routing is hash-based, with no router library.
+- Dependencies: do not add or upgrade any dependency. Pre-approved only: `vitest`, `@fontsource-variable/manrope`, `@fontsource-variable/jetbrains-mono`. For anything else, stop and ask.
+- Files in kebab-case, Svelte components in PascalCase. No leftover `console.log`, no commented-out code, no TODO without an issue number.
+
+## Repo map
+
+```
+src/
+  components/   reusable UI
+  pages/        Today, Tasks, Rewards, History, Settings
+  stores/       Svelte stores persisted through lib/storage
+  engine/       pure game logic + tests
+  lib/          storage, date helpers, ids, constants
+  app.css       Tailwind + design tokens
+docs/           PRD.md, decisions.md, design.md, tasks.md, stitch-notes.md (human-owned)
+```
