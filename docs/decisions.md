@@ -5,96 +5,126 @@ Choices made while revising the PRD at issue #12. Each has a default that the PR
 ## Decisions
 
 ### D1. Penalty per missed stat, by rank
-- **Default:** E 5, D 8, C 13, B 20, A 30, S 45. Rank E matches the History sample (−5 per missed stat). The rest are about a third of *Max points/task* (Rank S assumes 135).
+
+- **Default:** E 5, D 8, C 13, B 20, A 30, S 45. Rank E matches the History sample (−5 per missed stat). The rest are about a third of _Max points/task_ (Rank S assumes 135).
 - **Alternatives:** scale the penalty by the Rank multiplier; one flat value for all ranks; a user setting.
 - **Confirm before:** #15.
 
 ### D2. Floors
+
 - **Default:** Lifetime XP and Wallet never go below 0; each is floored separately after a deduction. `level(xp)` treats `xp ≤ 0` as Level 1.
 - **Alternatives:** allow a negative Wallet as debt.
 - **Confirm before:** #15.
 
 ### D3. What counts as a miss
+
 - **Default:** a stat is missed when `actual < required`. Under a 2x requirement, one completion of two is a miss: the penalty applies and the flag stays.
 - **Alternatives:** penalize only when a stat has zero completions (then 1 of 2 keeps the flag without a penalty, or clears it).
 - **Confirm before:** #14.
 
 ### D4. Freezes
+
 - **Default:** a counter per week (`freezesUsedThisWeek`), weeks start on Monday, used automatically on a day without completions, protects the streak only (penalties still apply).
 - **Alternatives:** manual use; a freeze that also cancels that day's penalty; weeks starting on Sunday.
 - **Confirm before:** #17.
 
 ### D5. Effective rank is stored
+
 - **Default:** `UserState.rank` holds the effective rank. Rank-ups go one step at a time and each step needs the balance gate. Rank-downs are immediate and need no gate. A blocked rank-up is shown to the user.
 - **Alternatives:** none that keep the 50% gate, because the gate makes rank depend on history.
 - **Confirm before:** #19.
 
 ### D6. Dates and the clock
+
 - **Default:** local calendar days as `YYYY-MM-DD`; timestamps with a UTC offset; `localDate` stored on every dated record; engine functions never read the clock and receive `now`/`today` and an id generator as parameters.
 - **Alternatives:** store UTC and convert on read (error-prone around midnight); a custom day-start hour (parked, P4).
 - **Confirm before:** C2 (date helpers).
 
 ### D7. Rollover
+
 - **Default:** every missed day is closed in order; rollover runs on load, when the tab becomes visible, and at local midnight; if today is earlier than the stored date, nothing happens. A skipped day uses the task list as it is now.
 - **Alternatives:** close only the last missed day (does not match "per day it is missed").
 - **Confirm before:** E2 (`runRollover`).
 
 ### D8. Two meanings of "active"
-- **Default:** *quest-active* (has a task; used for the Daily Quest) and *tracked* (has `statXP > 0`; used for the balance gate).
+
+- **Default:** _quest-active_ (has a task; used for the Daily Quest) and _tracked_ (has `statXP > 0`; used for the balance gate).
 - **Confirm before:** #13, #18.
 
 ### D9. Rotating selection
+
 - **Default:** one pick per quest-active stat per day, seeded by date and stat, stored when the day opens, not re-rolled after edits. A stat with a single rotating task always gets it. Yesterday's pick is not excluded.
 - **Alternatives:** avoid repeating yesterday's pick when two or more candidates exist (parked, P5).
 - **Confirm before:** #13.
 
 ### D10. How often a row can be completed
+
 - **Default:** a quest row can be completed up to the stat's `requiredCompletions` for that day (1, or 2 while penalized). Each completion awards points.
 - **Alternatives:** one completion per row per day, which would make 2x impossible for a stat with one row.
 - **Confirm before:** E1 (`completeTask`).
 
 ### D11. Tasks above the cap after a rank drop
+
 - **Default:** the stored value stays, awards use `min(nominal, cap)`, and the Tasks page shows "Over cap: counts as N".
 - **Alternatives:** rewrite stored values down to the new cap (loses the user's data); keep awarding the full value (defeats the cap).
 - **Confirm before:** E1.
 
 ### D12. Data model additions
+
 - **Default:** snapshots on `Completion` and `RewardPurchase`; `milestoneEvents` log (feeds History highlights and the reveal overlays); end-of-day snapshots on `DailyQuestDay`; counters `totalCompletions` and `totalPurchases`; 8-character ids.
 - **Confirm before:** C3 (`fix(data)`).
 
 ### D13. Routing
+
 - **Default:** hash-based routes (`#/today`, `#/tasks`, `#/rewards`, `#/history`, `#/settings`) with a small in-house implementation. It needs no server rewrite rules on static hosting and adds no dependency.
 - **Alternatives:** a router library; history-mode routing with a hosting fallback.
 - **Confirm before:** #27.
 
 ### D14. Charts
+
 - **Default:** radar and line charts are hand-written SVG. The design is minimal (thin lines, no axes clutter), so a chart library adds more weight than it saves.
 - **Confirm before:** #35, #49.
 
 ### D15. Fonts
+
 - **Default:** Manrope and JetBrains Mono through `@fontsource-variable/*`, self-hosted. No external font CDN, which fits a local-only app and helps Lighthouse.
 - **Confirm before:** #31.
 
 ### D16. Theme
+
 - **Default:** dark by default, stored under `daily-tracker:theme`, not part of Export/Import.
 - **Confirm before:** #28.
 
 ### D17. Titles
+
 - **Default:** the catalog names in the PRD are placeholders; ids are stored. The equipped title is chosen in a Settings row.
 - **Confirm before:** #21.
 
 ### D18. Schema changes before release
+
 - **Default:** no migrations. On a `schemaVersion` mismatch, offer an export, then reset to defaults. Start doing real migrations at the first public release.
 - **Confirm before:** C3 (`fix(data)`).
 
 ### D19. Destructive confirmation
+
 - **Default:** the confirm button for delete uses the danger color with a 1px danger border. This is the single exception to "buttons always use the fixed action color".
 - **Confirm before:** #45.
 
 ### D20. UI additions beyond the original screens
+
 - **Default:** `design.md` adds these on top of the Stitch screens: the freezes-left line and the rank-up-blocked line on Today; the inline tier picker on Today rows; the radar scale (outer ring = largest stat rounded up to a multiple of 10, minimum 20); the Rewards preview rule (the most expensive affordable reward plus the most expensive locked one, which matches the sample); the History range buttons (7 days, 30 days, All), the Freeze used label, and rank markers; the Title row in Settings and the Penalty column in the rank reference; the Add reward form; the overlay and notice details; the copy in §7; and the responsive rules in §8.
 - **Alternatives:** leave any of them out. The PRD only requires that gate status, freezes left, and the Over cap marker are visible.
 - **Confirm before:** the issue that builds each one.
+
+### D21. Cap validation returns a reason
+
+- **Default:** a result with `INVALID_NUMBER` or `ABOVE_CAP` (and the cap), because the task form shows a different message for each. Not a bare boolean.
+- **Confirm before:** the cap-validation fix issue (F).
+
+### D22. Storage reports instead of silently resetting
+
+- **Default:** when a stored value is corrupted or the schema version differs, keep the raw text under `daily-tracker:backup`, load defaults for that key, and return a report the UI can show. Export offers the backup. Refines D18.
+- **Confirm before:** the storage-hardening issue (C4).
 
 ## Retired
 

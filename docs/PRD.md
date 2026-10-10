@@ -21,14 +21,14 @@ The application runs entirely client-side for this phase: all data lives in the 
 - **Whole numbers.** Nominal points, awarded points, penalties, costs, XP, and Wallet are integers.
 - **Floors.** `lifetimeXP ≥ 0` and `wallet ≥ 0` at all times. `statXP` never decreases.
 - **Pure engine.** Engine functions never read the clock or a random source. `now`, `today`, seeds, and an id generator are parameters.
-- **Two kinds of "active" stat.** A stat is *quest-active* on a day if it has at least one registered task. A stat is *tracked* if it has at least one completion ever (`statXP > 0`). The bare word "active" is not used.
+- **Two kinds of "active" stat.** A stat is _quest-active_ on a day if it has at least one registered task. A stat is _tracked_ if it has at least one completion ever (`statXP > 0`). The bare word "active" is not used.
 
 **Tasks and stats**
 
 - Every task belongs to exactly one of five fixed stats: STR, VIT, INT, DISC, SOC.
 - A task is either an anchor task (always appears in the Daily Quest, never rotates) or a rotating task (the app picks one rotating task per stat each day).
-- A task has one to three effort variants — Ringan, Sedang, Berat, each tier at most once — each with its own short description and fixed nominal point value (an integer ≥ 1). A task with exactly one variant is *single-tier*: the UI shows no tier name and no picker, and its completions record `variantTier: null`.
-- A variant's nominal value is capped by the user's current Rank (*Max points/task* in the Rank table). The app prevents saving a variant above the current cap. If the Rank later drops below a stored value, the stored value stays, awards use `min(nominal, cap)`, and the Tasks page marks the variant "Over cap".
+- A task has one to three effort variants — Ringan, Sedang, Berat, each tier at most once — each with its own short description and fixed nominal point value (an integer ≥ 1). A task with exactly one variant is _single-tier_: the UI shows no tier name and no picker, and its completions record `variantTier: null`.
+- A variant's nominal value is capped by the user's current Rank (_Max points/task_ in the Rank table). The app prevents saving a variant above the current cap. If the Rank later drops below a stored value, the stored value stays, awards use `min(nominal, cap)`, and the Tasks page marks the variant "Over cap".
 
 **Daily Quest**
 
@@ -36,8 +36,8 @@ The application runs entirely client-side for this phase: all data lives in the 
 - Each quest-active stat needs at least **one** completion that day, or **two** while penalized (below). A completion of any of the stat's quest rows counts. Only quest rows can be completed. A row can be completed at most `requiredCompletions[stat]` times per day, so a penalized stat with one row shows a `0/2` counter.
 - A stat is **missed** on a day when `actualCompletions < requiredCompletions`. One completion out of two required is a miss. A stat with no task when the day is closed is not required, and is neither missed nor satisfied.
 - **2x requirement.** A missed stat is flagged: the next day its requirement is 2 completions, folded into the same Daily Quest rather than a separate quest. The flag clears when the stat meets its requirement. The requirement never exceeds 2, no matter how often the stat is missed.
-- **Penalty deduction.** Each missed stat, on each day it is missed, immediately deducts the current Rank's *Penalty per missed stat* from both Lifetime XP and Wallet, each floored at 0. Penalties are fixed numbers and are not multiplied by the Rank multiplier. `statXP` is not touched. All stats on one day use the Rank the user had when that day began.
-- The *Daily quest* counter on Today is `satisfied stats / quest-active stats`. It counts stats, not rows.
+- **Penalty deduction.** Each missed stat, on each day it is missed, immediately deducts the current Rank's _Penalty per missed stat_ from both Lifetime XP and Wallet, each floored at 0. Penalties are fixed numbers and are not multiplied by the Rank multiplier. `statXP` is not touched. All stats on one day use the Rank the user had when that day began.
+- The _Daily quest_ counter on Today is `satisfied stats / quest-active stats`. It counts stats, not rows.
 
 **Points, Level, Rank**
 
@@ -46,25 +46,25 @@ The application runs entirely client-side for this phase: all data lives in the 
 - Level is derived from Lifetime XP. The XP required to reach level N is `14 × (N − 1)²`, so `level(xp) = floor(sqrt(xp / 14)) + 1`, and any `xp ≤ 0` is Level 1. The curve is deliberately steep at higher levels so the full E-to-S arc spans roughly 1–5 years of consistent use.
 - The **level rank** is the Rank whose Level range contains the current Level (`rank(level)`). The user's **effective rank** is stored in `UserState.rank` and applies the balance gate:
   - If the level rank is lower than the effective rank, the effective rank drops to it immediately. There is no floor once a rank has been reached, and no gate on the way down.
-  - If the level rank is higher, the effective rank rises one step at a time, and each step needs the **balance gate** to pass. If it fails, the rank-up is *blocked*, the effective rank stays, and the UI says why.
+  - If the level rank is higher, the effective rank rises one step at a time, and each step needs the **balance gate** to pass. If it fails, the rank-up is _blocked_, the effective rank stays, and the UI says why.
   - The effective rank is recomputed whenever Lifetime XP changes and on every rollover.
 - **Balance gate.** Among tracked stats, the weakest `statXP` must be at least 50% of the average `statXP` of the tracked stats. With fewer than two tracked stats the gate passes. Integer form: `2 × weakest × count ≥ sum`. The threshold shown to the user is `ceil(sum / (2 × count))`.
 - Every Rank effect (freezes, cap, multiplier, penalty) comes from the effective rank.
 
 | Rank | Level range | Freeze/week | Max points/task | XP multiplier | Penalty per missed stat |
-|---|---|---|---|---|---|
-| E | 1–5 | 1 | 15 | ×0.5 | 5 |
-| D | 6–10 | 1 | 25 | ×0.7 | 8 |
-| C | 11–20 | 2 | 40 | ×0.85 | 13 |
-| B | 21–35 | 2 | 60 | ×1.0 | 20 |
-| A | 36–50 | 3 | 90 | ×1.15 | 30 |
-| S | 51+ | 3 | unlimited | ×1.3 | 45 |
+| ---- | ----------- | ----------- | --------------- | ------------- | ----------------------- |
+| E    | 1–5         | 1           | 15              | ×0.5          | 5                       |
+| D    | 6–10        | 1           | 25              | ×0.7          | 8                       |
+| C    | 11–20       | 2           | 40              | ×0.85         | 13                      |
+| B    | 21–35       | 2           | 60              | ×1.0          | 20                      |
+| A    | 36–50       | 3           | 90              | ×1.15         | 30                      |
+| S    | 51+         | 3           | unlimited       | ×1.3          | 45                      |
 
-The Rank E penalty (5) comes from the reference history in `design.md`. The other values are about a third of *Max points/task* and are defaults to confirm (`decisions.md` D1).
+The Rank E penalty (5) comes from the reference history in `design.md`. The other values are about a third of _Max points/task_ and are defaults to confirm (`decisions.md` D1).
 
 **Streaks and freezes**
 
-- A day *counts* toward the streak if it has at least one completion in any stat.
+- A day _counts_ toward the streak if it has at least one completion in any stat.
 - Each Rank allows a number of **freezes per week** (Rank table). Weeks start on Monday (local time). A freeze is used automatically, and only when a day has no completions and a freeze is left. It keeps the streak alive for that day. A freeze protects the streak only; stat penalties still apply.
 - When a day is closed (rollover), in this order: (1) if the day falls in a new week, reset `freezesUsedThisWeek` to 0; (2) if the day had no quest-active stats, change nothing; (3) else if the day counts, `currentStreak += 1`; (4) else if a freeze is left, use it and keep the streak; (5) else `currentStreak = 0`.
 - `UserState.currentStreak` covers closed days only. The displayed streak (top bar chip and titles) is `currentStreak + 1` when today already has a completion, otherwise `currentStreak`.
@@ -77,13 +77,13 @@ The Rank E penalty (5) comes from the reference history in `design.md`. The othe
 
 - Purely cosmetic. Unlocked at milestones (catalog below) and displayed under the Rank/Level readout on Today. One title is equipped at a time, chosen in Settings. A title is unlocked once and kept.
 
-| id | Name | Unlock condition |
-|---|---|---|
-| `streak-7` | Konsisten 7 hari | displayed streak reaches 7 |
-| `streak-30` | Konsisten 30 hari | displayed streak reaches 30 |
-| `first-reward` | Hadiah pertama | first reward purchase |
+| id                  | Name                            | Unlock condition                                    |
+| ------------------- | ------------------------------- | --------------------------------------------------- |
+| `streak-7`          | Konsisten 7 hari                | displayed streak reaches 7                          |
+| `streak-30`         | Konsisten 30 hari               | displayed streak reaches 30                         |
+| `first-reward`      | Hadiah pertama                  | first reward purchase                               |
 | `rank-d` … `rank-s` | Naik ke Rank D … Naik ke Rank S | effective rank reaches that rank for the first time |
-| `completions-100` | 100 tugas selesai | `totalCompletions ≥ 100` |
+| `completions-100`   | 100 tugas selesai               | `totalCompletions ≥ 100`                            |
 
 Names are placeholders; the ids are what is stored.
 
@@ -107,21 +107,21 @@ Names are placeholders; the ids are what is stored.
 - Cross-device or cross-browser sync.
 - Social features (friends, leaderboards, sharing).
 - Native mobile apps.
-- Randomized point values — only the rotating-task *selection* is random; a task's point value is always fixed and visible before it is completed.
+- Randomized point values — only the rotating-task _selection_ is random; a task's point value is always fixed and visible before it is completed.
 
 ## 3. Core Features
 
-| Feature | Description |
-|---|---|
-| Local persistence | All data lives in browser `localStorage`; no account or server needed |
-| Task library | Create/edit/delete tasks, assign to a stat, mark anchor or rotating, define 1–3 effort variants |
-| Daily Quest | Auto-generated per stat per day; one seeded rotating pick per stat; anchors always included |
-| Penalty system | A missed stat requires 2x the next day (capped) and deducts Lifetime XP + Wallet immediately |
-| Stats | Five fixed stats (STR, VIT, INT, DISC, SOC), each a running total, shown on a radar chart |
-| Level & Rank | Non-linear level curve; Rank E–S with real gates (freeze allowance, point cap, XP multiplier, penalty, balance requirement); rank can rise or fall |
-| Wallet & Rewards | Separate spendable currency; user-defined, repeatable reward purchases |
-| Titles | Cosmetic milestone unlocks, one equipped at a time, chosen in Settings |
-| History | Long-range XP trend chart and a day-by-day log, with level-up/rank-up/rank-down events highlighted |
+| Feature           | Description                                                                                                                                        |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local persistence | All data lives in browser `localStorage`; no account or server needed                                                                              |
+| Task library      | Create/edit/delete tasks, assign to a stat, mark anchor or rotating, define 1–3 effort variants                                                    |
+| Daily Quest       | Auto-generated per stat per day; one seeded rotating pick per stat; anchors always included                                                        |
+| Penalty system    | A missed stat requires 2x the next day (capped) and deducts Lifetime XP + Wallet immediately                                                       |
+| Stats             | Five fixed stats (STR, VIT, INT, DISC, SOC), each a running total, shown on a radar chart                                                          |
+| Level & Rank      | Non-linear level curve; Rank E–S with real gates (freeze allowance, point cap, XP multiplier, penalty, balance requirement); rank can rise or fall |
+| Wallet & Rewards  | Separate spendable currency; user-defined, repeatable reward purchases                                                                             |
+| Titles            | Cosmetic milestone unlocks, one equipped at a time, chosen in Settings                                                                             |
+| History           | Long-range XP trend chart and a day-by-day log, with level-up/rank-up/rank-down events highlighted                                                 |
 
 ## 4. User Flow
 
@@ -169,8 +169,8 @@ A fully client-side single-page app. Svelte components render the UI and read/wr
 type Stat = 'STR' | 'VIT' | 'INT' | 'DISC' | 'SOC';
 type Rank = 'E' | 'D' | 'C' | 'B' | 'A' | 'S';
 type Tier = 'ringan' | 'sedang' | 'berat';
-type LocalDate = string;  // 'YYYY-MM-DD', device-local day
-type Timestamp = string;  // ISO 8601 with UTC offset, e.g. '2026-10-04T10:15:30+07:00'
+type LocalDate = string; // 'YYYY-MM-DD', device-local day
+type Timestamp = string; // ISO 8601 with UTC offset, e.g. '2026-10-04T10:15:30+07:00'
 
 // key: "daily-tracker:schemaVersion" -> number
 // Bump on any change to a persisted shape. Pre-release: no migrations.
@@ -180,14 +180,14 @@ type Timestamp = string;  // ISO 8601 with UTC offset, e.g. '2026-10-04T10:15:30
 interface TaskVariant {
   tier: Tier;
   description: string;
-  points: number;             // nominal, pre-multiplier, integer >= 1
+  points: number; // nominal, pre-multiplier, integer >= 1
 }
 interface Task {
-  id: string;                 // short random id (8 chars)
-  familyName: string;         // e.g. "Push up routine"
+  id: string; // short random id (8 chars)
+  familyName: string; // e.g. "Push up routine"
   stat: Stat;
-  isAnchor: boolean;          // true = always in Daily Quest, never rotated
-  variants: TaskVariant[];    // 1 to 3 entries, tiers unique; exactly 1 = single-tier
+  isAnchor: boolean; // true = always in Daily Quest, never rotated
+  variants: TaskVariant[]; // 1 to 3 entries, tiers unique; exactly 1 = single-tier
   createdAt: Timestamp;
 }
 
@@ -195,10 +195,10 @@ interface Task {
 interface Completion {
   id: string;
   taskId: string;
-  taskName: string;           // snapshot of familyName
-  stat: Stat;                 // snapshot
-  variantTier: Tier | null;   // null for single-tier tasks
-  pointsAwarded: number;      // after cap and multiplier, rounded up
+  taskName: string; // snapshot of familyName
+  stat: Stat; // snapshot
+  variantTier: Tier | null; // null for single-tier tasks
+  pointsAwarded: number; // after cap and multiplier, rounded up
   completedAt: Timestamp;
   localDate: LocalDate;
 }
@@ -207,12 +207,12 @@ interface Completion {
 interface DailyQuestDay {
   date: LocalDate;
   selectedTaskIdPerStat: Partial<Record<Stat, string>>; // the rotating pick per quest-active stat
-  requiredCompletions: Record<Stat, number>;  // 0 = not required that day, 1 normal, 2 penalized
+  requiredCompletions: Record<Stat, number>; // 0 = not required that day, 1 normal, 2 penalized
   actualCompletions: Record<Stat, number>;
-  netPointsChange: number;    // Lifetime XP delta for the day (earned - deducted); live while open, final when closed
+  netPointsChange: number; // Lifetime XP delta for the day (earned - deducted); live while open, final when closed
   freezeUsed: boolean;
-  closed: boolean;            // false while the day is open
-  lifetimeXPEnd: number | null;  // snapshots, filled when the day is closed
+  closed: boolean; // false while the day is open
+  lifetimeXPEnd: number | null; // snapshots, filled when the day is closed
   levelEnd: number | null;
   rankEnd: Rank | null;
 }
@@ -221,7 +221,7 @@ interface DailyQuestDay {
 interface Reward {
   id: string;
   title: string;
-  cost: number;               // Wallet points, integer >= 1
+  cost: number; // Wallet points, integer >= 1
   createdAt: Timestamp;
 }
 
@@ -229,33 +229,40 @@ interface Reward {
 interface RewardPurchase {
   id: string;
   rewardId: string;
-  rewardTitle: string;        // snapshot
-  costAtPurchase: number;     // snapshot
+  rewardTitle: string; // snapshot
+  costAtPurchase: number; // snapshot
   purchasedAt: Timestamp;
   localDate: LocalDate;
 }
 
 // key: "daily-tracker:userState" -> UserState
 interface UserState {
-  lifetimeXP: number;               // >= 0; drives Level and Rank; decreases only via penalty
-  wallet: number;                   // >= 0; decreases via penalty and purchases
-  statXP: Record<Stat, number>;     // per-stat totals; monotonic, never decreases
-  rank: Rank;                       // effective rank; can lag the level rank when the gate blocks
-  currentStreak: number;            // closed days only
+  lifetimeXP: number; // >= 0; drives Level and Rank; decreases only via penalty
+  wallet: number; // >= 0; decreases via penalty and purchases
+  statXP: Record<Stat, number>; // per-stat totals; monotonic, never decreases
+  rank: Rank; // effective rank; can lag the level rank when the gate blocks
+  currentStreak: number; // closed days only
   freezesUsedThisWeek: number;
-  lastFreezeWeekReset: LocalDate;   // Monday of the current freeze week
-  penaltyStats: Stat[];             // stats currently requiring 2 completions
-  equippedTitle: string | null;     // title id
-  unlockedTitles: string[];         // title ids
+  lastFreezeWeekReset: LocalDate; // Monday of the current freeze week
+  penaltyStats: Stat[]; // stats currently requiring 2 completions
+  equippedTitle: string | null; // title id
+  unlockedTitles: string[]; // title ids
   totalCompletions: number;
   totalPurchases: number;
-  lastRolloverDate: LocalDate;      // the open day; every earlier day is closed
+  lastRolloverDate: LocalDate; // the open day; every earlier day is closed
 }
 
 // key: "daily-tracker:milestoneEvents" -> MilestoneEvent[]
 type MilestoneEvent =
   | { id: string; type: 'levelUp'; localDate: LocalDate; from: number; to: number; seen: boolean }
-  | { id: string; type: 'rankUp' | 'rankDown'; localDate: LocalDate; from: Rank; to: Rank; seen: boolean };
+  | {
+      id: string;
+      type: 'rankUp' | 'rankDown';
+      localDate: LocalDate;
+      from: Rank;
+      to: Rank;
+      seen: boolean;
+    };
 
 // key: "daily-tracker:theme" -> 'dark' | 'light'   (not part of Export)
 ```
@@ -286,8 +293,10 @@ type Result<T, E extends string> = { ok: true; value: T } | { ok: false; error: 
 ### 7.1 Level, rank, points (implemented in #9–#12; keep the existing names)
 
 - `xpForLevel(level) = 14 × (level − 1)²`. `level(xp) = floor(sqrt(max(xp, 0) / 14)) + 1`.
-- `rank(level)` returns the *level rank*. It ignores the balance gate. `getRankConfig(rank)` returns the Rank table row. The penalty column is added by the penalty issue. "Unlimited" cap exists in code only and is never persisted (`Infinity` becomes `null` in JSON).
+- `rank(level)` returns the _level rank_. It ignores the balance gate. `getRankConfig(rank)` returns the Rank table row. The penalty column is added by the penalty issue. "Unlimited" cap exists in code only and is never persisted (`Infinity` becomes `null` in JSON).
 - Point calculation (#11): `ceil(min(nominal, cap) × multiplier)`. Cap validation (#12): reject non-integers, values below 1, and values above the cap.
+- Edge behaviour (kept from the implementation): `level(xp)` returns 1 for `xp ≤ 0` and for non-finite input. `xpForLevel(level)` throws a `RangeError` for a non-integer or a level below 1; `level(xp)` never produces one.
+- Cap validation returns `{ ok: true } | { ok: false; reason: 'INVALID_NUMBER' | 'ABOVE_CAP'; cap: number | null }`. `INVALID_NUMBER` covers non-integers, non-finite values, and values below 1. The task form maps the two reasons to the two messages in section 7 of `design.md`.
 
 ### 7.2 Date helpers (`lib/date.ts`)
 
@@ -353,20 +362,20 @@ Calling it twice with the same `today` gives the same state as calling it once.
 
 ## 8. Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend framework | Svelte 5 (runes) with Vite |
-| Language | TypeScript, strict |
-| Styling | Tailwind CSS v4 (CSS-first config, tokens in `src/app.css`) |
-| Fonts | Manrope and JetBrains Mono, self-hosted via `@fontsource-variable/*` |
-| State management | Svelte stores, persisted to `localStorage` |
-| Engine | Plain TypeScript functions, no framework dependency |
-| Tests | Vitest |
-| Routing | Hash-based, no router library |
-| Charts | In-house SVG, no chart library |
-| Persistence | Browser `localStorage` (Web Storage API) |
-| Backend | None for this phase |
-| Version control | GitHub — milestone/issue/label/PR structured workflow |
+| Layer              | Technology                                                           |
+| ------------------ | -------------------------------------------------------------------- |
+| Frontend framework | Svelte 5 (runes) with Vite                                           |
+| Language           | TypeScript, strict                                                   |
+| Styling            | Tailwind CSS v4 (CSS-first config, tokens in `src/app.css`)          |
+| Fonts              | Manrope and JetBrains Mono, self-hosted via `@fontsource-variable/*` |
+| State management   | Svelte stores, persisted to `localStorage`                           |
+| Engine             | Plain TypeScript functions, no framework dependency                  |
+| Tests              | Vitest                                                               |
+| Routing            | Hash-based, no router library                                        |
+| Charts             | In-house SVG, no chart library                                       |
+| Persistence        | Browser `localStorage` (Web Storage API)                             |
+| Backend            | None for this phase                                                  |
+| Version control    | GitHub — milestone/issue/label/PR structured workflow                |
 
 ## Appendix A. Reference scenarios (use as test vectors)
 
@@ -374,22 +383,22 @@ All use Rank E unless stated. A 5-point task awards 3 at Rank E (5 × 0.5 = 2.5,
 
 **Scenario 1 — 2x requirement, cap, and clearing.** Five quest-active stats, one 5-point anchor task each. Start: Lifetime XP 100, Wallet 100, every `statXP` 20, no flags.
 
-| Day | Completions | Missed | XP change | Lifetime XP after | Flags after | Level |
-|---|---|---|---|---|---|---|
-| 1 | STR, VIT, INT, DISC once; SOC none | SOC | +12 − 5 = +7 | 107 | SOC | 3 |
-| 2 | every stat once (SOC needs 2) | SOC (1 of 2) | +15 − 5 = +10 | 117 | SOC | 3 |
-| 3 | every stat once, SOC twice | none | +18 | 135 | none | 4 (levelUp 3 → 4 on day 3) |
+| Day | Completions                        | Missed       | XP change     | Lifetime XP after | Flags after | Level                      |
+| --- | ---------------------------------- | ------------ | ------------- | ----------------- | ----------- | -------------------------- |
+| 1   | STR, VIT, INT, DISC once; SOC none | SOC          | +12 − 5 = +7  | 107               | SOC         | 3                          |
+| 2   | every stat once (SOC needs 2)      | SOC (1 of 2) | +15 − 5 = +10 | 117               | SOC         | 3                          |
+| 3   | every stat once, SOC twice         | none         | +18           | 135               | none        | 4 (levelUp 3 → 4 on day 3) |
 
 After day 3: Wallet 135, every `statXP` 29.
 
 **Scenario 2 — four days away.** Lifetime XP 60, Wallet 60, five quest-active stats, the open day has no completions, and the app is next opened four days later. Closing days 0–3:
 
-| Day | Missed | Lifetime XP | Wallet | Net |
-|---|---|---|---|---|
-| 0 | all 5 | 35 | 35 | −25 |
-| 1 | all 5 | 10 | 10 | −25 |
-| 2 | all 5 | 0 | 0 | −10 (floored) |
-| 3 | all 5 | 0 | 0 | 0 |
+| Day | Missed | Lifetime XP | Wallet | Net           |
+| --- | ------ | ----------- | ------ | ------------- |
+| 0   | all 5  | 35          | 35     | −25           |
+| 1   | all 5  | 10          | 10     | −25           |
+| 2   | all 5  | 0           | 0      | −10 (floored) |
+| 3   | all 5  | 0           | 0      | 0             |
 
 Flags after: all five stats. Level is 2 after day 0 and 1 after day 1. No rank change.
 
@@ -398,26 +407,26 @@ Flags after: all five stats. Level is 2 after day 0 and 1 after day 1. No rank c
 **Scenario 4 — balance gate.** `statXP` STR, VIT, INT, DISC = 100 each:
 
 | SOC | Tracked stats | Sum | Threshold | Passes |
-|---|---|---|---|---|
-| 0 | 4 | 400 | 50 | yes |
-| 10 | 5 | 410 | 41 | no |
-| 44 | 5 | 444 | 45 | no |
-| 45 | 5 | 445 | 45 | yes |
+| --- | ------------- | --- | --------- | ------ |
+| 0   | 4             | 400 | 50        | yes    |
+| 10  | 5             | 410 | 41        | no     |
+| 44  | 5             | 444 | 45        | no     |
+| 45  | 5             | 445 | 45        | yes    |
 
 Rank resolution: effective rank E and Level 6 with SOC = 10 stays E and is blocked. With every `statXP` equal it becomes D. At Level 12 with equal `statXP` it becomes C (two steps). Effective rank D at Level 4 drops to E.
 
 **Scenario 5 — streak and freeze.** Rank E (1 freeze per week), weeks Monday–Sunday, every day has quest-active stats:
 
-| Day | Completions | Result | Streak | Freezes used |
-|---|---|---|---|---|
-| Mon | ≥ 1 | counts | 1 | 0 |
-| Tue | ≥ 1 | counts | 2 | 0 |
-| Wed | 0 | freeze used | 2 | 1 |
-| Thu | ≥ 1 | counts | 3 | 1 |
-| Fri | 0 | no freeze left, reset | 0 | 1 |
-| Sat | ≥ 1 | counts | 1 | 1 |
-| Sun | 0 | no freeze left, reset | 0 | 1 |
-| next Mon | ≥ 1 | new week resets freezes; counts | 1 | 0 |
+| Day      | Completions | Result                          | Streak | Freezes used |
+| -------- | ----------- | ------------------------------- | ------ | ------------ |
+| Mon      | ≥ 1         | counts                          | 1      | 0            |
+| Tue      | ≥ 1         | counts                          | 2      | 0            |
+| Wed      | 0           | freeze used                     | 2      | 1            |
+| Thu      | ≥ 1         | counts                          | 3      | 1            |
+| Fri      | 0           | no freeze left, reset           | 0      | 1            |
+| Sat      | ≥ 1         | counts                          | 1      | 1            |
+| Sun      | 0           | no freeze left, reset           | 0      | 1            |
+| next Mon | ≥ 1         | new week resets freezes; counts | 1      | 0            |
 
 ## Appendix B. Level thresholds
 
@@ -425,8 +434,8 @@ XP needed to reach a level: L2 = 14, L3 = 56, L4 = 126, L5 = 224, L6 = 350, L11 
 
 `level(xp)` vectors:
 
-| xp | −5 | 0 | 13 | 14 | 55 | 56 | 349 | 350 | 1,399 | 1,400 | 5,599 | 5,600 | 17,149 | 17,150 | 34,999 | 35,000 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| level | 1 | 1 | 1 | 2 | 2 | 3 | 5 | 6 | 10 | 11 | 20 | 21 | 35 | 36 | 50 | 51 |
+| xp    | −5  | 0   | 13  | 14  | 55  | 56  | 349 | 350 | 1,399 | 1,400 | 5,599 | 5,600 | 17,149 | 17,150 | 34,999 | 35,000 |
+| ----- | --- | --- | --- | --- | --- | --- | --- | --- | ----- | ----- | ----- | ----- | ------ | ------ | ------ | ------ |
+| level | 1   | 1   | 1   | 2   | 2   | 3   | 5   | 6   | 10    | 11    | 20    | 21    | 35     | 36     | 50     | 51     |
 
 `rank(level)`: 5 → E, 6 → D, 10 → D, 11 → C, 20 → C, 21 → B, 35 → B, 36 → A, 50 → A, 51 → S.
