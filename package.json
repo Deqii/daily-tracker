@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
+    "test": "vitest run",
     "lint": "eslint . --ext .ts,.js,.svelte",
     "lint:fix": "eslint . --ext .ts,.js,.svelte --fix",
     "format": "prettier --write .",
@@ -29,6 +30,7 @@
     "svelte-check": "^4.7.6",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
-    "vite": "^8.3.1"
+    "vite": "^8.3.1",
+    "vitest": "^5.0.3"
   }
 }
