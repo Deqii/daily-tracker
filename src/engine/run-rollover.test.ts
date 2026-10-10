@@ -527,3 +527,108 @@ describe('runRollover day-boundary edge cases', () => {
     expect(result.events).toEqual([]);
   });
 });
+
+/**
+ * Orchestration-level coverage for the penalty deduction and the 2x cap (PRD §2.1, §7.4). The
+ * per-rank amounts and the requirement arithmetic are unit-tested in `evaluation.test.ts`; these
+ * tests pin how they surface through `runRollover`: flags, requirement, balances, and events.
+ */
+describe('penalty deduction and the 2x cap through runRollover', () => {
+  const required = (overrides: Partial<Record<Stat, number>>): Record<Stat, number> => ({
+    ...zeroCounts(),
+    ...overrides,
+  });
+
+  const closedByDate = (state: AppState, date: LocalDate): DailyQuestDay | undefined =>
+    state.dailyQuestLog.find((day) => day.date === date);
+
+  it('caps a repeatedly missed stat at a requirement of 2 and charges one penalty per day', () => {
+    const state = makeState({
+      tasks: [anchor('aSTR', 'STR')],
+      userState: { lifetimeXP: 100, wallet: 100, rank: 'E', lastRolloverDate: '2026-10-10' },
+      dailyQuestLog: [openDay('2026-10-10')],
+    });
+    const { state: next, events } = runRollover(state, '2026-10-15', ids());
+
+    const closedDays = next.dailyQuestLog.filter((day) => day.closed);
+
+    expect(closedDays.map((day) => day.date)).toEqual([
+      '2026-10-10',
+      '2026-10-11',
+      '2026-10-12',
+      '2026-10-13',
+      '2026-10-14',
+    ]);
+    expect(closedDays.map((day) => day.requiredCompletions.STR)).toEqual([1, 2, 2, 2, 2]);
+    expect(closedDays.map((day) => day.netPointsChange)).toEqual([-5, -5, -5, -5, -5]);
+    expect(closedDays.map((day) => day.lifetimeXPEnd)).toEqual([95, 90, 85, 80, 75]);
+
+    expect(next.userState.lifetimeXP).toBe(75);
+    expect(next.userState.wallet).toBe(75);
+    expect(next.userState.penaltyStats).toEqual(['STR']);
+    expect(closedByDate(next, '2026-10-15')?.requiredCompletions.STR).toBe(2);
+    expect(events).toEqual([]);
+  });
+
+  it('charges the full penalty once for a penalized stat that is only half satisfied (1 of 2)', () => {
+    const state = makeState({
+      tasks: [anchor('aSTR', 'STR')],
+      userState: {
+        lifetimeXP: 100,
+        wallet: 100,
+        rank: 'E',
+        penaltyStats: ['STR'],
+        lastRolloverDate: '2026-10-10',
+      },
+      dailyQuestLog: [
+        openDay('2026-10-10', {
+          requiredCompletions: required({ STR: 2 }),
+          actualCompletions: required({ STR: 1 }),
+        }),
+      ],
+    });
+    const { state: next, events } = runRollover(state, '2026-10-11', ids());
+
+    expect(closedByDate(next, '2026-10-10')).toMatchObject({
+      closed: true,
+      netPointsChange: -5,
+      lifetimeXPEnd: 95,
+    });
+    expect(next.userState.lifetimeXP).toBe(95);
+    expect(next.userState.wallet).toBe(95);
+    expect(next.userState.penaltyStats).toEqual(['STR']);
+    expect(closedByDate(next, '2026-10-11')?.requiredCompletions.STR).toBe(2);
+    expect(events).toEqual([]);
+  });
+
+  it('clears the 2x flag and returns the requirement to 1 when the stat is satisfied (2 of 2)', () => {
+    const state = makeState({
+      tasks: [anchor('aSTR', 'STR')],
+      userState: {
+        lifetimeXP: 100,
+        wallet: 100,
+        rank: 'E',
+        penaltyStats: ['STR'],
+        lastRolloverDate: '2026-10-10',
+      },
+      dailyQuestLog: [
+        openDay('2026-10-10', {
+          requiredCompletions: required({ STR: 2 }),
+          actualCompletions: required({ STR: 2 }),
+        }),
+      ],
+    });
+    const { state: next, events } = runRollover(state, '2026-10-11', ids());
+
+    expect(closedByDate(next, '2026-10-10')).toMatchObject({
+      closed: true,
+      netPointsChange: 0,
+      lifetimeXPEnd: 100,
+    });
+    expect(next.userState.lifetimeXP).toBe(100);
+    expect(next.userState.wallet).toBe(100);
+    expect(next.userState.penaltyStats).toEqual([]);
+    expect(closedByDate(next, '2026-10-11')?.requiredCompletions.STR).toBe(1);
+    expect(events).toEqual([]);
+  });
+});
