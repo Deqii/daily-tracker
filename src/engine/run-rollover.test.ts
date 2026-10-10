@@ -632,3 +632,32 @@ describe('penalty deduction and the 2x cap through runRollover', () => {
     expect(events).toEqual([]);
   });
 });
+
+/**
+ * Appendix A scenario 4 through `runRollover`: a rank drop is immediate and ungated, so even a stat
+ * with zero completions cannot hold the rank up (PRD §2.1, §7.6; D5).
+ */
+describe('runRollover balance gate (Appendix A scenario 4)', () => {
+  it('drops an effective rank above the level rank even when a stat has zero completions', () => {
+    const state = makeState({
+      userState: {
+        lifetimeXP: 200,
+        wallet: 200,
+        rank: 'D',
+        statXP: { STR: 100, VIT: 100, INT: 100, DISC: 100, SOC: 0 },
+        lastRolloverDate: '2026-10-10',
+      },
+      dailyQuestLog: [openDay('2026-10-10')],
+    });
+    const { state: next, events } = runRollover(state, '2026-10-11', ids());
+
+    expect(next.userState.lifetimeXP).toBe(160);
+    expect(next.userState.rank).toBe('E');
+    expect(events).toEqual([
+      { id: 'id1', type: 'rankDown', localDate: '2026-10-10', from: 'D', to: 'E', seen: false },
+    ]);
+
+    const closed = next.dailyQuestLog.find((day) => day.date === '2026-10-10');
+    expect(closed).toMatchObject({ levelEnd: 4, rankEnd: 'E', netPointsChange: -40 });
+  });
+});

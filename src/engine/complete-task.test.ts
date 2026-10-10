@@ -98,9 +98,9 @@ describe('completeTask', () => {
   });
 
   it('returns TASK_NOT_IN_QUEST for an unknown id or a stat with no requirement', () => {
-    expect(
-      completeTask(makeState(), { taskId: 'missing', variantTier: null }, now, ids())
-    ).toEqual({ ok: false, error: 'TASK_NOT_IN_QUEST' });
+    expect(completeTask(makeState(), { taskId: 'missing', variantTier: null }, now, ids())).toEqual(
+      { ok: false, error: 'TASK_NOT_IN_QUEST' }
+    );
 
     expect(
       completeTask(
@@ -244,9 +244,10 @@ describe('completeTask', () => {
     expect(second.state.dailyQuestLog[0]?.actualCompletions.STR).toBe(2);
     expect(second.state.userState.lifetimeXP).toBe(106);
 
-    expect(
-      completeTask(second.state, { taskId: 't1', variantTier: null }, now, ids())
-    ).toEqual({ ok: false, error: 'ROW_LIMIT_REACHED' });
+    expect(completeTask(second.state, { taskId: 't1', variantTier: null }, now, ids())).toEqual({
+      ok: false,
+      error: 'ROW_LIMIT_REACHED',
+    });
   });
 
   it('refuses a second completion when the requirement is normal', () => {
@@ -254,9 +255,10 @@ describe('completeTask', () => {
       completeTask(makeState(), { taskId: 't1', variantTier: null }, now, ids())
     );
 
-    expect(
-      completeTask(first.state, { taskId: 't1', variantTier: null }, now, ids())
-    ).toEqual({ ok: false, error: 'ROW_LIMIT_REACHED' });
+    expect(completeTask(first.state, { taskId: 't1', variantTier: null }, now, ids())).toEqual({
+      ok: false,
+      error: 'ROW_LIMIT_REACHED',
+    });
   });
 
   it('emits one levelUp event crossing 126 XP', () => {
@@ -407,12 +409,7 @@ describe('completeTask', () => {
     });
 
     const value = expectOk(
-      completeTask(
-        makeState({ tasks: [overCap] }),
-        { taskId: 't1', variantTier: null },
-        now,
-        ids()
-      )
+      completeTask(makeState({ tasks: [overCap] }), { taskId: 't1', variantTier: null }, now, ids())
     );
 
     expect(value.completion.pointsAwarded).toBe(8);
@@ -426,5 +423,96 @@ describe('completeTask', () => {
     completeTask(state, { taskId: 't1', variantTier: null }, now, ids());
 
     expect(state).toEqual(snapshot);
+  });
+});
+
+/**
+ * Appendix A scenario 4 through `completeTask` (PRD §2.1, §7.6; D5). The gate arithmetic itself is
+ * unit-tested in `balance.test.ts`; these tests pin how a passing gate turns into a rank-up event.
+ */
+describe('completeTask rank-up balance gate (Appendix A scenario 4)', () => {
+  const big = task({ variants: [{ tier: 'berat', description: '15 reps', points: 15 }] });
+
+  it('lets a tracked stat with zero completions pass the gate', () => {
+    const value = expectOk(
+      completeTask(
+        makeState({
+          tasks: [big],
+          userState: {
+            lifetimeXP: 349,
+            rank: 'E',
+            statXP: { STR: 100, VIT: 100, INT: 100, DISC: 100, SOC: 0 },
+          },
+        }),
+        { taskId: 't1', variantTier: null },
+        now,
+        ids()
+      )
+    );
+
+    expect(value.state.userState.rank).toBe('D');
+    expect(value.state.userState.statXP.SOC).toBe(0);
+    expect(value.events.map((event) => event.type)).toEqual(['levelUp', 'rankUp']);
+    expect(value.events[1]).toMatchObject({ type: 'rankUp', from: 'E', to: 'D' });
+  });
+
+  it('climbs two ranks in one rankUp event when the gate passes', () => {
+    const value = expectOk(
+      completeTask(
+        makeState({
+          tasks: [big],
+          userState: {
+            lifetimeXP: 1693,
+            rank: 'E',
+            statXP: { STR: 100, VIT: 100, INT: 100, DISC: 100, SOC: 100 },
+          },
+        }),
+        { taskId: 't1', variantTier: null },
+        now,
+        ids()
+      )
+    );
+
+    expect(value.state.userState.rank).toBe('C');
+    expect(value.events.map((event) => event.type)).toEqual(['levelUp', 'rankUp']);
+    expect(value.events[1]).toMatchObject({ type: 'rankUp', from: 'E', to: 'C' });
+  });
+
+  it('passes with a single tracked stat and with none', () => {
+    const oneStat = expectOk(
+      completeTask(
+        makeState({
+          tasks: [big],
+          userState: {
+            lifetimeXP: 349,
+            rank: 'E',
+            statXP: { STR: 500, VIT: 0, INT: 0, DISC: 0, SOC: 0 },
+          },
+        }),
+        { taskId: 't1', variantTier: null },
+        now,
+        ids()
+      )
+    );
+
+    expect(oneStat.state.userState.rank).toBe('D');
+
+    const none = expectOk(
+      completeTask(
+        makeState({
+          tasks: [big],
+          userState: {
+            lifetimeXP: 349,
+            rank: 'E',
+            statXP: { STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 },
+          },
+        }),
+        { taskId: 't1', variantTier: null },
+        now,
+        ids()
+      )
+    );
+
+    expect(none.state.userState.rank).toBe('D');
   });
 });
