@@ -5,7 +5,7 @@ Granular issue/PR checklist for an agentic coding assistant. One GitHub issue pe
 How to read this file:
 
 - Milestones 1–10 below are the original checklist. **Do not reorder, edit, or delete those lines.** Issue numbers #1–#62 follow line order, and `create-issues.sh` must not be run again.
-- New issues (keys C1 to U5) are created with `scripts/create-new-issues.sh`. They get new numbers. GitHub numbers issues and PRs from one sequence, so expect numbers above the last PR. The execution order below refers to them by key.
+- New issues (keys C1 to U5) are created by hand on GitHub when their turn comes, and get new numbers. GitHub numbers issues and PRs from one sequence, so expect numbers above the last PR. The number is written next to each key once the issue exists, for example `(C1 = #75)`. The execution order below refers to them by key.
 - State lives in GitHub (open or closed), not in the checkboxes. #1–#12 are ticked as of this revision, for reference. Agents never edit this file.
 - Original issues that need more than their title are specified in "Acceptance criteria for #13–#25" below.
 
@@ -113,21 +113,21 @@ This supersedes the top-to-bottom order wherever they differ.
 - [ ] `chore(perf)`: Lighthouse pass, target 90+ — `area:frontend`
 - [ ] `chore(deploy)`: configure static hosting and domain — `area:frontend`
 
-## New issues (created with `scripts/create-new-issues.sh`)
+## New issues (created by hand on GitHub)
 
-Full bodies with acceptance criteria are in the script.
+Full bodies with acceptance criteria are in the GitHub issues.
 
 ### Checkpoint, before #13
 
-- [ ] `chore(setup)`: configure Vitest with a single-run `test` script and a smoke test — `area:frontend` (C1)
-- [ ] `feat(lib)`: implement local-date helpers (`toLocalDate`, `toTimestamp`, `addDays`, `daysBetween`, `eachDay`, `weekStart`) with tests — `area:data` (C2)
-- [ ] `fix(data)`: align persisted types, defaults, validation, and write errors with PRD v2 — `area:data` (C3)
-- [ ] `fix(engine)`: apply the rank cap in point calculation and return a reason from cap validation — `area:engine` (F)
+- [ ] `chore(setup)`: configure Vitest with a single-run `test` script and a smoke test — `area:frontend` (C1 = #75)
+- [ ] `feat(lib)`: rework `lib/date.ts` into local-date helpers (`toLocalDate`, `toTimestamp`, `addDays`, `daysBetween`, `eachDay`, `weekStart`) with tests — `area:data` (C2 = #76)
+- [ ] `fix(data)`: align persisted types and defaults with PRD v2 — `area:data` (C3 = #77)
+- [ ] `fix(engine)`: apply the rank cap in point calculation and return a reason from cap validation — `area:engine` (F = #78)
 
 ### Orchestration, before Milestone 3
 
-- [ ] `feat(engine)`: implement `completeTask` orchestration (validation, points, XP, Wallet, statXP, log, events, titles) — `area:engine` (E1)
-- [ ] `feat(engine)`: implement `runRollover` orchestration (every missed day, ordered steps, events, open today) — `area:engine` (E2)
+- [ ] `feat(engine)`: implement `completeTask` orchestration (validation, points, XP, Wallet, statXP, log, events, titles) and wire titles into `purchaseReward` — `area:engine` (E1 = #94)
+- [ ] `feat(engine)`: implement `runRollover` orchestration (every missed day, ordered steps, events, open today) — `area:engine` (E2 = #95)
 - [ ] `feat(store)`: implement persisted stores; run rollover on load, on tab focus, and at local midnight — `area:frontend` (S1)
 - [ ] `fix(data)`: harden `lib/storage` (guarded reads and writes, per-key shape validation, schema mismatch, recovery report with raw backup) — `area:data` (C4)
 
@@ -186,7 +186,7 @@ All engine issues are blocked by C1 and C3, and include tests for the code they 
 
 **#20 Reward purchase** (PRD §2.1 Rewards, §7.7).
 
-- `purchaseReward(state, rewardId, now, newId)` as specified: Wallet only, snapshots, `totalPurchases`, titles. It returns an error result (no exception) when Wallet is short.
+- `purchaseReward(state, rewardId, now, newId)` as specified: Wallet only, snapshots, `totalPurchases`. Titles are wired into it later, in E1. It returns an error result (no exception) when Wallet is short.
 - Tests: exact balance leaves 0; one point short fails; repeat purchases; Lifetime XP and `statXP` unchanged; a later edit of the reward does not change the log.
 
 **#21 Titles** (PRD §2.1 Titles, §7.8).
