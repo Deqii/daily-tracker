@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Rank, Stat } from '../lib/types';
 import { RANKS, STATS } from '../lib/types';
-import { applyPenalty, buildRequired, evaluateDay } from './evaluation';
+import { applyPenalty, buildRequired, evaluateDay, nextPenaltyStats } from './evaluation';
 
 const PENALTY_BY_RANK: Record<Rank, number> = { E: 5, D: 8, C: 13, B: 20, A: 30, S: 45 };
 
@@ -94,6 +94,65 @@ describe('evaluateDay', () => {
       missed: [],
       satisfied: [],
     });
+  });
+});
+
+describe('nextPenaltyStats', () => {
+  it('flags a stat on its first miss', () => {
+    expect(nextPenaltyStats([], ['STR'], [], ['STR', 'VIT'])).toEqual(['STR']);
+  });
+
+  it('keeps a flag when a penalized stat is missed again (1 of 2)', () => {
+    expect(nextPenaltyStats(['STR'], ['STR'], [], ['STR'])).toEqual(['STR']);
+  });
+
+  it('clears a flag when a penalized stat meets its requirement (2 of 2)', () => {
+    expect(nextPenaltyStats(['STR'], [], ['STR'], ['STR'])).toEqual([]);
+  });
+
+  it('clears a stat that stops being quest-active even if it was flagged', () => {
+    expect(nextPenaltyStats(['STR'], [], [], [])).toEqual([]);
+  });
+
+  it('repeated misses never escalate the requirement past 2', () => {
+    const questStats = ['STR'] as const;
+    let flags: Stat[] = [];
+
+    for (let day = 0; day < 31; day++) {
+      flags = nextPenaltyStats(flags, ['STR'], [], questStats);
+
+      expect(flags).toEqual(['STR']);
+      expect(buildRequired(questStats, flags).STR).toBe(2);
+    }
+  });
+
+  it('adds missed stats, keeps unflagged satisfied stats unflagged, and returns fixed order', () => {
+    const all: Stat[] = ['STR', 'VIT', 'INT', 'DISC', 'SOC'];
+    const flags = nextPenaltyStats(['SOC', 'DISC'], ['INT'], ['DISC'], all);
+
+    expect(flags).toEqual(['INT', 'SOC']);
+  });
+
+  it('caps every flagged stat at 2 via buildRequired', () => {
+    const all: Stat[] = ['STR', 'VIT', 'INT', 'DISC', 'SOC'];
+    const flags = nextPenaltyStats([], all, [], all);
+
+    for (const stat of STATS) {
+      expect(buildRequired(all, flags)[stat]).toBe(2);
+    }
+  });
+
+  it('does not mutate its inputs', () => {
+    const prev = Object.freeze(['SOC'] as const);
+    const missed = Object.freeze(['STR'] as const);
+    const satisfied = Object.freeze([] as const);
+    const questStats = Object.freeze(['STR', 'SOC'] as const);
+
+    expect(nextPenaltyStats(prev, missed, satisfied, questStats)).toEqual(['STR', 'SOC']);
+    expect(prev).toEqual(['SOC']);
+    expect(missed).toEqual(['STR']);
+    expect(satisfied).toEqual([]);
+    expect(questStats).toEqual(['STR', 'SOC']);
   });
 });
 
