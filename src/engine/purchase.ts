@@ -1,6 +1,7 @@
 import type { RewardPurchase } from '../lib/types';
 import { toLocalDate, toTimestamp } from '../lib/date';
 import type { AppState, Result } from './state';
+import { applyTitleUnlocks } from './titles';
 
 export type PurchaseError = 'REWARD_NOT_FOUND' | 'INSUFFICIENT_WALLET';
 
@@ -10,7 +11,8 @@ export type PurchaseResult = Result<{ state: AppState; purchase: RewardPurchase 
  * Buys a repeatable reward with Wallet (PRD §7.7, decisions D7). Enforces `wallet >= cost`, deducts
  * from Wallet only (Lifetime XP and `statXP` are never touched), appends a `RewardPurchase` that
  * snapshots the reward's title and cost at that moment, and bumps `totalPurchases`. Because of the
- * snapshot, a later edit or deletion of the reward does not change history. Never mutates its input.
+ * snapshot, a later edit or deletion of the reward does not change history. Newly unlocked titles
+ * (including `first-reward`) are stored against the displayed streak. Never mutates its input.
  */
 export function purchaseReward(
   state: AppState,
@@ -40,7 +42,7 @@ export function purchaseReward(
   return {
     ok: true,
     value: {
-      state: {
+      state: applyTitleUnlocks({
         ...state,
         rewardPurchases: [...state.rewardPurchases, purchase],
         userState: {
@@ -48,7 +50,7 @@ export function purchaseReward(
           wallet: state.userState.wallet - reward.cost,
           totalPurchases: state.userState.totalPurchases + 1,
         },
-      },
+      }),
       purchase,
     },
   };

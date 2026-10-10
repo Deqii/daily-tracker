@@ -135,4 +135,22 @@ describe('purchaseReward', () => {
     });
     expect(result.value.purchase.purchasedAt).toContain('T');
   });
+
+  it('unlocks first-reward on the first purchase without repeating it', () => {
+    const first = purchaseReward(makeState(), 'r1', now, ids());
+
+    if (!first.ok) {
+      throw new Error('Expected a successful purchase');
+    }
+
+    expect(first.value.state.userState.unlockedTitles).toEqual(['first-reward']);
+
+    const second = purchaseReward(first.value.state, 'r1', now, ids());
+
+    if (!second.ok) {
+      throw new Error('Expected a successful purchase');
+    }
+
+    expect(second.value.state.userState.unlockedTitles).toEqual(['first-reward']);
+  });
 });

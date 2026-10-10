@@ -1,6 +1,7 @@
 import type { Rank, UserState } from '../lib/types';
-import { RANKS } from '../lib/types';
-import type { Result } from './state';
+import { RANKS, STATS } from '../lib/types';
+import { displayStreak } from './streak';
+import type { AppState, Result } from './state';
 
 export type TitleId =
   | 'streak-7'
@@ -87,6 +88,35 @@ export function evaluateTitles(input: TitlesInput): string[] {
   return TITLES.filter((title) => !unlocked.has(title.id) && title.condition(input)).map(
     (title) => title.id
   );
+}
+
+/**
+ * Appends the ids newly returned by `evaluateTitles` to `unlockedTitles`, never repeating an id
+ * (PRD §7.7). The displayed streak is read from the open day (`lastRolloverDate`), so a completion
+ * already logged today counts as one more. Used after a completion and after a purchase so the
+ * `rank-*` titles, `first-reward`, and `completions-100` unlock the first time they apply. The
+ * input is never mutated.
+ */
+export function applyTitleUnlocks(state: AppState): AppState {
+  const openDay = state.dailyQuestLog.find((day) => day.date === state.userState.lastRolloverDate);
+  const todayHasCompletion =
+    openDay !== undefined && STATS.some((stat) => openDay.actualCompletions[stat] > 0);
+  const unlockedTitleIds = evaluateTitles({
+    userState: state.userState,
+    displayedStreak: displayStreak(state.userState.currentStreak, todayHasCompletion),
+  });
+
+  if (unlockedTitleIds.length === 0) {
+    return state;
+  }
+
+  return {
+    ...state,
+    userState: {
+      ...state.userState,
+      unlockedTitles: [...state.userState.unlockedTitles, ...unlockedTitleIds],
+    },
+  };
 }
 
 /**
