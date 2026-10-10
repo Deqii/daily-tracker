@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import type { Stat } from '../lib/types';
-import { STATS } from '../lib/types';
-import { buildRequired, evaluateDay } from './evaluation';
+import type { Rank, Stat } from '../lib/types';
+import { RANKS, STATS } from '../lib/types';
+import { applyPenalty, buildRequired, evaluateDay } from './evaluation';
+
+const PENALTY_BY_RANK: Record<Rank, number> = { E: 5, D: 8, C: 13, B: 20, A: 30, S: 45 };
 
 const record = (entries: Partial<Record<Stat, number>>): Record<Stat, number> => {
   const result = {} as Record<Stat, number>;
@@ -92,5 +94,83 @@ describe('evaluateDay', () => {
       missed: [],
       satisfied: [],
     });
+  });
+});
+
+describe('applyPenalty', () => {
+  it('deducts the rank penalty once per missed stat from both balances', () => {
+    const result = applyPenalty({ lifetimeXP: 1000, wallet: 500 }, 'D', 3);
+
+    expect(result).toEqual({
+      lifetimeXP: 976,
+      wallet: 476,
+      xpDeducted: 24,
+      walletDeducted: 24,
+    });
+  });
+
+  it('clamps Lifetime XP at 0 while Wallet still takes the full deduction', () => {
+    const result = applyPenalty({ lifetimeXP: 10, wallet: 100 }, 'E', 3);
+
+    expect(result).toEqual({
+      lifetimeXP: 0,
+      wallet: 85,
+      xpDeducted: 10,
+      walletDeducted: 15,
+    });
+  });
+
+  it('clamps Wallet at 0 while Lifetime XP still takes the full deduction', () => {
+    const result = applyPenalty({ lifetimeXP: 100, wallet: 3 }, 'E', 1);
+
+    expect(result).toEqual({
+      lifetimeXP: 95,
+      wallet: 0,
+      xpDeducted: 5,
+      walletDeducted: 3,
+    });
+  });
+
+  it('clamps both balances at 0', () => {
+    const result = applyPenalty({ lifetimeXP: 4, wallet: 3 }, 'C', 2);
+
+    expect(result).toEqual({
+      lifetimeXP: 0,
+      wallet: 0,
+      xpDeducted: 4,
+      walletDeducted: 3,
+    });
+  });
+
+  it('deducts nothing when there are no missed stats', () => {
+    const state = { lifetimeXP: 17, wallet: 23 };
+
+    expect(applyPenalty(state, 'A', 0)).toEqual({
+      lifetimeXP: 17,
+      wallet: 23,
+      xpDeducted: 0,
+      walletDeducted: 0,
+    });
+  });
+
+  it('uses the penalty value of the rank', () => {
+    for (const rank of RANKS) {
+      const result = applyPenalty({ lifetimeXP: 1000, wallet: 1000 }, rank, 1);
+
+      expect(result.xpDeducted).toBe(PENALTY_BY_RANK[rank]);
+      expect(result.walletDeducted).toBe(PENALTY_BY_RANK[rank]);
+      expect(result.lifetimeXP).toBe(1000 - PENALTY_BY_RANK[rank]);
+      expect(result.wallet).toBe(1000 - PENALTY_BY_RANK[rank]);
+    }
+  });
+
+  it('does not mutate its input', () => {
+    const state = Object.freeze({ lifetimeXP: 20, wallet: 20 });
+
+    const result = applyPenalty(state, 'D', 1);
+
+    expect(result.lifetimeXP).toBe(12);
+    expect(result.wallet).toBe(12);
+    expect(state).toEqual({ lifetimeXP: 20, wallet: 20 });
   });
 });

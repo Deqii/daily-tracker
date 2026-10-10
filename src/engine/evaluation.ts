@@ -1,5 +1,6 @@
-import type { Stat } from '../lib/types';
+import type { Rank, Stat } from '../lib/types';
 import { STATS } from '../lib/types';
+import { getRankConfig } from './rank';
 
 /**
  * The required completion count per stat for a day: 0 for a stat that is not quest-active, 2 for a
@@ -57,4 +58,35 @@ export function evaluateDay(
   }
 
   return { missed, satisfied };
+}
+
+export interface PenaltyState {
+  readonly lifetimeXP: number;
+  readonly wallet: number;
+}
+
+export interface PenaltyResult {
+  lifetimeXP: number;
+  wallet: number;
+  xpDeducted: number;
+  walletDeducted: number;
+}
+
+/**
+ * Deducts `penalty(rank) × missedCount` from Lifetime XP and Wallet, each floored at 0
+ * (PRD §7.4; decisions D1, D2). `statXP` is not part of the input or output, and the input is
+ * never mutated. Reports how much was actually deducted from each, which differs from the nominal
+ * total when a balance is below it.
+ */
+export function applyPenalty(state: PenaltyState, rank: Rank, missedCount: number): PenaltyResult {
+  const total = getRankConfig(rank).penalty * missedCount;
+  const xpDeducted = Math.min(state.lifetimeXP, total);
+  const walletDeducted = Math.min(state.wallet, total);
+
+  return {
+    lifetimeXP: state.lifetimeXP - xpDeducted,
+    wallet: state.wallet - walletDeducted,
+    xpDeducted,
+    walletDeducted,
+  };
 }
