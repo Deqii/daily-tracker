@@ -1,4 +1,7 @@
 import type { Rank } from '../lib/types';
+import { RANKS } from '../lib/types';
+import type { StatXP } from './balance';
+import { passesBalanceGate } from './balance';
 
 export interface RankConfig {
   readonly rank: Rank;
@@ -53,4 +56,38 @@ export function rank(level: number): Rank {
 
   return RANK_CONFIGS.reduce((current, config) => (safeLevel >= config.minLevel ? config : current))
     .rank;
+}
+
+export type RankChange = 'up' | 'down' | null;
+
+export interface RankResolution {
+  readonly rank: Rank;
+  readonly change: RankChange;
+  readonly blocked: boolean;
+}
+
+/**
+ * Resolves the effective rank from the level rank and the balance gate (PRD §7.6, decisions D3).
+ * A rank drop is immediate and ungated. A rank-up would climb one step at a time toward the level
+ * rank, each step gated; because the gate depends only on `statXP` (never on rank), one gate check
+ * settles the whole climb. When it fails the rank stays and `blocked` is set.
+ */
+export function resolveRank(
+  currentRank: Rank,
+  level: number,
+  statXP: Readonly<StatXP>
+): RankResolution {
+  const levelRank = rank(level);
+
+  if (levelRank === currentRank) {
+    return { rank: currentRank, change: null, blocked: false };
+  }
+
+  if (RANKS.indexOf(levelRank) < RANKS.indexOf(currentRank)) {
+    return { rank: levelRank, change: 'down', blocked: false };
+  }
+
+  return passesBalanceGate(statXP).passes
+    ? { rank: levelRank, change: 'up', blocked: false }
+    : { rank: currentRank, change: null, blocked: true };
 }
