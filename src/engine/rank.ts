@@ -1,12 +1,13 @@
 import type { Rank } from '../lib/types';
 
 export interface RankConfig {
-  rank: Rank;
-  minLevel: number;
-  maxLevel: number;
-  freezesPerWeek: number;
-  maxPointsPerTask: number | null;
-  xpMultiplier: number;
+  readonly rank: Rank;
+  readonly minLevel: number;
+  readonly maxLevel: number;
+  readonly freezesPerWeek: number;
+  readonly maxPointsPerTask: number | null;
+  readonly xpMultiplier: number;
+  readonly penalty: number;
 }
 
 interface RankParams {
@@ -15,24 +16,25 @@ interface RankParams {
   freezesPerWeek: number;
   maxPointsPerTask: number | null;
   xpMultiplier: number;
+  penalty: number;
 }
 
 const RANK_PARAMS = [
-  { rank: 'E', minLevel: 1, freezesPerWeek: 1, maxPointsPerTask: 15, xpMultiplier: 0.5 },
-  { rank: 'D', minLevel: 6, freezesPerWeek: 1, maxPointsPerTask: 25, xpMultiplier: 0.7 },
-  { rank: 'C', minLevel: 11, freezesPerWeek: 2, maxPointsPerTask: 40, xpMultiplier: 0.85 },
-  { rank: 'B', minLevel: 21, freezesPerWeek: 2, maxPointsPerTask: 60, xpMultiplier: 1 },
-  { rank: 'A', minLevel: 36, freezesPerWeek: 3, maxPointsPerTask: 90, xpMultiplier: 1.15 },
-  { rank: 'S', minLevel: 51, freezesPerWeek: 3, maxPointsPerTask: null, xpMultiplier: 1.3 },
+  { rank: 'E', minLevel: 1, freezesPerWeek: 1, maxPointsPerTask: 15, xpMultiplier: 0.5, penalty: 5 },
+  { rank: 'D', minLevel: 6, freezesPerWeek: 1, maxPointsPerTask: 25, xpMultiplier: 0.7, penalty: 8 },
+  { rank: 'C', minLevel: 11, freezesPerWeek: 2, maxPointsPerTask: 40, xpMultiplier: 0.85, penalty: 13 },
+  { rank: 'B', minLevel: 21, freezesPerWeek: 2, maxPointsPerTask: 60, xpMultiplier: 1, penalty: 20 },
+  { rank: 'A', minLevel: 36, freezesPerWeek: 3, maxPointsPerTask: 90, xpMultiplier: 1.15, penalty: 30 },
+  { rank: 'S', minLevel: 51, freezesPerWeek: 3, maxPointsPerTask: null, xpMultiplier: 1.3, penalty: 45 },
 ] as const satisfies readonly RankParams[];
 
-export const RANK_CONFIGS: RankConfig[] = RANK_PARAMS.map((params, index) => {
+export const RANK_CONFIGS: readonly RankConfig[] = RANK_PARAMS.map((params, index) => {
   const next = RANK_PARAMS[index + 1];
 
-  return {
+  return Object.freeze({
     ...params,
     maxLevel: next ? next.minLevel - 1 : Number.POSITIVE_INFINITY,
-  };
+  });
 });
 
 export function getRankConfig(target: Rank): RankConfig {
