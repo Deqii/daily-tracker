@@ -14,10 +14,10 @@ How to read this file:
 This supersedes the top-to-bottom order wherever they differ.
 
 1. Merge the PR for #12.
-2. Checkpoint: C1, then C2, then C3. Commit the `.github/` files with the docs revision, and remove `--if-present` from the test steps in `ci.yml` once C1 is merged. Then pull #22 forward.
+2. Checkpoint: C1 (Vitest). Then the human adds `.github/workflows/ci.yml` (without `--if-present`) so tests run under three timezones. Then C2, C3, F, and #22 pulled forward.
 3. Engine rules: #13, #14, #15, #16, #17, #18, #19, #20, #21.
 4. Orchestrators: E1, E2. Then the remaining engine tests: #23, #24, #25.
-5. Milestone 3 in this order: #31, #28, #27, #29, #30, S1, #26.
+5. C4 (storage hardening), then Milestone 3 in this order: #31, #28, #27, #29, #30, S1, #26.
 6. Milestones 4 to 9 in order. U1 after #34. U2 after #53. U3 after #54.
 7. Milestone 10: #60, U4, U5, #61. #62 is human-only.
 
@@ -122,12 +122,14 @@ Full bodies with acceptance criteria are in the script.
 - [ ] `chore(setup)`: configure Vitest with a single-run `test` script and a smoke test — `area:frontend` (C1)
 - [ ] `feat(lib)`: implement local-date helpers (`toLocalDate`, `toTimestamp`, `addDays`, `daysBetween`, `eachDay`, `weekStart`) with tests — `area:data` (C2)
 - [ ] `fix(data)`: align persisted types, defaults, validation, and write errors with PRD v2 — `area:data` (C3)
+- [ ] `fix(engine)`: apply the rank cap in point calculation and return a reason from cap validation — `area:engine` (F)
 
 ### Orchestration, before Milestone 3
 
 - [ ] `feat(engine)`: implement `completeTask` orchestration (validation, points, XP, Wallet, statXP, log, events, titles) — `area:engine` (E1)
 - [ ] `feat(engine)`: implement `runRollover` orchestration (every missed day, ordered steps, events, open today) — `area:engine` (E2)
 - [ ] `feat(store)`: implement persisted stores; run rollover on load, on tab focus, and at local midnight — `area:frontend` (S1)
+- [ ] `fix(data)`: harden `lib/storage` (guarded reads and writes, per-key shape validation, schema mismatch, recovery report with raw backup) — `area:data` (C4)
 
 ### UI additions
 
@@ -139,75 +141,89 @@ Full bodies with acceptance criteria are in the script.
 
 ## Acceptance criteria for #13–#25
 
-All engine issues are blocked by C1 and C3, and include tests for the code they add. Terms: *quest-active* and *tracked* are defined in `PRD.md` §2.1.
+All engine issues are blocked by C1 and C3, and include tests for the code they add. Terms: _quest-active_ and _tracked_ are defined in `PRD.md` §2.1.
 
 **#13 Rotating-task selection** (PRD §2.1 Daily Quest, §7.3). "Active stat" in the title means quest-active.
+
 - `getQuestStats(tasks)` returns quest-active stats in the order STR, VIT, INT, DISC, SOC.
 - `selectDailyTasks(tasks, date)` returns the picked id per quest-active stat that has rotating tasks. Anchors are never returned. Seeded exactly as PRD §7.3; the result does not depend on input order.
 - One rotating task means that task; none means the stat is absent.
 - Tests: determinism and order independence; single and no rotating task; each of 3 candidates appears at least once over 60 consecutive dates; dates across a month and year boundary.
 
 **#14 Day evaluation** (PRD §7.4).
+
 - `buildRequired(questStats, penaltyStats)` returns 0, 1, or 2 per stat.
 - `evaluateDay(required, actual)` returns `missed` (`actual < required`, `required > 0`) and `satisfied` in the fixed stat order.
 - Tests: normal miss; 0 of 1; 1 of 2 is a miss; 2 of 2 is satisfied; a stat with `required = 0` appears in neither list.
 - Looping over several days is not part of this issue (see E2).
 
 **#15 Penalty deduction** (PRD §2.1, §7.4; decision D1, D2).
+
 - Add `penalty` to the rank config: E 5, D 8, C 13, B 20, A 30, S 45. This small edit to #10's file is in scope.
 - `applyPenalty(state, rank, missedCount)` deducts `penalty × missedCount` from Lifetime XP and Wallet, each floored at 0, and reports what was actually deducted. `statXP` is untouched and inputs are not mutated.
 - Tests: normal; XP clamps while Wallet does not; Wallet clamps while XP does not; both clamp; zero missed; penalty values per rank.
+- `RANK_CONFIGS` and each config become readonly (`as const` or `Object.freeze`). A rank config is never persisted.
 
 **#16 2x flag** (PRD §7.4).
+
 - `nextPenaltyStats(prev, missed, satisfied, questStats)` as specified. A required value never exceeds 2.
 - Tests: first miss flags; 1 of 2 under a flag keeps it; 2 of 2 clears it; a stat that stops being quest-active is cleared; repeated misses never produce 3.
 
 **#17 Streak and freezes** (PRD §2.1 Streaks, §7.5; D4). "One freeze/week" in the title means the freezes per week in the Rank table (1 to 3).
+
 - `closeDayStreak(streakState, day, rank)` implements the five steps. `displayStreak(currentStreak, todayHasCompletion)`.
 - Tests: Appendix A scenario 5 exactly; 2 freezes allowed at Rank C; more freezes used than allowed after a rank drop means none left; a day with no quest-active stats changes nothing; week reset on a Monday across a month and a year boundary.
 
 **#18 Balance gate** (PRD §2.1, §7.6). "Active stat" in the title means tracked.
+
 - `getTrackedStats(statXP)` and `passesBalanceGate(statXP)` with the integer comparison `2 × weakest × count ≥ sum` and `threshold = ceil(sum / (2 × count))`.
 - Tests: Appendix A scenario 4; a stat with zero completions is excluded; exactly 50% passes and one below fails; one tracked stat and none both pass.
 
 **#19 Rank resolution** (PRD §2.1, §7.6; D5).
+
 - `resolveRank(currentRank, level, statXP)`: down is immediate and ungated; up goes one step at a time, each step gated; `blocked` is set when the level rank stays above the result.
 - Tests: Appendix A scenario 3 and scenario 4's rank resolution lines; blocked at E with Level 6 and unbalanced stats; two steps up when balanced; re-climbing after a drop needs the gate again.
 
 **#20 Reward purchase** (PRD §2.1 Rewards, §7.7).
+
 - `purchaseReward(state, rewardId, now, newId)` as specified: Wallet only, snapshots, `totalPurchases`, titles. It returns an error result (no exception) when Wallet is short.
 - Tests: exact balance leaves 0; one point short fails; repeat purchases; Lifetime XP and `statXP` unchanged; a later edit of the reward does not change the log.
 
 **#21 Titles** (PRD §2.1 Titles, §7.8).
+
 - `TITLES` catalog, `evaluateTitles`, `equipTitle`.
 - Tests: each condition at its boundary (6 and 7 day streaks, 99 and 100 completions); no duplicates on repeated calls; a `rank-*` title only on the first time; equipping a locked id is rejected.
 
 **#22 Level and rank boundaries** (run right after C1; PRD Appendix B).
+
 - Every `level(xp)` vector in Appendix B, XP at or below 0 is Level 1, `rank(level)` at 5/6, 10/11, 20/21, 35/36, 50/51, and `getRankConfig` matches the Rank table.
 
 **#23 Rollover edge cases** (after E2).
+
 - Appendix A scenario 2 (several days away); a clock that moved back; month, year and leap-day boundaries; a week boundary; DST dates. Runs green under all three CI timezones.
 
 **#24 Penalty and 2x tests** (after E2).
+
 - Appendix A scenarios 1 to 3 through `runRollover` and `completeTask`: XP, Wallet, flags, events.
 
 **#25 Balance gate tests** (after E2).
+
 - Appendix A scenario 4 through the orchestrators, including a stat with zero completions.
 
 ## Notes for later issues
 
-| Issue | Note |
-|---|---|
-| #26 | Needs S1 first (chips read derived stores). |
-| #27 | Hash router, no library: `#/today`, `#/tasks`, `#/rewards`, `#/history`, `#/settings`; default `#/today`; unknown hash goes to Today (D13). |
-| #28 | Theme stored under `daily-tracker:theme`, default dark, sets `data-theme` on `<html>` (D16). |
-| #31 | Implement `design.md` §2 verbatim (dark and light). `data-rank` on `<html>` follows the effective rank (set by S1). Fonts per D15. |
-| #35, #49 | In-house SVG with the accessible labels from `design.md` §9 (D14). |
-| #37, #38 | The checklist and completion call `completeTask` through the stores. No game logic in components. |
-| #40 | "Active-count header" means the task count shown in `design.md` ("11 tasks"). |
-| #48 | Buying calls `purchaseReward` through the stores. |
+| Issue    | Note                                                                                                                                                          |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #26      | Needs S1 first (chips read derived stores).                                                                                                                   |
+| #27      | Hash router, no library: `#/today`, `#/tasks`, `#/rewards`, `#/history`, `#/settings`; default `#/today`; unknown hash goes to Today (D13).                   |
+| #28      | Theme stored under `daily-tracker:theme`, default dark, sets `data-theme` on `<html>` (D16).                                                                  |
+| #31      | Implement `design.md` §2 verbatim (dark and light). `data-rank` on `<html>` follows the effective rank (set by S1). Fonts per D15.                            |
+| #35, #49 | In-house SVG with the accessible labels from `design.md` §9 (D14).                                                                                            |
+| #37, #38 | The checklist and completion call `completeTask` through the stores. No game logic in components.                                                             |
+| #40      | "Active-count header" means the task count shown in `design.md` ("11 tasks").                                                                                 |
+| #48      | Buying calls `purchaseReward` through the stores.                                                                                                             |
 | #54, #55 | Export and import the keys in PRD §6 except the theme. Import validates `schemaVersion` and shapes without a validation library; any failure changes nothing. |
-| #56–#59 | `design.md` §6. |
-| #60 | Copy in `design.md` §7. |
-| #61 | Both themes. Contrast already follows `design.md` §2 and §9. |
-| #62 | Human-only (domain, DNS). The agent may prepare static-hosting config only. |
+| #56–#59  | `design.md` §6.                                                                                                                                               |
+| #60      | Copy in `design.md` §7.                                                                                                                                       |
+| #61      | Both themes. Contrast already follows `design.md` §2 and §9.                                                                                                  |
+| #62      | Human-only (domain, DNS). The agent may prepare static-hosting config only.                                                                                   |

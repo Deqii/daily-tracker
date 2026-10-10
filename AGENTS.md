@@ -31,7 +31,7 @@ Never edit `docs/`. If a doc is wrong or incomplete, say so in your report.
 - Before starting: `git switch main && git pull --ff-only`. Check that the issues this one depends on are closed (the issue's "Blocked by", or the execution order in `docs/tasks.md`). If not, stop and report. If the issue already has an open PR or a branch, stop and report.
 - Branch: `<type>/<N>-<short-kebab-description>`, for example `feat/13-daily-rotation`. `<type>` is the Conventional Commit type of the issue title.
 - Implement only this issue's scope and acceptance criteria. If you must touch code outside it, stop and report instead of expanding scope.
-- Every `feat` and `fix` in `engine/`, `lib/`, or the data layer ships with unit tests for the code it adds (co-located `name.test.ts`).
+- Every `feat` and `fix` in `engine/`, `lib/`, or the data layer ships with unit tests for the code it adds (co-located `name.test.ts`). This applies from the first issue after Vitest is installed. Code merged earlier gets its tests from the checkpoint issues and #22.
 - Commits: Conventional Commits in English, imperative, subject at most 72 characters: `type(scope): description`. Type and scope come from the issue title. Add the footer `Refs #N`.
 - PR: the title equals the issue title (shortened to 72 characters if needed). The body follows `.github/pull_request_template.md` and ends with `Closes #N`. Open it with `gh pr create`. Do not merge.
 - After the PR is open, stop. Report in at most 5 lines: what changed, tests added, checks run, assumptions you had to make, anything skipped. Do not start another issue.
