@@ -390,3 +390,140 @@ describe('runRollover', () => {
     });
   });
 });
+
+/**
+ * Day-boundary coverage for `runRollover`. The engine only ever sees `LocalDate` strings and does
+ * UTC calendar arithmetic (`lib/date`), so every assertion here is a plain date sequence and holds
+ * under any process timezone, including the three CI timezones.
+ */
+describe('runRollover day-boundary edge cases', () => {
+  const closedDates = (state: AppState): LocalDate[] =>
+    state.dailyQuestLog.filter((day) => day.closed).map((day) => day.date);
+
+  const closedXPEnds = (state: AppState): (number | null)[] =>
+    state.dailyQuestLog.filter((day) => day.closed).map((day) => day.lifetimeXPEnd);
+
+  const rollover = (
+    from: LocalDate,
+    to: LocalDate,
+    overrides: Partial<UserState> = {},
+    log: DailyQuestDay[] = [openDay(from)]
+  ) => {
+    const state = makeState({
+      userState: { lifetimeXP: 100, wallet: 100, lastRolloverDate: from, ...overrides },
+      dailyQuestLog: log,
+    });
+
+    return runRollover(state, to, ids());
+  };
+
+  it('closes days across a month boundary', () => {
+    const { state: next, events } = rollover('2026-01-30', '2026-02-02');
+
+    expect(closedDates(next)).toEqual(['2026-01-30', '2026-01-31', '2026-02-01']);
+    expect(closedXPEnds(next)).toEqual([75, 50, 25]);
+    expect(next.dailyQuestLog.find((day) => day.date === '2026-02-02')).toMatchObject({
+      closed: false,
+    });
+    expect(next.userState.lastRolloverDate).toBe('2026-02-02');
+    expect(events).toEqual([]);
+  });
+
+  it('closes days across a year boundary', () => {
+    const { state: next, events } = rollover('2025-12-30', '2026-01-02');
+
+    expect(closedDates(next)).toEqual(['2025-12-30', '2025-12-31', '2026-01-01']);
+    expect(closedXPEnds(next)).toEqual([75, 50, 25]);
+    expect(next.userState.lastRolloverDate).toBe('2026-01-02');
+    expect(events).toEqual([]);
+  });
+
+  it('closes the leap day 2028-02-29', () => {
+    const { state: next, events } = rollover('2028-02-28', '2028-03-02');
+
+    expect(closedDates(next)).toEqual(['2028-02-28', '2028-02-29', '2028-03-01']);
+    expect(closedXPEnds(next)).toEqual([75, 50, 25]);
+    expect(next.userState.lastRolloverDate).toBe('2028-03-02');
+    expect(events).toEqual([]);
+  });
+
+  it('resets freezesUsedThisWeek to 0 on the first day of a new week', () => {
+    const { state: next } = rollover(
+      '2026-10-11',
+      '2026-10-13',
+      {
+        currentStreak: 5,
+        freezesUsedThisWeek: 1,
+        lastFreezeWeekReset: '2026-10-05',
+      },
+      [
+        openDay('2026-10-11', { actualCompletions: requiredAll() }),
+        openDay('2026-10-12', { actualCompletions: requiredAll() }),
+      ]
+    );
+
+    expect(closedDates(next)).toEqual(['2026-10-11', '2026-10-12']);
+    expect(next.userState.currentStreak).toBe(7);
+    expect(next.userState.freezesUsedThisWeek).toBe(0);
+    expect(next.userState.lastFreezeWeekReset).toBe('2026-10-12');
+  });
+
+  it('grants a fresh freeze on Monday after the previous week used its only one', () => {
+    const { state: next } = rollover('2026-10-11', '2026-10-13', {
+      currentStreak: 5,
+      freezesUsedThisWeek: 1,
+      lastFreezeWeekReset: '2026-10-05',
+    });
+
+    const sunday = next.dailyQuestLog.find((day) => day.date === '2026-10-11');
+    const monday = next.dailyQuestLog.find((day) => day.date === '2026-10-12');
+
+    expect(sunday).toMatchObject({ closed: true, freezeUsed: false });
+    expect(monday).toMatchObject({ closed: true, freezeUsed: true });
+    expect(next.userState).toMatchObject({
+      currentStreak: 0,
+      freezesUsedThisWeek: 1,
+      lastFreezeWeekReset: '2026-10-12',
+    });
+  });
+
+  it.each([
+    {
+      name: 'US spring-forward',
+      from: '2026-03-06',
+      to: '2026-03-10',
+      expected: ['2026-03-06', '2026-03-07', '2026-03-08', '2026-03-09'],
+    },
+    {
+      name: 'US fall-back',
+      from: '2026-10-30',
+      to: '2026-11-03',
+      expected: ['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02'],
+    },
+    {
+      name: 'EU fall-back',
+      from: '2026-10-23',
+      to: '2026-10-27',
+      expected: ['2026-10-23', '2026-10-24', '2026-10-25', '2026-10-26'],
+    },
+  ])('closes every calendar day across the $name DST transition', ({ from, to, expected }) => {
+    const { state: next, events } = rollover(from, to);
+
+    expect(closedDates(next)).toEqual(expected);
+    expect(closedXPEnds(next)).toEqual([75, 50, 25, 0]);
+    expect(next.userState.lastRolloverDate).toBe(to);
+    expect(next.dailyQuestLog.find((day) => day.date === to)).toMatchObject({ closed: false });
+    expect(events).toEqual([]);
+  });
+
+  it('returns the state unchanged when the clock moved back across a month boundary', () => {
+    const state = makeState({
+      userState: { lastRolloverDate: '2026-11-02' },
+      dailyQuestLog: [openDay('2026-11-02')],
+    });
+    const result = runRollover(state, '2026-10-30', ids());
+
+    expect(result.state).toBe(state);
+    expect(result.events).toEqual([]);
+  });
+});
