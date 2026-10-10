@@ -60,6 +60,30 @@ export function evaluateDay(
   return { missed, satisfied };
 }
 
+/**
+ * The penalty flags carried into the next day (PRD §7.4): a stat stays or becomes flagged when it
+ * is missed, is un-flagged when it meets its requirement (landed in `satisfied`), and is always
+ * cleared once it is no longer quest-active. Each stat appears at most once, so a required value can
+ * never exceed 2 no matter how many consecutive days the stat is missed. The result follows the
+ * fixed stat order.
+ */
+export function nextPenaltyStats(
+  prev: readonly Stat[],
+  missed: readonly Stat[],
+  satisfied: readonly Stat[],
+  questStats: readonly Stat[]
+): Stat[] {
+  const questActive = new Set(questStats);
+  const satisfiedSet = new Set(satisfied);
+  const flagged = new Set(prev);
+
+  for (const stat of missed) {
+    flagged.add(stat);
+  }
+
+  return STATS.filter((stat) => questActive.has(stat) && flagged.has(stat) && !satisfiedSet.has(stat));
+}
+
 export interface PenaltyState {
   readonly lifetimeXP: number;
   readonly wallet: number;
