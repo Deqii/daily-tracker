@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import globals from 'globals';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import svelte from 'eslint-plugin-svelte';
@@ -16,11 +17,9 @@ export default [
     languageOptions: {
       parser: tsParser,
       globals: {
-        document: 'readonly',
-        window: 'readonly',
-        browser: true,
-        es2022: true,
-        node: true,
+        ...globals.browser,
+        ...globals.es2022,
+        ...globals.node,
       },
     },
     plugins: {
@@ -46,11 +45,9 @@ export default [
         parser: tsParser,
       },
       globals: {
-        document: 'readonly',
-        window: 'readonly',
-        browser: true,
-        es2022: true,
-        node: true,
+        ...globals.browser,
+        ...globals.es2022,
+        ...globals.node,
       },
     },
     plugins: {
