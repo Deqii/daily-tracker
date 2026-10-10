@@ -1,4 +1,4 @@
-import { formatLocalIsoDate } from './date';
+import { toLocalDate } from './date';
 import type { Completion, DailyQuestDay, Reward, RewardPurchase, Task, UserState } from './types';
 
 /** Value type held under each localStorage key, per the PRD data model. */
@@ -48,7 +48,7 @@ export function write<K extends keyof StorageSchema>(key: K, value: StorageSchem
 }
 
 export function createDefaultUserState(): UserState {
-  const today = formatLocalIsoDate();
+  const today = toLocalDate(new Date());
 
   return {
     lifetimeXP: 0,
