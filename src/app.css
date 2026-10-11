@@ -1,1 +1,116 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/manrope';
+@import '@fontsource-variable/jetbrains-mono';
+
+:root {
+  color-scheme: dark;
+
+  /* surfaces and text */
+  --bg: #0a0e14; /* page and panel background */
+  --surface: #1a2230; /* hairlines, dividers, empty bar tracks */
+  --text: #dce8f0;
+  --text-muted: #8fa0b2; /* secondary text, labels, helper text */
+  --icon-muted: #5b6b7a; /* non-text icons only: empty circle, lock */
+
+  /* actions and states */
+  --action: #2fa8e8; /* button fill, at every rank */
+  --action-text: #0a0e14; /* text on --action */
+  --action-ink: #2fa8e8; /* signal-blue text, check icons, nav underline */
+  --danger: #e8544a; /* penalty and warning states, destructive confirm */
+
+  /* effort tiers */
+  --tier-ringan: #4fd1a8;
+  --tier-sedang: #2fa8e8;
+  --tier-berat: #e8544a;
+
+  /* coin */
+  --coin: #f2c94c;
+  --coin-rim: #c9982e;
+
+  /* rank accents */
+  --rank-e: #7fb2d9;
+  --rank-d: #2fa8e8;
+  --rank-c: #4fd1a8;
+  --rank-b: #9b6fe8;
+  --rank-a: #f0a93a;
+  --rank-s: #ffe9a8;
+
+  /* current rank */
+  --accent: var(--rank-e);
+  --glow-px: 6px;
+  --glow-alpha: 60%;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f2f5f8;
+  --surface: #dce3ea;
+  --text: #0f1620;
+  --text-muted: #4b5967;
+  --icon-muted: #667584;
+  --action-ink: #0a6aa0; /* --action and --action-text stay the same */
+  --danger: #b83228;
+  --tier-ringan: #0a7658;
+  --tier-sedang: #0a6aa0;
+  --tier-berat: #b83228;
+  --rank-e: #2a6a99;
+  --rank-d: #0a6aa0;
+  --rank-c: #0a7658;
+  --rank-b: #643ab8;
+  --rank-a: #8f5400;
+  --rank-s: #735300;
+  --glow-alpha: 30%;
+}
+
+:root[data-rank='E'] {
+  --accent: var(--rank-e);
+  --glow-px: 6px;
+}
+:root[data-rank='D'] {
+  --accent: var(--rank-d);
+  --glow-px: 8px;
+}
+:root[data-rank='C'] {
+  --accent: var(--rank-c);
+  --glow-px: 10px;
+}
+:root[data-rank='B'] {
+  --accent: var(--rank-b);
+  --glow-px: 12px;
+}
+:root[data-rank='A'] {
+  --accent: var(--rank-a);
+  --glow-px: 14px;
+}
+:root[data-rank='S'] {
+  --accent: var(--rank-s);
+  --glow-px: 18px;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-icon-muted: var(--icon-muted);
+  --color-action: var(--action);
+  --color-action-text: var(--action-text);
+  --color-action-ink: var(--action-ink);
+  --color-danger: var(--danger);
+  --color-accent: var(--accent);
+  --color-tier-ringan: var(--tier-ringan);
+  --color-tier-sedang: var(--tier-sedang);
+  --color-tier-berat: var(--tier-berat);
+  --color-coin: var(--coin);
+  --color-coin-rim: var(--coin-rim);
+  --font-sans: 'Manrope Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --radius-sm: 2px;
+}
+
+.glow-text {
+  text-shadow: 0 0 var(--glow-px) color-mix(in srgb, var(--accent) var(--glow-alpha), transparent);
+}
+.glow-box {
+  box-shadow: 0 0 var(--glow-px) color-mix(in srgb, var(--accent) var(--glow-alpha), transparent);
+}
