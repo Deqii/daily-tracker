@@ -1,10 +1,21 @@
 <script lang="ts">
-  import ThemeToggle from './components/ThemeToggle.svelte';
-
-  let title = 'Daily Tracker';
+  import Today from './pages/Today.svelte';
+  import Tasks from './pages/Tasks.svelte';
+  import Rewards from './pages/Rewards.svelte';
+  import History from './pages/History.svelte';
+  import Settings from './pages/Settings.svelte';
+  import { currentRoute, type Route } from './lib/router';
+  import type { Component } from 'svelte';
+  
+  const routes: Record<Route, Component> = {
+    today: Today,
+    tasks: Tasks,
+    rewards: Rewards,
+    history: History,
+    settings: Settings,
+  };
 </script>
 
-<main class="flex items-center justify-between p-4">
-  <h1>{title}</h1>
-  <ThemeToggle />
+<main>
+  <svelte:component this={routes[$currentRoute]} />
 </main>
