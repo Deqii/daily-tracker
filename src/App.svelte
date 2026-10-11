@@ -1,4 +1,5 @@
 <script lang="ts">
+  import TopBar from './components/TopBar.svelte';
   import Today from './pages/Today.svelte';
   import Tasks from './pages/Tasks.svelte';
   import Rewards from './pages/Rewards.svelte';
@@ -15,6 +16,8 @@
     settings: Settings,
   };
 </script>
+
+<TopBar />
 
 <main>
   <svelte:component this={routes[$currentRoute]} />
