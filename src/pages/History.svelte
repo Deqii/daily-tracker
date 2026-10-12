@@ -1,6 +1,8 @@
 <script lang="ts">
+  import DayByDayLog from '../components/DayByDayLog.svelte';
   import PanelFrame from '../components/PanelFrame.svelte';
   import XpTrendChart from '../components/XpTrendChart.svelte';
+  import { buildDailyLog } from '../lib/daily-log';
   import { buildXpTrend, type TrendRange } from '../lib/xp-trend';
   import { app } from '../stores/app';
 
@@ -21,6 +23,9 @@
       $app.userState.lastRolloverDate,
       range
     )
+  );
+  const log = $derived(
+    buildDailyLog($app.dailyQuestLog, $app.milestoneEvents, $app.userState.lastRolloverDate, range)
   );
 </script>
 
@@ -51,6 +56,10 @@
       </div>
 
       <XpTrendChart {points} />
+
+      {#key range}
+        <DayByDayLog rows={log} {range} />
+      {/key}
     </PanelFrame>
   </div>
 </section>
