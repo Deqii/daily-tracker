@@ -30,7 +30,7 @@ function task(id: string, stat: Stat, isAnchor: boolean, points: number[]): Task
     stat,
     isAnchor,
     variants: points.map((value, index) => ({
-      tier: index === 0 ? 'ringan' : index === 1 ? 'sedang' : 'berat',
+      tier: index === 0 ? 'easy' : index === 1 ? 'medium' : 'hard',
       description: id,
       points: value,
     })),

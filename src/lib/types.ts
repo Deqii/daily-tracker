@@ -1,6 +1,6 @@
 export type Stat = 'STR' | 'VIT' | 'INT' | 'DISC' | 'SOC';
 export type Rank = 'E' | 'D' | 'C' | 'B' | 'A' | 'S';
-export type Tier = 'ringan' | 'sedang' | 'berat';
+export type Tier = 'easy' | 'medium' | 'hard';
 export type LocalDate = string; // 'YYYY-MM-DD', device-local day
 export type Timestamp = string; // ISO 8601 with UTC offset
 
@@ -88,4 +88,4 @@ export type MilestoneEvent =
 
 export const STATS: readonly Stat[] = ['STR', 'VIT', 'INT', 'DISC', 'SOC'];
 export const RANKS: readonly Rank[] = ['E', 'D', 'C', 'B', 'A', 'S'];
-export const TIERS: readonly Tier[] = ['ringan', 'sedang', 'berat'];
+export const TIERS: readonly Tier[] = ['easy', 'medium', 'hard'];

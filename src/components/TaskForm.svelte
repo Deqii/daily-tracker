@@ -20,9 +20,9 @@
   let { task = null, onsave, oncancel }: Props = $props();
 
   const TIER_MARKER_CLASS: Record<Tier, string> = {
-    ringan: 'bg-tier-ringan',
-    sedang: 'bg-tier-sedang',
-    berat: 'bg-tier-berat',
+    easy: 'bg-tier-easy',
+    medium: 'bg-tier-medium',
+    hard: 'bg-tier-hard',
   };
 
   const FIELD_CLASS =

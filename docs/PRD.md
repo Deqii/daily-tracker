@@ -6,7 +6,7 @@ Version 2, revised at issue #12. This document is the source of truth for mechan
 
 Daily Tracker is a gamified habit-tracking web application built on a **token-economy model**: point values are fixed, visible, and predictable, never randomized. Tasks are grouped under five fixed character stats (Strength, Vitality, Intellect, Discipline, Social). Completing tasks earns points that raise a stat, a total Level, and a Rank (E through S); missing tasks has real, bounded consequences rather than being consequence-free.
 
-The system is deliberately inspired by "status window" progression fiction (LitRPG-style rank/stat growth) rather than a flat points-and-badges tracker. This is a considered pivot away from the project's original no-punishment principle: real stakes were chosen specifically to force long-term consistency over a 1–5 year horizon, in exchange for a genuine risk of losing progress.
+The system is delihardely inspired by "status window" progression fiction (LitRPG-style rank/stat growth) rather than a flat points-and-badges tracker. This is a considered pivot away from the project's original no-punishment principle: real stakes were chosen specifically to force long-term consistency over a 1–5 year horizon, in exchange for a genuine risk of losing progress.
 
 The application runs entirely client-side for this phase: all data lives in the browser via `localStorage`. No server, database, or account system is involved.
 
@@ -27,7 +27,7 @@ The application runs entirely client-side for this phase: all data lives in the 
 
 - Every task belongs to exactly one of five fixed stats: STR, VIT, INT, DISC, SOC.
 - A task is either an anchor task (always appears in the Daily Quest, never rotates) or a rotating task (the app picks one rotating task per stat each day).
-- A task has one to three effort variants — Ringan, Sedang, Berat, each tier at most once — each with its own short description and fixed nominal point value (an integer ≥ 1). A task with exactly one variant is _single-tier_: the UI shows no tier name and no picker, and its completions record `variantTier: null`.
+- A task has one to three effort variants — easy, medium, hard, each tier at most once — each with its own short description and fixed nominal point value (an integer ≥ 1). A task with exactly one variant is _single-tier_: the UI shows no tier name and no picker, and its completions record `variantTier: null`.
 - A variant's nominal value is capped by the user's current Rank (_Max points/task_ in the Rank table). The app prevents saving a variant above the current cap. If the Rank later drops below a stored value, the stored value stays, awards use `min(nominal, cap)`, and the Tasks page marks the variant "Over cap".
 
 **Daily Quest**
@@ -43,7 +43,7 @@ The application runs entirely client-side for this phase: all data lives in the 
 
 - Two separate point pools exist: **Lifetime XP** (drives Level and Rank; decreases only through the penalty above) and **Wallet** (spendable on Rewards; reduced by the penalty and by purchases).
 - Points awarded for a completion are `ceil(min(nominal, cap) × multiplier)`, using the Rank in effect at that moment. The same amount is added to Lifetime XP, Wallet, and the stat's `statXP`. (Checked: `Math.ceil` with the table multipliers has no floating-point drift for nominal values up to 100,000.)
-- Level is derived from Lifetime XP. The XP required to reach level N is `14 × (N − 1)²`, so `level(xp) = floor(sqrt(xp / 14)) + 1`, and any `xp ≤ 0` is Level 1. The curve is deliberately steep at higher levels so the full E-to-S arc spans roughly 1–5 years of consistent use.
+- Level is derived from Lifetime XP. The XP required to reach level N is `14 × (N − 1)²`, so `level(xp) = floor(sqrt(xp / 14)) + 1`, and any `xp ≤ 0` is Level 1. The curve is delihardely steep at higher levels so the full E-to-S arc spans roughly 1–5 years of consistent use.
 - The **level rank** is the Rank whose Level range contains the current Level (`rank(level)`). The user's **effective rank** is stored in `UserState.rank` and applies the balance gate:
   - If the level rank is lower than the effective rank, the effective rank drops to it immediately. There is no floor once a rank has been reached, and no gate on the way down.
   - If the level rank is higher, the effective rank rises one step at a time, and each step needs the **balance gate** to pass. If it fails, the rank-up is _blocked_, the effective rank stays, and the UI says why.
@@ -168,7 +168,7 @@ A fully client-side single-page app. Svelte components render the UI and read/wr
 ```typescript
 type Stat = 'STR' | 'VIT' | 'INT' | 'DISC' | 'SOC';
 type Rank = 'E' | 'D' | 'C' | 'B' | 'A' | 'S';
-type Tier = 'ringan' | 'sedang' | 'berat';
+type Tier = 'easy' | 'medium' | 'hard';
 type LocalDate = string; // 'YYYY-MM-DD', device-local day
 type Timestamp = string; // ISO 8601 with UTC offset, e.g. '2026-10-04T10:15:30+07:00'
 

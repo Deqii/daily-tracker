@@ -8,7 +8,7 @@ const task = (id: string, stat: Stat, isAnchor: boolean): Task => ({
   familyName: `Task ${id}`,
   stat,
   isAnchor,
-  variants: [{ tier: 'ringan', description: 'A short effort', points: 5 }],
+  variants: [{ tier: 'easy', description: 'A short effort', points: 5 }],
   createdAt: '2026-10-10T10:00:00+07:00',
 });
 

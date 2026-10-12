@@ -128,7 +128,7 @@ Choices made while revising the PRD at issue #12. Each has a default that the PR
 
 ## Retired
 
-- **R1. Quest tier (Normal / Elite / Boss).** An earlier draft derived a label from a task's point value. It solved the same problem as the effort variants (Ringan / Sedang / Berat) and was dropped. Do not implement it.
+- **R1. Quest tier (Normal / Elite / Boss).** An earlier draft derived a label from a task's point value. It solved the same problem as the effort variants (easy / medium / hard) and was dropped. Do not implement it.
 
 ## Parked (not in this phase)
 

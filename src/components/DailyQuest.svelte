@@ -11,9 +11,9 @@
   const questRows = app.questRows;
 
   const TIER_MARKER_CLASS: Record<Tier, string> = {
-    ringan: 'bg-tier-ringan',
-    sedang: 'bg-tier-sedang',
-    berat: 'bg-tier-berat',
+    easy: 'bg-tier-easy',
+    medium: 'bg-tier-medium',
+    hard: 'bg-tier-hard',
   };
 
   let expandedTaskId = $state<string | null>(null);

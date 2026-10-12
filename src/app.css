@@ -19,9 +19,9 @@
   --danger: #e8544a; /* penalty and warning states, destructive confirm */
 
   /* effort tiers */
-  --tier-ringan: #4fd1a8;
-  --tier-sedang: #2fa8e8;
-  --tier-berat: #e8544a;
+  --tier-easy: #4fd1a8;
+  --tier-medium: #2fa8e8;
+  --tier-hard: #e8544a;
 
   /* coin */
   --coin: #f2c94c;
@@ -50,9 +50,9 @@
   --icon-muted: #667584;
   --action-ink: #0a6aa0; /* --action and --action-text stay the same */
   --danger: #b83228;
-  --tier-ringan: #0a7658;
-  --tier-sedang: #0a6aa0;
-  --tier-berat: #b83228;
+  --tier-easy: #0a7658;
+  --tier-medium: #0a6aa0;
+  --tier-hard: #b83228;
   --rank-e: #2a6a99;
   --rank-d: #0a6aa0;
   --rank-c: #0a7658;
@@ -98,9 +98,9 @@
   --color-action-ink: var(--action-ink);
   --color-danger: var(--danger);
   --color-accent: var(--accent);
-  --color-tier-ringan: var(--tier-ringan);
-  --color-tier-sedang: var(--tier-sedang);
-  --color-tier-berat: var(--tier-berat);
+  --color-tier-easy: var(--tier-easy);
+  --color-tier-medium: var(--tier-medium);
+  --color-tier-hard: var(--tier-hard);
   --color-coin: var(--coin);
   --color-coin-rim: var(--coin-rim);
   --font-sans: 'Manrope Variable', ui-sans-serif, system-ui, sans-serif;

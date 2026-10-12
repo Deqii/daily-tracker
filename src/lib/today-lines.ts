@@ -17,9 +17,9 @@ const STAT_LABELS: Record<Stat, string> = {
 
 /** Display labels for the three effort tiers, as written in copy (design §5). */
 const TIER_LABELS: Record<Tier, string> = {
-  ringan: 'Ringan',
-  sedang: 'Sedang',
-  berat: 'Berat',
+  easy: 'Easy',
+  medium: 'Medium',
+  hard: 'Hard',
 };
 
 /** The copy label for a stat: `STR` renders as `Str`, and so on (design §5). */
@@ -27,7 +27,7 @@ export function statLabel(stat: Stat): string {
   return STAT_LABELS[stat];
 }
 
-/** The copy label for an effort tier: `ringan` renders as `Ringan`, and so on (design §5). */
+/** The copy label for an effort tier: `easy` renders as `easy`, and so on (design §5). */
 export function tierLabel(tier: Tier): string {
   return TIER_LABELS[tier];
 }

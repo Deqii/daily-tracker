@@ -16,7 +16,7 @@ const task = (overrides: Partial<Task> = {}): Task => ({
   familyName: 'Push up',
   stat: 'STR',
   isAnchor: true,
-  variants: [{ tier: 'ringan', description: '5 reps', points: 5 }],
+  variants: [{ tier: 'easy', description: '5 reps', points: 5 }],
   createdAt: '2026-10-01T00:00:00+00:00',
   ...overrides,
 });
@@ -144,15 +144,15 @@ describe('completeTask', () => {
   it('returns VARIANT_NOT_FOUND when a multi-variant task lacks a matching tier', () => {
     const variants = task({
       variants: [
-        { tier: 'ringan', description: '5 reps', points: 5 },
-        { tier: 'berat', description: '20 reps', points: 20 },
+        { tier: 'easy', description: '5 reps', points: 5 },
+        { tier: 'hard', description: '20 reps', points: 20 },
       ],
     });
 
     expect(
       completeTask(
         makeState({ tasks: [variants] }),
-        { taskId: 't1', variantTier: 'sedang' },
+        { taskId: 't1', variantTier: 'medium' },
         now,
         ids()
       )
@@ -206,21 +206,21 @@ describe('completeTask', () => {
   it('records the matching tier for a multi-variant task', () => {
     const variants = task({
       variants: [
-        { tier: 'ringan', description: '5 reps', points: 5 },
-        { tier: 'berat', description: '20 reps', points: 20 },
+        { tier: 'easy', description: '5 reps', points: 5 },
+        { tier: 'hard', description: '20 reps', points: 20 },
       ],
     });
 
     const value = expectOk(
       completeTask(
         makeState({ tasks: [variants] }),
-        { taskId: 't1', variantTier: 'berat' },
+        { taskId: 't1', variantTier: 'hard' },
         now,
         ids()
       )
     );
 
-    expect(value.completion.variantTier).toBe('berat');
+    expect(value.completion.variantTier).toBe('hard');
     expect(value.completion.pointsAwarded).toBe(8);
   });
 
@@ -262,7 +262,7 @@ describe('completeTask', () => {
   });
 
   it('emits one levelUp event crossing 126 XP', () => {
-    const big = task({ variants: [{ tier: 'berat', description: '15 reps', points: 15 }] });
+    const big = task({ variants: [{ tier: 'hard', description: '15 reps', points: 15 }] });
 
     const value = expectOk(
       completeTask(
@@ -288,7 +288,7 @@ describe('completeTask', () => {
   });
 
   it('emits one levelUp event even when several levels are crossed', () => {
-    const huge = task({ variants: [{ tier: 'berat', description: 'huge', points: 50000 }] });
+    const huge = task({ variants: [{ tier: 'hard', description: 'huge', points: 50000 }] });
 
     const value = expectOk(
       completeTask(
@@ -311,7 +311,7 @@ describe('completeTask', () => {
   });
 
   it('emits a rankUp event when the gate passes', () => {
-    const big = task({ variants: [{ tier: 'berat', description: '15 reps', points: 15 }] });
+    const big = task({ variants: [{ tier: 'hard', description: '15 reps', points: 15 }] });
 
     const value = expectOk(
       completeTask(
@@ -350,7 +350,7 @@ describe('completeTask', () => {
   });
 
   it('holds the rank and emits no rankUp event when the gate blocks', () => {
-    const big = task({ variants: [{ tier: 'berat', description: '15 reps', points: 15 }] });
+    const big = task({ variants: [{ tier: 'hard', description: '15 reps', points: 15 }] });
 
     const value = expectOk(
       completeTask(
@@ -405,7 +405,7 @@ describe('completeTask', () => {
 
   it('awards the capped value for a variant above the cap', () => {
     const overCap = task({
-      variants: [{ tier: 'berat', description: '100 reps', points: 100 }],
+      variants: [{ tier: 'hard', description: '100 reps', points: 100 }],
     });
 
     const value = expectOk(
@@ -431,7 +431,7 @@ describe('completeTask', () => {
  * unit-tested in `balance.test.ts`; these tests pin how a passing gate turns into a rank-up event.
  */
 describe('completeTask rank-up balance gate (Appendix A scenario 4)', () => {
-  const big = task({ variants: [{ tier: 'berat', description: '15 reps', points: 15 }] });
+  const big = task({ variants: [{ tier: 'hard', description: '15 reps', points: 15 }] });
 
   it('lets a tracked stat with zero completions pass the gate', () => {
     const value = expectOk(

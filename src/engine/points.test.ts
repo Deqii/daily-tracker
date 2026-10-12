@@ -75,8 +75,8 @@ describe('taskExceedsPointCap', () => {
     stat: 'STR',
     isAnchor: true,
     variants: [
-      { tier: 'ringan', description: '10 reps', points: 5 },
-      { tier: 'berat', description: '40 reps', points: 40 },
+      { tier: 'easy', description: '10 reps', points: 5 },
+      { tier: 'hard', description: '40 reps', points: 40 },
     ],
     createdAt: '2026-10-10T10:00:00+07:00',
   };
@@ -92,7 +92,7 @@ describe('taskExceedsPointCap', () => {
   it('is true when a variant is not a whole number of 1 or more', () => {
     const invalidTask: Task = {
       ...task,
-      variants: [{ tier: 'ringan', description: '10 reps', points: 0.5 }],
+      variants: [{ tier: 'easy', description: '10 reps', points: 0.5 }],
     };
 
     expect(taskExceedsPointCap(invalidTask, 'S')).toBe(true);

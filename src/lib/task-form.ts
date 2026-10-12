@@ -8,7 +8,7 @@ export interface TaskVariantDraft {
   points: string;
 }
 
-/** The Add/Edit task form's draft, always carrying one card per tier in Ringan, Sedang, Berat order. */
+/** The Add/Edit task form's draft, always carrying one card per tier in easy, medium, hard order. */
 export interface TaskFormDraft {
   familyName: string;
   stat: Stat;
@@ -115,13 +115,15 @@ export function validateTaskForm(draft: TaskFormDraft, rank: Rank): TaskFormErro
   const valid =
     !familyName &&
     !noVariant &&
-    variants.every((entry) => !entry.description && entry.points === null && entry.overCap === null);
+    variants.every(
+      (entry) => !entry.description && entry.points === null && entry.overCap === null
+    );
 
   return { familyName, variants, noVariant, valid };
 }
 
 /**
- * The task's effort variants from a valid draft: only the filled cards, in Ringan, Sedang, Berat
+ * The task's effort variants from a valid draft: only the filled cards, in easy, medium, hard
  * order, with trimmed descriptions and parsed integers. Callers validate first (design §5, PRD §2.1).
  */
 export function buildTaskVariants(draft: TaskFormDraft): TaskVariant[] {

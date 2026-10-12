@@ -99,7 +99,7 @@ function anchorTask(): Task {
     familyName: 'Morning plank',
     stat: 'STR',
     isAnchor: true,
-    variants: [{ tier: 'ringan', description: '60 seconds', points: 5 }],
+    variants: [{ tier: 'easy', description: '60 seconds', points: 5 }],
     createdAt: '2026-10-01T08:00:00+07:00',
   };
 }
@@ -110,7 +110,7 @@ function rotatingTask(id: string, familyName: string, stat: Task['stat']): Task 
     familyName,
     stat,
     isAnchor: false,
-    variants: [{ tier: 'ringan', description: '1 rep', points: 5 }],
+    variants: [{ tier: 'easy', description: '1 rep', points: 5 }],
     createdAt: '2026-10-01T08:00:00+07:00',
   };
 }
@@ -360,7 +360,7 @@ describe('createAppStore', () => {
     expect(rows[0]?.rows[0]?.isAnchor).toBe(true);
     expect(rows[0]?.rows[0]?.points).toEqual({ min: 3, max: 3 });
     expect(rows[0]?.rows[0]?.options).toEqual([
-      { tier: 'ringan', description: '60 seconds', points: 3 },
+      { tier: 'easy', description: '60 seconds', points: 3 },
     ]);
 
     store.teardown();
@@ -377,9 +377,9 @@ describe('createAppStore', () => {
           stat: 'STR',
           isAnchor: true,
           variants: [
-            { tier: 'ringan', description: '10x2 set', points: 5 },
-            { tier: 'sedang', description: '20x3 set', points: 9 },
-            { tier: 'berat', description: '30x4 set or jogging 2km', points: 15 },
+            { tier: 'easy', description: '10x2 set', points: 5 },
+            { tier: 'medium', description: '20x3 set', points: 9 },
+            { tier: 'hard', description: '30x4 set or jogging 2km', points: 15 },
           ],
           createdAt: '2026-10-01T08:00:00+07:00',
         },
@@ -391,9 +391,9 @@ describe('createAppStore', () => {
 
     expect(rows[0]?.rows[0]?.points).toEqual({ min: 3, max: 8 });
     expect(rows[0]?.rows[0]?.options).toEqual([
-      { tier: 'ringan', description: '10x2 set', points: 3 },
-      { tier: 'sedang', description: '20x3 set', points: 5 },
-      { tier: 'berat', description: '30x4 set or jogging 2km', points: 8 },
+      { tier: 'easy', description: '10x2 set', points: 3 },
+      { tier: 'medium', description: '20x3 set', points: 5 },
+      { tier: 'hard', description: '30x4 set or jogging 2km', points: 8 },
     ]);
 
     store.teardown();
@@ -457,7 +457,7 @@ describe('createAppStore', () => {
           familyName: 'Chat 1 temen',
           stat: 'SOC',
           isAnchor: true,
-          variants: [{ tier: 'ringan', description: '1 chat', points: 5 }],
+          variants: [{ tier: 'easy', description: '1 chat', points: 5 }],
           createdAt: '2026-10-01T08:00:00+07:00',
         },
       ],
@@ -522,9 +522,9 @@ describe('createAppStore', () => {
       stat: 'STR',
       isAnchor: true,
       variants: [
-        { tier: 'ringan', description: '10x2 set', points: '5' },
-        { tier: 'sedang', description: '', points: '' },
-        { tier: 'berat', description: '30x4 set', points: '15' },
+        { tier: 'easy', description: '10x2 set', points: '5' },
+        { tier: 'medium', description: '', points: '' },
+        { tier: 'hard', description: '30x4 set', points: '15' },
       ],
     };
 
@@ -539,8 +539,8 @@ describe('createAppStore', () => {
       stat: 'STR',
       isAnchor: true,
       variants: [
-        { tier: 'ringan', description: '10x2 set', points: 5 },
-        { tier: 'berat', description: '30x4 set', points: 15 },
+        { tier: 'easy', description: '10x2 set', points: 5 },
+        { tier: 'hard', description: '30x4 set', points: 15 },
       ],
     });
     expect(state.tasks[0]?.createdAt.startsWith('2026-10-11T09:00:00')).toBe(true);
@@ -560,7 +560,7 @@ describe('createAppStore', () => {
       familyName: 'Morning plank',
       stat: 'VIT',
       isAnchor: false,
-      variants: [{ tier: 'sedang', description: '2 minutes', points: '8' }],
+      variants: [{ tier: 'medium', description: '2 minutes', points: '8' }],
     };
 
     store.saveTask(form, 'task0001');
@@ -573,7 +573,7 @@ describe('createAppStore', () => {
       familyName: 'Morning plank',
       stat: 'VIT',
       isAnchor: false,
-      variants: [{ tier: 'sedang', description: '2 minutes', points: 8 }],
+      variants: [{ tier: 'medium', description: '2 minutes', points: 8 }],
       createdAt: '2026-10-01T08:00:00+07:00',
     });
 

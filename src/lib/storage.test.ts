@@ -57,7 +57,7 @@ function sampleTask(): Task {
     familyName: 'Push up routine',
     stat: 'STR',
     isAnchor: true,
-    variants: [{ tier: 'ringan', description: '10 reps', points: 5 }],
+    variants: [{ tier: 'easy', description: '10 reps', points: 5 }],
     createdAt: '2026-10-04T10:15:30+07:00',
   };
 }

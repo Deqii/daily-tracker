@@ -17,7 +17,7 @@ const anchor = (id: string, stat: Stat): Task => ({
   familyName: `Task ${stat}`,
   stat,
   isAnchor: true,
-  variants: [{ tier: 'ringan', description: '5 reps', points: 5 }],
+  variants: [{ tier: 'easy', description: '5 reps', points: 5 }],
   createdAt: '2026-10-01T00:00:00+00:00',
 });
 
