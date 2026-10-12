@@ -1,4 +1,5 @@
-import { TIERS, type Stat, type Task, type TaskVariant, type Tier } from './types';
+import { isWithinPointCap } from '../engine/points';
+import { TIERS, type Rank, type Stat, type Task, type TaskVariant, type Tier } from './types';
 
 /** One effort-variant card in the Add/Edit task form; `points` stays raw user input (design §5). */
 export interface TaskVariantDraft {
@@ -18,10 +19,11 @@ export interface TaskFormDraft {
 /** Why a card's Points field is rejected; `MISSING` is empty, `INVALID` is not a whole number ≥ 1. */
 export type VariantPointsError = 'MISSING' | 'INVALID';
 
-/** The per-card piece of `TaskFormErrors` (design §7). */
+/** The per-card piece of `TaskFormErrors` (design §7). `overCap` carries the rank's cap to show. */
 export interface VariantDraftErrors {
   readonly description: boolean;
   readonly points: VariantPointsError | null;
+  readonly overCap: number | null;
 }
 
 /** Which messages the Add/Edit task form shows (design §7); `valid` is false while any is set. */
@@ -78,35 +80,42 @@ function parsePoints(raw: string): number | null {
   return Number.isInteger(value) && value >= 1 ? value : null;
 }
 
-function variantErrors(variant: TaskVariantDraft): VariantDraftErrors {
+function variantErrors(variant: TaskVariantDraft, rank: Rank): VariantDraftErrors {
   if (!isVariantDraftFilled(variant)) {
-    return { description: false, points: null };
+    return { description: false, points: null, overCap: null };
   }
 
   const description = variant.description.trim() === '';
-  const points: VariantPointsError | null =
-    variant.points.trim() === ''
-      ? 'MISSING'
-      : parsePoints(variant.points) === null
-        ? 'INVALID'
-        : null;
 
-  return { description, points };
+  if (variant.points.trim() === '') {
+    return { description, points: 'MISSING', overCap: null };
+  }
+
+  const parsed = parsePoints(variant.points);
+
+  if (parsed === null) {
+    return { description, points: 'INVALID', overCap: null };
+  }
+
+  const cap = isWithinPointCap(parsed, rank);
+
+  return { description, points: null, overCap: cap.ok ? null : cap.cap };
 }
 
 /**
- * Validates a form draft and reports which messages to show (design §7, PRD §2.1). A card is only
- * checked once it has input; a fully empty card is ignored. `valid` is true exactly when the name
- * is set, at least one card is filled, and every filled card is complete with whole points ≥ 1.
+ * Validates a form draft against the current rank's per-task cap and reports which messages to show
+ * (design §7, PRD §2.1, decisions D21). A card is only checked once it has input; a fully empty card
+ * is ignored. `valid` is true exactly when the name is set, at least one card is filled, and every
+ * filled card is complete with whole points ≥ 1 that stay within the cap.
  */
-export function validateTaskForm(draft: TaskFormDraft): TaskFormErrors {
-  const variants = draft.variants.map(variantErrors);
+export function validateTaskForm(draft: TaskFormDraft, rank: Rank): TaskFormErrors {
+  const variants = draft.variants.map((variant) => variantErrors(variant, rank));
   const noVariant = !draft.variants.some(isVariantDraftFilled);
   const familyName = draft.familyName.trim() === '';
   const valid =
     !familyName &&
     !noVariant &&
-    variants.every((entry) => !entry.description && entry.points === null);
+    variants.every((entry) => !entry.description && entry.points === null && entry.overCap === null);
 
   return { familyName, variants, noVariant, valid };
 }

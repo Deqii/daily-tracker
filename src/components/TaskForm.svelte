@@ -28,10 +28,12 @@
   const FIELD_CLASS =
     'mt-1 block w-full rounded-sm border border-surface bg-bg px-2 py-1.5 text-base text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:text-sm';
 
+  const rank = app.rank;
+
   // svelte-ignore state_referenced_locally
   let draft = $state<TaskFormDraft>(task === null ? emptyTaskFormDraft() : taskToFormDraft(task));
   let submitted = $state(false);
-  const errors = $derived(validateTaskForm(draft));
+  const errors = $derived(validateTaskForm(draft, $rank));
 
   function submit(event: SubmitEvent): void {
     event.preventDefault();
@@ -120,6 +122,11 @@
         {/if}
         {#if submitted && variantErrors?.points === 'INVALID'}
           <p class="mt-1 text-xs text-danger">Enter a whole number of 1 or more.</p>
+        {/if}
+        {#if submitted && variantErrors && variantErrors.overCap !== null}
+          <p class="mt-1 text-xs text-danger">
+            Max {variantErrors.overCap} points at Rank {$rank}.
+          </p>
         {/if}
       </div>
     {/each}
