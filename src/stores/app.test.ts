@@ -336,6 +336,35 @@ describe('createAppStore', () => {
     expect(rows[0]?.required).toBe(1);
     expect(rows[0]?.rows[0]?.task.id).toBe('task0001');
     expect(rows[0]?.rows[0]?.isAnchor).toBe(true);
+    expect(rows[0]?.rows[0]?.points).toEqual({ min: 3, max: 3 });
+
+    store.teardown();
+  });
+
+  it('derives the awarded point range for a task with effort variants', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [
+        {
+          id: 'task0003',
+          familyName: 'Push up routine',
+          stat: 'STR',
+          isAnchor: true,
+          variants: [
+            { tier: 'ringan', description: '10x2 set', points: 5 },
+            { tier: 'sedang', description: '20x3 set', points: 9 },
+            { tier: 'berat', description: '30x4 set or jogging 2km', points: 15 },
+          ],
+          createdAt: '2026-10-01T08:00:00+07:00',
+        },
+      ],
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const rows = read(store.questRows);
+
+    expect(rows[0]?.rows[0]?.points).toEqual({ min: 3, max: 8 });
 
     store.teardown();
   });

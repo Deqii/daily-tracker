@@ -60,3 +60,33 @@ export function penaltyNotificationLine(stat: Stat): LineSegment[] {
     { text: ' completions today.', mono: false },
   ];
 }
+
+/** The visual state of one Daily Quest row (design §5). */
+export type QuestRowState = 'done' | 'pending' | 'penalty';
+
+/**
+ * The state of one quest row from its stat's completion progress (design §5, PRD §2.1). A row is
+ * `done` once the stat has met its requirement for the day; before that a penalized stat (a
+ * requirement of 2, PRD §7.4) shows the `penalty` state and any other shows `pending`.
+ */
+export function questRowState(completed: number, required: number): QuestRowState {
+  if (required > 0 && completed >= required) {
+    return 'done';
+  }
+
+  return required > 1 ? 'penalty' : 'pending';
+}
+
+/**
+ * The points a quest row will award, after the cap and rank multiplier (PRD §2.1, design §5). A
+ * single-tier task shows one value; a task with several effort variants shows its lowest to highest
+ * award.
+ */
+export function questPointsLabel(min: number, max: number): string {
+  return min === max ? `+${min}` : `+${min} to +${max}`;
+}
+
+/** The `completed/required` counter shown on a penalized quest row in place of its points (design §5). */
+export function questCounterLabel(completed: number, required: number): string {
+  return `${completed}/${required}`;
+}

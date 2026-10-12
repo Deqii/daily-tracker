@@ -5,6 +5,7 @@ import {
   type CompleteTaskResult,
 } from '../engine/complete-task';
 import { level as levelOf, xpForLevel } from '../engine/level';
+import { pointsAwarded } from '../engine/points';
 import { purchaseReward as enginePurchaseReward, type PurchaseResult } from '../engine/purchase';
 import { getRankConfig, rank as levelRankOf, resolveRank } from '../engine/rank';
 import { runRollover as engineRunRollover } from '../engine/run-rollover';
@@ -49,12 +50,19 @@ export interface RankGateStatus {
   readonly current: number | null;
 }
 
+/** The points a quest row awards (after cap and multiplier), lowest to highest across its variants. */
+export interface QuestRowPoints {
+  readonly min: number;
+  readonly max: number;
+}
+
 /** One row of the open day's Daily Quest (an anchor task or that day's rotating pick). */
 export interface QuestRow {
   readonly task: Task;
   readonly isAnchor: boolean;
   readonly isRotating: boolean;
   readonly completionCount: number;
+  readonly points: QuestRowPoints;
 }
 
 /** The open day's quest rows for one quest-active stat. */
@@ -201,6 +209,12 @@ function equippedTitleName(id: string | null): string | null {
   return TITLES.find((title) => title.id === id)?.name ?? null;
 }
 
+function toQuestRowPoints(task: Task, rank: Rank): QuestRowPoints {
+  const awarded = task.variants.map((variant) => pointsAwarded(variant.points, rank));
+
+  return { min: Math.min(...awarded), max: Math.max(...awarded) };
+}
+
 function toQuestGroups(state: AppState): QuestStatGroup[] {
   const openDay = openDayOf(state);
 
@@ -216,6 +230,7 @@ function toQuestGroups(state: AppState): QuestStatGroup[] {
     }
 
     const rotatingTaskId = openDay.selectedTaskIdPerStat[stat];
+    const rank = state.userState.rank;
 
     const rows = state.tasks
       .filter((task) => task.stat === stat && (task.isAnchor || task.id === rotatingTaskId))
@@ -226,6 +241,7 @@ function toQuestGroups(state: AppState): QuestStatGroup[] {
         completionCount: state.completions.filter(
           (completion) => completion.localDate === openDay.date && completion.taskId === task.id
         ).length,
+        points: toQuestRowPoints(task, rank),
       }));
 
     groups.push({

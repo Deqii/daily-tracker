@@ -1,4 +1,5 @@
 <script lang="ts">
+  import DailyQuest from '../components/DailyQuest.svelte';
   import EquippedTitleLine from '../components/EquippedTitleLine.svelte';
   import NotificationBlocks from '../components/NotificationBlocks.svelte';
   import RadarChart from '../components/RadarChart.svelte';
@@ -14,4 +15,5 @@
   <TodayStatusLines />
   <RadarChart />
   <NotificationBlocks />
+  <DailyQuest />
 </section>
