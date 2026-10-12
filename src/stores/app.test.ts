@@ -7,6 +7,7 @@ import {
   type StorageSchema,
 } from '../lib/storage';
 import { emptyTaskFormDraft, type TaskFormDraft } from '../lib/task-form';
+import { emptyRewardFormDraft, type RewardFormDraft } from '../lib/reward-form';
 import type { DailyQuestDay, Reward, Task } from '../lib/types';
 import {
   createAppStore,
@@ -576,6 +577,65 @@ describe('createAppStore', () => {
       variants: [{ tier: 'medium', description: '2 minutes', points: 8 }],
       createdAt: '2026-10-01T08:00:00+07:00',
     });
+
+    store.teardown();
+  });
+
+  it('saves a new reward from a form draft and persists it', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, { rewards: [aReward()] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const form: RewardFormDraft = {
+      ...emptyRewardFormDraft(),
+      title: '  Main game 2 jam  ',
+      cost: '60',
+    };
+
+    store.saveReward(form, null);
+
+    const state = read<AppState>(store);
+
+    expect(state.rewards).toHaveLength(2);
+    expect(state.rewards[1]).toMatchObject({
+      id: 'id000000',
+      title: 'Main game 2 jam',
+      cost: 60,
+    });
+    expect(state.rewards[1]?.createdAt.startsWith('2026-10-11T09:00:00')).toBe(true);
+    expect(JSON.parse(fake.getItem(STORAGE_KEYS.rewards) ?? '[]')).toHaveLength(2);
+
+    store.teardown();
+  });
+
+  it('edits a reward in place, keeping its id and creation time', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 10, 0, 0));
+    const fake = stubStorage();
+    seed(fake, { rewards: [aReward()] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const form: RewardFormDraft = { title: 'Main game 2 jam', cost: '120' };
+
+    store.saveReward(form, 'rew00001');
+
+    const state = read<AppState>(store);
+
+    expect(state.rewards).toHaveLength(1);
+    expect(state.rewards[0]).toEqual({
+      id: 'rew00001',
+      title: 'Main game 2 jam',
+      cost: 120,
+      createdAt: '2026-10-01T08:00:00+07:00',
+    });
+    expect(JSON.parse(fake.getItem(STORAGE_KEYS.rewards) ?? '[]')).toEqual([
+      {
+        id: 'rew00001',
+        title: 'Main game 2 jam',
+        cost: 120,
+        createdAt: '2026-10-01T08:00:00+07:00',
+      },
+    ]);
 
     store.teardown();
   });
