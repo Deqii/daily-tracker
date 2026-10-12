@@ -338,6 +338,28 @@ describe('createAppStore', () => {
     store.teardown();
   });
 
+  it('derives the equipped title name, or null when none is equipped', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      userState: {
+        ...createDefaultUserState(TODAY),
+        equippedTitle: 'streak-7',
+        unlockedTitles: ['streak-7'],
+      },
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    expect(read(store.equippedTitle)).toBe('Konsisten 7 hari');
+    store.teardown();
+
+    seed(stubStorage());
+    const empty = createAppStore({ root: null, newId: idFactory() });
+
+    expect(read(empty.equippedTitle)).toBeNull();
+    empty.teardown();
+  });
+
   it('reports a blocked rank-up with the gate threshold', () => {
     vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
     const fake = stubStorage();
