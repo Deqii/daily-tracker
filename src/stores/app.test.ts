@@ -328,6 +328,7 @@ describe('createAppStore', () => {
     expect(read(store.statXP)).toEqual({ STR: 16, VIT: 12, INT: 20, DISC: 10, SOC: 7 });
     expect(read(store.freezesLeft)).toBe(1);
     expect(read(store.streak)).toBe(0);
+    expect(read(store.penaltyStats)).toEqual([]);
 
     const rows = read(store.questRows);
     expect(rows).toHaveLength(1);
@@ -383,6 +384,42 @@ describe('createAppStore', () => {
       threshold: 27,
       current: 5,
     });
+
+    store.teardown();
+  });
+
+  it('derives the penalized stats from the open day requirement', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [
+        {
+          id: 'task0002',
+          familyName: 'Chat 1 temen',
+          stat: 'SOC',
+          isAnchor: true,
+          variants: [{ tier: 'ringan', description: '1 chat', points: 5 }],
+          createdAt: '2026-10-01T08:00:00+07:00',
+        },
+      ],
+      dailyQuestLog: [
+        {
+          date: TODAY,
+          selectedTaskIdPerStat: { SOC: 'task0002' },
+          requiredCompletions: { STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 2 },
+          actualCompletions: { STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 1 },
+          netPointsChange: 3,
+          freezeUsed: false,
+          closed: false,
+          lifetimeXPEnd: null,
+          levelEnd: null,
+          rankEnd: null,
+        },
+      ],
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    expect(read(store.penaltyStats)).toEqual(['SOC']);
 
     store.teardown();
   });
