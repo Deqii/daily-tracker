@@ -7,9 +7,10 @@ import {
   questRowState,
   rankUpBlockedLine,
   statLabel,
+  tierLabel,
   type LineSegment,
 } from './today-lines';
-import { STATS, type Stat } from './types';
+import { STATS, TIERS, type Stat, type Tier } from './types';
 
 function text(segments: LineSegment[]): string {
   return segments.map((segment) => segment.text).join('');
@@ -40,6 +41,12 @@ describe('statLabel', () => {
       'Disc',
       'Soc',
     ]);
+  });
+});
+
+describe('tierLabel', () => {
+  it('maps every effort tier to its copy label', () => {
+    expect(TIERS.map((tier: Tier) => tierLabel(tier))).toEqual(['Ringan', 'Sedang', 'Berat']);
   });
 });
 
