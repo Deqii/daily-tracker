@@ -85,6 +85,7 @@ export interface AppStore extends Readable<AppState> {
   readonly rank: Readable<Rank>;
   readonly levelRank: Readable<Rank>;
   readonly rankGate: Readable<RankGateStatus>;
+  readonly statXP: Readable<Record<Stat, number>>;
   readonly equippedTitle: Readable<string | null>;
   readonly streak: Readable<number>;
   readonly freezesLeft: Readable<number>;
@@ -338,6 +339,7 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
     rank,
     levelRank,
     rankGate: derived(base, toRankGate),
+    statXP: derived(base, (state) => state.userState.statXP),
     equippedTitle: derived(base, (state) => equippedTitleName(state.userState.equippedTitle)),
     streak: derived(base, (state) =>
       displayStreak(state.userState.currentStreak, hasCompletionToday(state))

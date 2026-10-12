@@ -325,6 +325,7 @@ describe('createAppStore', () => {
     });
     expect(read(store.rank)).toBe('E');
     expect(read(store.levelRank)).toBe('E');
+    expect(read(store.statXP)).toEqual({ STR: 16, VIT: 12, INT: 20, DISC: 10, SOC: 7 });
     expect(read(store.freezesLeft)).toBe(1);
     expect(read(store.streak)).toBe(0);
 
