@@ -67,7 +67,7 @@ export interface LoadStateResult {
   report: StorageReport;
 }
 
-type BackupRecord = Record<string, string>;
+export type BackupRecord = Record<string, string>;
 
 type ReadResult = { ok: true; raw: string | null } | { ok: false };
 type ParseResult = { ok: true; value: unknown } | { ok: false };
@@ -202,17 +202,18 @@ function writeDefault(key: keyof StorageSchema, today: string): WriteResult {
   }
 }
 
-function readBackup(): BackupRecord {
+/** The recovery backup kept under `daily-tracker:backup`, or null when none was written (D22). */
+export function readBackupRecord(): BackupRecord | null {
   const read = readRaw(BACKUP_KEY);
 
   if (!read.ok || read.raw === null) {
-    return {};
+    return null;
   }
 
   const parsed = parseRaw(read.raw);
 
   if (!parsed.ok || !isPlainObject(parsed.value)) {
-    return {};
+    return null;
   }
 
   const record: BackupRecord = {};
@@ -224,6 +225,10 @@ function readBackup(): BackupRecord {
   }
 
   return record;
+}
+
+function readBackup(): BackupRecord {
+  return readBackupRecord() ?? {};
 }
 
 function writeBackup(record: BackupRecord): WriteResult {
