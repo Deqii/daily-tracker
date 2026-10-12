@@ -27,6 +27,10 @@
     formOpen = false;
     editing = null;
   }
+
+  function buy(rewardId: string): void {
+    app.purchaseReward(rewardId);
+  }
 </script>
 
 <section class="p-4 {layoutClass}">
@@ -93,6 +97,7 @@
               <button
                 type="button"
                 class="inline-flex min-h-11 shrink-0 items-center rounded-sm bg-action px-3 text-xs font-semibold text-action-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:min-h-9"
+                onclick={() => buy(row.reward.id)}
               >
                 Buy
               </button>
