@@ -46,7 +46,7 @@ describe('statLabel', () => {
 
 describe('tierLabel', () => {
   it('maps every effort tier to its copy label', () => {
-    expect(TIERS.map((tier: Tier) => tierLabel(tier))).toEqual(['easy', 'medium', 'hard']);
+    expect(TIERS.map((tier: Tier) => tierLabel(tier))).toEqual(['Easy', 'Medium', 'Hard']);
   });
 });
 
