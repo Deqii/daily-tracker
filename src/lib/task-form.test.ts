@@ -83,7 +83,7 @@ describe('isVariantDraftFilled', () => {
 
 describe('validateTaskForm', () => {
   it('reports no variant when every card is empty', () => {
-    const errors = validateTaskForm(draft({ familyName: 'Push up' }));
+    const errors = validateTaskForm(draft({ familyName: 'Push up' }), 'E');
 
     expect(errors.noVariant).toBe(true);
     expect(errors.valid).toBe(false);
@@ -92,8 +92,8 @@ describe('validateTaskForm', () => {
   it('requires the task name', () => {
     const form = draft({ variants: [card('ringan', '10x2 set', '5')] });
 
-    expect(validateTaskForm(form).familyName).toBe(true);
-    expect(validateTaskForm(form).valid).toBe(false);
+    expect(validateTaskForm(form, 'E').familyName).toBe(true);
+    expect(validateTaskForm(form, 'E').valid).toBe(false);
   });
 
   it('ignores a fully empty card next to a filled one', () => {
@@ -102,12 +102,12 @@ describe('validateTaskForm', () => {
       variants: [card('ringan', '10x2 set', '5'), card('sedang', '', ''), card('berat', '', '')],
     });
 
-    expect(validateTaskForm(form)).toEqual({
+    expect(validateTaskForm(form, 'E')).toEqual({
       familyName: false,
       variants: [
-        { description: false, points: null },
-        { description: false, points: null },
-        { description: false, points: null },
+        { description: false, points: null, overCap: null },
+        { description: false, points: null, overCap: null },
+        { description: false, points: null, overCap: null },
       ],
       noVariant: false,
       valid: true,
@@ -117,30 +117,72 @@ describe('validateTaskForm', () => {
   it('asks for points when a card has a description but no value', () => {
     const form = draft({ familyName: 'Push up', variants: [card('ringan', '10x2 set', '')] });
 
-    expect(validateTaskForm(form).variants[0]).toEqual({ description: false, points: 'MISSING' });
-    expect(validateTaskForm(form).valid).toBe(false);
+    expect(validateTaskForm(form, 'E').variants[0]).toEqual({
+      description: false,
+      points: 'MISSING',
+      overCap: null,
+    });
+    expect(validateTaskForm(form, 'E').valid).toBe(false);
   });
 
   it('asks what to do when a card has points but no description', () => {
     const form = draft({ familyName: 'Push up', variants: [card('ringan', '', '5')] });
 
-    expect(validateTaskForm(form).variants[0]).toEqual({ description: true, points: null });
-    expect(validateTaskForm(form).valid).toBe(false);
+    expect(validateTaskForm(form, 'E').variants[0]).toEqual({
+      description: true,
+      points: null,
+      overCap: null,
+    });
+    expect(validateTaskForm(form, 'E').valid).toBe(false);
   });
 
   it('rejects points that are not a whole number of 1 or more', () => {
     for (const points of ['0', '-2', '1.5', 'abc']) {
       const form = draft({ familyName: 'Push up', variants: [card('ringan', '10x2 set', points)] });
 
-      expect(validateTaskForm(form).variants[0]?.points).toBe('INVALID');
-      expect(validateTaskForm(form).valid).toBe(false);
+      expect(validateTaskForm(form, 'E').variants[0]?.points).toBe('INVALID');
+      expect(validateTaskForm(form, 'E').variants[0]?.overCap).toBeNull();
+      expect(validateTaskForm(form, 'E').valid).toBe(false);
     }
+  });
+
+  it('accepts points exactly at the rank cap', () => {
+    const form = draft({ familyName: 'Push up', variants: [card('ringan', '10x2 set', '15')] });
+
+    expect(validateTaskForm(form, 'E').variants[0]?.overCap).toBeNull();
+    expect(validateTaskForm(form, 'E').valid).toBe(true);
+  });
+
+  it('rejects points above the cap and reports the cap', () => {
+    const form = draft({ familyName: 'Push up', variants: [card('ringan', '10x2 set', '16')] });
+
+    expect(validateTaskForm(form, 'E').variants[0]).toEqual({
+      description: false,
+      points: null,
+      overCap: 15,
+    });
+    expect(validateTaskForm(form, 'E').valid).toBe(false);
+  });
+
+  it('uses the cap of the rank it is given', () => {
+    const form = draft({ familyName: 'Push up', variants: [card('ringan', '10x2 set', '40')] });
+
+    expect(validateTaskForm(form, 'D').variants[0]?.overCap).toBe(25);
+    expect(validateTaskForm(form, 'C').variants[0]?.overCap).toBeNull();
+    expect(validateTaskForm(form, 'C').valid).toBe(true);
+  });
+
+  it('treats rank S as uncapped', () => {
+    const form = draft({ familyName: 'Push up', variants: [card('ringan', '10x2 set', '1000')] });
+
+    expect(validateTaskForm(form, 'S').variants[0]?.overCap).toBeNull();
+    expect(validateTaskForm(form, 'S').valid).toBe(true);
   });
 
   it('accepts a complete single-tier task', () => {
     const form = draft({ familyName: 'Push up', variants: [card('ringan', '10x2 set', '5')] });
 
-    expect(validateTaskForm(form).valid).toBe(true);
+    expect(validateTaskForm(form, 'E').valid).toBe(true);
   });
 
   it('accepts a complete family and trims whitespace', () => {
@@ -149,7 +191,7 @@ describe('validateTaskForm', () => {
       variants: [card('ringan', ' 10x2 set ', ' 5 '), card('berat', ' 30x4 set ', ' 15 ')],
     });
 
-    expect(validateTaskForm(form).valid).toBe(true);
+    expect(validateTaskForm(form, 'E').valid).toBe(true);
     expect(buildTaskVariants(form)).toEqual([
       { tier: 'ringan', description: '10x2 set', points: 5 },
       { tier: 'berat', description: '30x4 set', points: 15 },
