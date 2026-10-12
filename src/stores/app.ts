@@ -14,10 +14,11 @@ import type { AppState } from '../engine/state';
 import { displayStreak } from '../engine/streak';
 import { TITLES } from '../engine/titles';
 import { toLocalDate, toTimestamp } from '../lib/date';
+import { buildRewardFromDraft, type RewardFormDraft } from '../lib/reward-form';
 import { selectRewardPreview, type RewardPreviewRow } from '../lib/rewards-preview';
 import { loadState, write, type StorageFailure, type StorageSchema } from '../lib/storage';
 import { buildTaskVariants, type TaskFormDraft } from '../lib/task-form';
-import type { Rank, Stat, Task, Tier } from '../lib/types';
+import type { Rank, Reward, Stat, Task, Tier } from '../lib/types';
 import { STATS } from '../lib/types';
 
 export type TimerHandle = ReturnType<typeof setTimeout>;
@@ -97,6 +98,7 @@ export interface AppStore extends Readable<AppState> {
   completeTask(taskId: string, variantTier: Tier | null): CompleteTaskResult;
   deleteTask(taskId: string): void;
   saveTask(draft: TaskFormDraft, editingId: string | null): void;
+  saveReward(draft: RewardFormDraft, editingId: string | null): void;
   purchaseReward(rewardId: string): PurchaseResult;
   rollover(): void;
   teardown(): void;
@@ -459,6 +461,25 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
       }
 
       const next: AppState = { ...current, tasks, dailyQuestLog };
+
+      commit(next);
+      persist(next);
+    },
+    saveReward(draft, editingId) {
+      const existing =
+        editingId === null ? undefined : current.rewards.find((reward) => reward.id === editingId);
+      const data = buildRewardFromDraft(draft);
+      const reward: Reward = {
+        id: existing?.id ?? newId(),
+        title: data.title,
+        cost: data.cost,
+        createdAt: existing?.createdAt ?? toTimestamp(now()),
+      };
+      const rewards =
+        existing === undefined
+          ? [...current.rewards, reward]
+          : current.rewards.map((entry) => (entry.id === reward.id ? reward : entry));
+      const next: AppState = { ...current, rewards };
 
       commit(next);
       persist(next);
