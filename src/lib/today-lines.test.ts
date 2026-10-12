@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   freezesLine,
   penaltyNotificationLine,
+  questCounterLabel,
+  questPointsLabel,
+  questRowState,
   rankUpBlockedLine,
   statLabel,
   type LineSegment,
@@ -91,5 +94,41 @@ describe('penaltyNotificationLine', () => {
       'Penalty active: Soc needs ',
       ' completions today.',
     ]);
+  });
+});
+
+describe('questRowState', () => {
+  it('is done once the stat has met its requirement', () => {
+    expect(questRowState(1, 1)).toBe('done');
+    expect(questRowState(2, 2)).toBe('done');
+    expect(questRowState(3, 2)).toBe('done');
+  });
+
+  it('is penalty while a penalized stat is unmet', () => {
+    expect(questRowState(0, 2)).toBe('penalty');
+    expect(questRowState(1, 2)).toBe('penalty');
+  });
+
+  it('is pending for a normal unmet stat', () => {
+    expect(questRowState(0, 1)).toBe('pending');
+    expect(questRowState(0, 0)).toBe('pending');
+  });
+});
+
+describe('questPointsLabel', () => {
+  it('shows a single value for a single-tier task', () => {
+    expect(questPointsLabel(3, 3)).toBe('+3');
+  });
+
+  it('shows a range for a task with several effort variants', () => {
+    expect(questPointsLabel(3, 8)).toBe('+3 to +8');
+  });
+});
+
+describe('questCounterLabel', () => {
+  it('shows the completed out of required count', () => {
+    expect(questCounterLabel(0, 2)).toBe('0/2');
+    expect(questCounterLabel(1, 2)).toBe('1/2');
+    expect(questCounterLabel(2, 2)).toBe('2/2');
   });
 });
