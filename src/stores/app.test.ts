@@ -6,6 +6,7 @@ import {
   createDefaultUserState,
   type StorageSchema,
 } from '../lib/storage';
+import { emptyTaskFormDraft, type TaskFormDraft } from '../lib/task-form';
 import type { Reward, Task } from '../lib/types';
 import {
   createAppStore,
@@ -484,6 +485,76 @@ describe('createAppStore', () => {
         locked: true,
       },
     ]);
+
+    store.teardown();
+  });
+
+  it('saves a new task from a form draft and persists it', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake);
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const form: TaskFormDraft = {
+      ...emptyTaskFormDraft(),
+      familyName: '  Push up routine  ',
+      stat: 'STR',
+      isAnchor: true,
+      variants: [
+        { tier: 'ringan', description: '10x2 set', points: '5' },
+        { tier: 'sedang', description: '', points: '' },
+        { tier: 'berat', description: '30x4 set', points: '15' },
+      ],
+    };
+
+    store.saveTask(form, null);
+
+    const state = read<AppState>(store);
+
+    expect(state.tasks).toHaveLength(1);
+    expect(state.tasks[0]).toMatchObject({
+      id: 'id000000',
+      familyName: 'Push up routine',
+      stat: 'STR',
+      isAnchor: true,
+      variants: [
+        { tier: 'ringan', description: '10x2 set', points: 5 },
+        { tier: 'berat', description: '30x4 set', points: 15 },
+      ],
+    });
+    expect(state.tasks[0]?.createdAt.startsWith('2026-10-11T09:00:00')).toBe(true);
+    expect(JSON.parse(fake.getItem(STORAGE_KEYS.tasks) ?? '[]')).toHaveLength(1);
+
+    store.teardown();
+  });
+
+  it('edits a task in place, keeping its id and creation time', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 10, 0, 0));
+    const fake = stubStorage();
+    seed(fake, { tasks: [anchorTask()] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const form: TaskFormDraft = {
+      ...emptyTaskFormDraft(),
+      familyName: 'Morning plank',
+      stat: 'VIT',
+      isAnchor: false,
+      variants: [{ tier: 'sedang', description: '2 minutes', points: '8' }],
+    };
+
+    store.saveTask(form, 'task0001');
+
+    const state = read<AppState>(store);
+
+    expect(state.tasks).toHaveLength(1);
+    expect(state.tasks[0]).toEqual({
+      id: 'task0001',
+      familyName: 'Morning plank',
+      stat: 'VIT',
+      isAnchor: false,
+      variants: [{ tier: 'sedang', description: '2 minutes', points: 8 }],
+      createdAt: '2026-10-01T08:00:00+07:00',
+    });
 
     store.teardown();
   });

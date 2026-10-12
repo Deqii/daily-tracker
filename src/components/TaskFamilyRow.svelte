@@ -7,9 +7,10 @@
 
   interface Props {
     task: Task;
+    onedit?: (task: Task) => void;
   }
 
-  let { task }: Props = $props();
+  let { task, onedit }: Props = $props();
 
   const rank = app.rank;
 
@@ -33,6 +34,7 @@
         type="button"
         aria-label={`Edit ${task.familyName}`}
         class="inline-flex shrink-0 items-center rounded-sm p-1 text-icon-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        onclick={() => onedit?.(task)}
       >
         <svg
           viewBox="0 0 16 16"
