@@ -1,4 +1,4 @@
-import { STATS, type Stat, type Task } from './types';
+import { STATS, type Stat, type Task, type TaskVariant } from './types';
 
 /** Section labels for the five stats as written on the Tasks page (design §5). */
 const STAT_SECTION_LABELS: Record<Stat, string> = {
@@ -40,6 +40,15 @@ export function taskTag(task: Task): 'Anchor' | 'Rotating' {
  */
 export function hasEffortVariants(task: Task): boolean {
   return task.variants.length > 1;
+}
+
+/**
+ * The one variant of a single-tier task, or `null` when the task carries no variants (PRD §2.1). A
+ * single-tier task has exactly one variant, so the single-tier row renders it without a tier name or
+ * a picker; the `null` case lets the row skip rather than guess a value.
+ */
+export function singleTierVariant(task: Task): TaskVariant | null {
+  return task.variants[0] ?? null;
 }
 
 /** The points shown for one effort variant on a family sub-row, before the multiplier (design §5). */
