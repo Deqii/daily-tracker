@@ -10,6 +10,7 @@ import { getRankConfig, rank as levelRankOf, resolveRank } from '../engine/rank'
 import { runRollover as engineRunRollover } from '../engine/run-rollover';
 import type { AppState } from '../engine/state';
 import { displayStreak } from '../engine/streak';
+import { TITLES } from '../engine/titles';
 import { toLocalDate } from '../lib/date';
 import { loadState, write, type StorageFailure, type StorageSchema } from '../lib/storage';
 import type { Rank, Stat, Task, Tier } from '../lib/types';
@@ -84,6 +85,7 @@ export interface AppStore extends Readable<AppState> {
   readonly rank: Readable<Rank>;
   readonly levelRank: Readable<Rank>;
   readonly rankGate: Readable<RankGateStatus>;
+  readonly equippedTitle: Readable<string | null>;
   readonly streak: Readable<number>;
   readonly freezesLeft: Readable<number>;
   readonly questRows: Readable<QuestStatGroup[]>;
@@ -187,6 +189,14 @@ function toRankGate(state: AppState): RankGateStatus {
     threshold: gate.threshold,
     current: gate.weakest === null ? null : state.userState.statXP[gate.weakest],
   };
+}
+
+function equippedTitleName(id: string | null): string | null {
+  if (id === null) {
+    return null;
+  }
+
+  return TITLES.find((title) => title.id === id)?.name ?? null;
 }
 
 function toQuestGroups(state: AppState): QuestStatGroup[] {
@@ -328,6 +338,7 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
     rank,
     levelRank,
     rankGate: derived(base, toRankGate),
+    equippedTitle: derived(base, (state) => equippedTitleName(state.userState.equippedTitle)),
     streak: derived(base, (state) =>
       displayStreak(state.userState.currentStreak, hasCompletionToday(state))
     ),
