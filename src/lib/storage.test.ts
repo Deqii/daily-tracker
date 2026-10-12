@@ -6,6 +6,7 @@ import {
   STORAGE_KEYS,
   createDefaultUserState,
   loadState,
+  readBackupRecord,
   write,
   type StorageSchema,
 } from './storage';
@@ -319,5 +320,27 @@ describe('loadState', () => {
 
     expect(backup[STORAGE_KEYS.tasks]).toBe('second-bad');
     expect(Object.keys(backup)).toEqual([STORAGE_KEYS.tasks]);
+  });
+});
+
+describe('readBackupRecord', () => {
+  it('returns null when no backup was written', () => {
+    stubStorage();
+
+    expect(readBackupRecord()).toBeNull();
+  });
+
+  it('returns the parsed record when a backup was written', () => {
+    const fake = stubStorage();
+    fake.setItem(BACKUP_KEY, JSON.stringify({ [STORAGE_KEYS.tasks]: '{broken' }));
+
+    expect(readBackupRecord()).toEqual({ [STORAGE_KEYS.tasks]: '{broken' });
+  });
+
+  it('returns null when the backup is corrupt', () => {
+    const fake = stubStorage();
+    fake.setItem(BACKUP_KEY, '{not valid json');
+
+    expect(readBackupRecord()).toBeNull();
   });
 });

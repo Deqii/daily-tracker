@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ExportButton from '../components/ExportButton.svelte';
   import RankReference from '../components/RankReference.svelte';
   import ThemeToggle from '../components/ThemeToggle.svelte';
   import TitlePicker from '../components/TitlePicker.svelte';
@@ -14,5 +15,9 @@
     </li>
     <TitlePicker />
     <RankReference />
+    <li class="flex items-center justify-between gap-4 border-b border-surface py-2">
+      <span class="text-sm text-text">Data</span>
+      <ExportButton />
+    </li>
   </ul>
 </section>
