@@ -12,9 +12,10 @@ import { runRollover as engineRunRollover } from '../engine/run-rollover';
 import type { AppState } from '../engine/state';
 import { displayStreak } from '../engine/streak';
 import { TITLES } from '../engine/titles';
-import { toLocalDate } from '../lib/date';
+import { toLocalDate, toTimestamp } from '../lib/date';
 import { selectRewardPreview, type RewardPreviewRow } from '../lib/rewards-preview';
 import { loadState, write, type StorageFailure, type StorageSchema } from '../lib/storage';
+import { buildTaskVariants, type TaskFormDraft } from '../lib/task-form';
 import type { Rank, Stat, Task, Tier } from '../lib/types';
 import { STATS } from '../lib/types';
 
@@ -93,6 +94,7 @@ export interface AppDeps {
 
 export interface AppStore extends Readable<AppState> {
   completeTask(taskId: string, variantTier: Tier | null): CompleteTaskResult;
+  saveTask(draft: TaskFormDraft, editingId: string | null): void;
   purchaseReward(rewardId: string): PurchaseResult;
   rollover(): void;
   teardown(): void;
@@ -407,6 +409,26 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
       }
 
       return result;
+    },
+    saveTask(draft, editingId) {
+      const existing =
+        editingId === null ? undefined : current.tasks.find((task) => task.id === editingId);
+      const task: Task = {
+        id: existing?.id ?? newId(),
+        familyName: draft.familyName.trim(),
+        stat: draft.stat,
+        isAnchor: draft.isAnchor,
+        variants: buildTaskVariants(draft),
+        createdAt: existing?.createdAt ?? toTimestamp(now()),
+      };
+      const tasks =
+        existing === undefined
+          ? [...current.tasks, task]
+          : current.tasks.map((entry) => (entry.id === task.id ? task : entry));
+      const next: AppState = { ...current, tasks };
+
+      commit(next);
+      persist(next);
     },
     purchaseReward(rewardId) {
       const result = enginePurchaseReward(current, rewardId, now(), newId);
