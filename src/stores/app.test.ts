@@ -460,4 +460,31 @@ describe('createAppStore', () => {
 
     store.teardown();
   });
+
+  it('derives the Rewards preview from the wallet balance', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    const createdAt = '2026-10-01T08:00:00+07:00';
+    seed(fake, {
+      rewards: [
+        { id: 'rew00001', title: 'Main game 2 jam', cost: 60, createdAt },
+        { id: 'rew00002', title: 'Nonton bioskop', cost: 800, createdAt },
+      ],
+      userState: { ...createDefaultUserState(TODAY), wallet: 65 },
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    expect(read(store.rewardPreview)).toEqual([
+      {
+        reward: { id: 'rew00001', title: 'Main game 2 jam', cost: 60, createdAt },
+        locked: false,
+      },
+      {
+        reward: { id: 'rew00002', title: 'Nonton bioskop', cost: 800, createdAt },
+        locked: true,
+      },
+    ]);
+
+    store.teardown();
+  });
 });
