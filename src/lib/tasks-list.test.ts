@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   groupTasksByStat,
+  hasEffortVariants,
+  overCapLabel,
   statSectionLabel,
   taskCountLabel,
   taskPointsLabel,
   taskTag,
+  variantPointsLabel,
   type TaskStatGroup,
 } from './tasks-list';
 import type { Stat, Task } from './types';
@@ -114,5 +117,38 @@ describe('taskPointsLabel', () => {
 describe('taskCountLabel', () => {
   it('renders the task-family count next to the title', () => {
     expect(taskCountLabel(11)).toBe('11 tasks');
+  });
+});
+
+describe('hasEffortVariants', () => {
+  it('is false for a single-tier task', () => {
+    expect(hasEffortVariants(task('water', 'VIT', true, [5]))).toBe(false);
+  });
+
+  it('is true for a task with several variants', () => {
+    expect(hasEffortVariants(task('push-up', 'STR', false, [5, 9, 15]))).toBe(true);
+    expect(hasEffortVariants(task('stretch', 'VIT', false, [4, 4]))).toBe(true);
+  });
+});
+
+describe('variantPointsLabel', () => {
+  it('shows a variant point value before the multiplier', () => {
+    expect(variantPointsLabel(5)).toBe('5 pts');
+    expect(variantPointsLabel(15)).toBe('15 pts');
+  });
+});
+
+describe('overCapLabel', () => {
+  it('flags a variant stored above the rank cap with the cap it counts as', () => {
+    expect(overCapLabel(20, 15)).toBe('Over cap: counts as 15');
+  });
+
+  it('is null when the variant is within the cap or exactly at it', () => {
+    expect(overCapLabel(10, 15)).toBeNull();
+    expect(overCapLabel(15, 15)).toBeNull();
+  });
+
+  it('is null at an uncapped rank', () => {
+    expect(overCapLabel(500, null)).toBeNull();
   });
 });
