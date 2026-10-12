@@ -1,5 +1,6 @@
 <script lang="ts">
   import EquippedTitleLine from '../components/EquippedTitleLine.svelte';
+  import NotificationBlocks from '../components/NotificationBlocks.svelte';
   import RadarChart from '../components/RadarChart.svelte';
   import RankLevelReadout from '../components/RankLevelReadout.svelte';
   import TodayStatusLines from '../components/TodayStatusLines.svelte';
@@ -12,4 +13,5 @@
   <XpProgressBar />
   <TodayStatusLines />
   <RadarChart />
+  <NotificationBlocks />
 </section>

@@ -47,3 +47,16 @@ export function rankUpBlockedLine(stat: Stat, threshold: number, current: number
     { text: ')', mono: false },
   ];
 }
+
+/**
+ * One penalized stat's notification line under the system message (design §5). The required count
+ * is always 2 because the penalty flag caps the requirement at 2 (PRD §7.4, decisions D3). Only the
+ * number is monospace.
+ */
+export function penaltyNotificationLine(stat: Stat): LineSegment[] {
+  return [
+    { text: `Penalty active: ${statLabel(stat)} needs `, mono: false },
+    { text: '2', mono: true },
+    { text: ' completions today.', mono: false },
+  ];
+}

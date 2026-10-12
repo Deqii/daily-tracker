@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { freezesLine, rankUpBlockedLine, statLabel, type LineSegment } from './today-lines';
+import {
+  freezesLine,
+  penaltyNotificationLine,
+  rankUpBlockedLine,
+  statLabel,
+  type LineSegment,
+} from './today-lines';
 import { STATS, type Stat } from './types';
 
 function text(segments: LineSegment[]): string {
@@ -58,6 +64,32 @@ describe('rankUpBlockedLine', () => {
       'Rank-up blocked: raise Soc to ',
       ' xp (now ',
       ')',
+    ]);
+  });
+});
+
+describe('penaltyNotificationLine', () => {
+  function notificationFor(stat: Stat): LineSegment[] {
+    return penaltyNotificationLine(stat);
+  }
+
+  it('builds the exact copy for each stat', () => {
+    expect(text(notificationFor('STR'))).toBe('Penalty active: Str needs 2 completions today.');
+    expect(text(notificationFor('VIT'))).toBe('Penalty active: Vit needs 2 completions today.');
+    expect(text(notificationFor('INT'))).toBe('Penalty active: Int needs 2 completions today.');
+    expect(text(notificationFor('DISC'))).toBe('Penalty active: Disc needs 2 completions today.');
+    expect(text(notificationFor('SOC'))).toBe('Penalty active: Soc needs 2 completions today.');
+  });
+
+  it('marks only the required count as monospace', () => {
+    const segments = notificationFor('SOC');
+
+    expect(segments.filter((segment) => segment.mono).map((segment) => segment.text)).toEqual([
+      '2',
+    ]);
+    expect(segments.filter((segment) => !segment.mono).map((segment) => segment.text)).toEqual([
+      'Penalty active: Soc needs ',
+      ' completions today.',
     ]);
   });
 });

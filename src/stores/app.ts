@@ -90,6 +90,7 @@ export interface AppStore extends Readable<AppState> {
   readonly streak: Readable<number>;
   readonly freezesLeft: Readable<number>;
   readonly questRows: Readable<QuestStatGroup[]>;
+  readonly penaltyStats: Readable<Stat[]>;
 }
 
 /** Milliseconds from `now` to the next local midnight. */
@@ -346,6 +347,15 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
     ),
     freezesLeft,
     questRows: derived(base, toQuestGroups),
+    penaltyStats: derived(base, (state) => {
+      const openDay = openDayOf(state);
+
+      if (openDay === undefined) {
+        return [];
+      }
+
+      return STATS.filter((stat) => openDay.requiredCompletions[stat] === 2);
+    }),
     completeTask(taskId, variantTier) {
       const result = engineCompleteTask(current, { taskId, variantTier }, now(), newId);
 
