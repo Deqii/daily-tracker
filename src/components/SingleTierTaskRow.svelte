@@ -3,6 +3,7 @@
   import { overCapLabel, singleTierVariant, taskTag, variantPointsLabel } from '../lib/tasks-list';
   import type { Task } from '../lib/types';
   import { app } from '../stores/app';
+  import DeleteConfirm from './DeleteConfirm.svelte';
 
   interface Props {
     task: Task;
@@ -13,11 +14,19 @@
 
   const rank = app.rank;
 
+  let confirming = $state(false);
+
   const variant = $derived(singleTierVariant(task));
   const maxPointsPerTask = $derived(getRankConfig($rank).maxPointsPerTask);
 </script>
 
-{#if variant !== null}
+{#if confirming}
+  <DeleteConfirm
+    name={task.familyName}
+    onconfirm={() => app.deleteTask(task.id)}
+    oncancel={() => (confirming = false)}
+  />
+{:else if variant !== null}
   {@const capLabel = overCapLabel(variant.points, maxPointsPerTask)}
   <li class="flex items-center gap-2 border-b border-surface py-2">
     <span class="text-sm text-text">{task.familyName}</span>
@@ -53,6 +62,7 @@
       type="button"
       aria-label={`Delete ${task.familyName}`}
       class="inline-flex shrink-0 items-center rounded-sm p-1 text-icon-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      onclick={() => (confirming = true)}
     >
       <svg
         viewBox="0 0 16 16"

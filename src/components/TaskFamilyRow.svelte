@@ -4,6 +4,7 @@
   import { tierLabel } from '../lib/today-lines';
   import type { Task, Tier } from '../lib/types';
   import { app } from '../stores/app';
+  import DeleteConfirm from './DeleteConfirm.svelte';
 
   interface Props {
     task: Task;
@@ -14,6 +15,8 @@
 
   const rank = app.rank;
 
+  let confirming = $state(false);
+
   const TIER_MARKER_CLASS: Record<Tier, string> = {
     ringan: 'bg-tier-ringan',
     sedang: 'bg-tier-sedang',
@@ -23,6 +26,13 @@
   const maxPointsPerTask = $derived(getRankConfig($rank).maxPointsPerTask);
 </script>
 
+{#if confirming}
+  <DeleteConfirm
+    name={task.familyName}
+    onconfirm={() => app.deleteTask(task.id)}
+    oncancel={() => (confirming = false)}
+  />
+{:else}
 <li class="border-b border-surface py-2">
   <div class="flex items-center gap-2">
     <span class="text-sm text-text">{task.familyName}</span>
@@ -55,6 +65,7 @@
         type="button"
         aria-label={`Delete ${task.familyName}`}
         class="inline-flex shrink-0 items-center rounded-sm p-1 text-icon-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        onclick={() => (confirming = true)}
       >
         <svg
           viewBox="0 0 16 16"
@@ -95,3 +106,4 @@
     {/each}
   </ul>
 </li>
+{/if}

@@ -7,7 +7,7 @@ import {
   type StorageSchema,
 } from '../lib/storage';
 import { emptyTaskFormDraft, type TaskFormDraft } from '../lib/task-form';
-import type { Reward, Task } from '../lib/types';
+import type { DailyQuestDay, Reward, Task } from '../lib/types';
 import {
   createAppStore,
   millisecondsUntilNextMidnight,
@@ -104,6 +104,17 @@ function anchorTask(): Task {
   };
 }
 
+function rotatingTask(id: string, familyName: string, stat: Task['stat']): Task {
+  return {
+    id,
+    familyName,
+    stat,
+    isAnchor: false,
+    variants: [{ tier: 'ringan', description: '1 rep', points: 5 }],
+    createdAt: '2026-10-01T08:00:00+07:00',
+  };
+}
+
 function aReward(cost = 10): Reward {
   return { id: 'rew00001', title: 'Kopi susu', cost, createdAt: '2026-10-01T08:00:00+07:00' };
 }
@@ -134,6 +145,16 @@ function plainRoot(): {
       values[name] = value;
     },
   };
+}
+
+function openDayOf(state: AppState): DailyQuestDay {
+  const day = state.dailyQuestLog.find((entry) => entry.date === TODAY && !entry.closed);
+
+  if (day === undefined) {
+    throw new Error('expected an open day');
+  }
+
+  return day;
 }
 
 beforeEach(() => {
@@ -555,6 +576,171 @@ describe('createAppStore', () => {
       variants: [{ tier: 'sedang', description: '2 minutes', points: 8 }],
       createdAt: '2026-10-01T08:00:00+07:00',
     });
+
+    store.teardown();
+  });
+
+  it('deletes a task and persists the change', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [
+        anchorTask(),
+        rotatingTask('task0002', 'Dead hang', 'STR'),
+        rotatingTask('task0003', 'Jogging', 'VIT'),
+      ],
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    store.deleteTask('task0001');
+
+    const state = read<AppState>(store);
+
+    expect(state.tasks.map((task) => task.id)).toEqual(['task0002', 'task0003']);
+    expect(JSON.parse(fake.getItem(STORAGE_KEYS.tasks) ?? '[]')).toHaveLength(2);
+
+    store.teardown();
+  });
+
+  it('ignores a delete for an unknown task id', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, { tasks: [anchorTask()] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    store.deleteTask('does-not-exist');
+
+    expect(read<AppState>(store).tasks).toHaveLength(1);
+
+    store.teardown();
+  });
+
+  it('re-picks a replacement rotating task when the open day pick is deleted', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [rotatingTask('task0001', 'Task A', 'STR'), rotatingTask('task0002', 'Task B', 'STR')],
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const picked = openDayOf(read<AppState>(store)).selectedTaskIdPerStat.STR;
+    expect(picked).toBeDefined();
+    if (picked === undefined) {
+      return;
+    }
+
+    store.deleteTask(picked);
+
+    const state = read<AppState>(store);
+    const day = openDayOf(state);
+    const remaining = picked === 'task0001' ? 'task0002' : 'task0001';
+
+    expect(state.tasks.map((task) => task.id)).toEqual([remaining]);
+    expect(day.selectedTaskIdPerStat.STR).toBe(remaining);
+
+    store.teardown();
+  });
+
+  it('re-picks the deleted rotating pick by the seeded rule', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [
+        rotatingTask('task0001', 'Task A', 'STR'),
+        rotatingTask('task0002', 'Task B', 'STR'),
+        rotatingTask('task0003', 'Task C', 'STR'),
+        rotatingTask('task0004', 'Task D', 'STR'),
+      ],
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const picked = openDayOf(read<AppState>(store)).selectedTaskIdPerStat.STR;
+    expect(picked).toBeDefined();
+    if (picked === undefined) {
+      return;
+    }
+
+    store.deleteTask(picked);
+
+    const day = openDayOf(read<AppState>(store));
+
+    expect(day.selectedTaskIdPerStat.STR).not.toBe(picked);
+    expect(day.selectedTaskIdPerStat.STR).toBeDefined();
+    expect(day.date).toBe(TODAY);
+
+    store.teardown();
+  });
+
+  it('leaves the open day pick unchanged when a non-picked rotating task is deleted', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    const ids = ['task0001', 'task0002', 'task0003'];
+    seed(fake, {
+      tasks: ids.map((id) => rotatingTask(id, `Task ${id}`, 'STR')),
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const picked = openDayOf(read<AppState>(store)).selectedTaskIdPerStat.STR;
+    expect(picked).toBeDefined();
+    if (picked === undefined) {
+      return;
+    }
+
+    const other = ids.find((id) => id !== picked);
+    expect(other).toBeDefined();
+    if (other === undefined) {
+      return;
+    }
+
+    store.deleteTask(other);
+
+    const state = read<AppState>(store);
+
+    expect(state.tasks.map((task) => task.id)).not.toContain(other);
+    expect(openDayOf(state).selectedTaskIdPerStat.STR).toBe(picked);
+
+    store.teardown();
+  });
+
+  it('deleting an anchor task does not touch the rotating pick', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [
+        anchorTask(),
+        rotatingTask('task0002', 'Task B', 'STR'),
+        rotatingTask('task0003', 'Task C', 'STR'),
+      ],
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const picked = openDayOf(read<AppState>(store)).selectedTaskIdPerStat.STR;
+    expect(picked).toBeDefined();
+    if (picked === undefined) {
+      return;
+    }
+
+    store.deleteTask('task0001');
+
+    const state = read<AppState>(store);
+
+    expect(state.tasks.map((task) => task.id)).toEqual(['task0002', 'task0003']);
+    expect(openDayOf(state).selectedTaskIdPerStat.STR).toBe(picked);
+
+    store.teardown();
+  });
+
+  it('clears the pick when the deleted rotating task was the only one in its stat', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, { tasks: [rotatingTask('task0001', 'Task A', 'STR')] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    store.deleteTask('task0001');
+
+    const day = openDayOf(read<AppState>(store));
+
+    expect(day.selectedTaskIdPerStat.STR).toBeUndefined();
 
     store.teardown();
   });

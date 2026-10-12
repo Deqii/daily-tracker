@@ -1,5 +1,6 @@
 import { derived, writable, type Readable } from 'svelte/store';
 import { passesBalanceGate } from '../engine/balance';
+import { selectDailyTasks } from '../engine/daily';
 import {
   completeTask as engineCompleteTask,
   type CompleteTaskResult,
@@ -94,6 +95,7 @@ export interface AppDeps {
 
 export interface AppStore extends Readable<AppState> {
   completeTask(taskId: string, variantTier: Tier | null): CompleteTaskResult;
+  deleteTask(taskId: string): void;
   saveTask(draft: TaskFormDraft, editingId: string | null): void;
   purchaseReward(rewardId: string): PurchaseResult;
   rollover(): void;
@@ -426,6 +428,37 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
           ? [...current.tasks, task]
           : current.tasks.map((entry) => (entry.id === task.id ? task : entry));
       const next: AppState = { ...current, tasks };
+
+      commit(next);
+      persist(next);
+    },
+    deleteTask(taskId) {
+      const task = current.tasks.find((entry) => entry.id === taskId);
+
+      if (task === undefined) {
+        return;
+      }
+
+      const tasks = current.tasks.filter((entry) => entry.id !== taskId);
+      const openDay = openDayOf(current);
+      let dailyQuestLog = current.dailyQuestLog;
+
+      if (openDay !== undefined && openDay.selectedTaskIdPerStat[task.stat] === taskId) {
+        const selectedTaskIdPerStat = { ...openDay.selectedTaskIdPerStat };
+        const replacement = selectDailyTasks(tasks, openDay.date)[task.stat];
+
+        if (replacement === undefined) {
+          delete selectedTaskIdPerStat[task.stat];
+        } else {
+          selectedTaskIdPerStat[task.stat] = replacement;
+        }
+
+        dailyQuestLog = dailyQuestLog.map((day) =>
+          day.date === openDay.date ? { ...day, selectedTaskIdPerStat } : day
+        );
+      }
+
+      const next: AppState = { ...current, tasks, dailyQuestLog };
 
       commit(next);
       persist(next);
