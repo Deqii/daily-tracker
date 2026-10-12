@@ -1,6 +1,7 @@
 <script lang="ts">
   import RankReference from '../components/RankReference.svelte';
   import ThemeToggle from '../components/ThemeToggle.svelte';
+  import TitlePicker from '../components/TitlePicker.svelte';
 </script>
 
 <section class="p-4">
@@ -11,6 +12,7 @@
       <span class="text-sm text-text">Theme</span>
       <ThemeToggle />
     </li>
+    <TitlePicker />
     <RankReference />
   </ul>
 </section>

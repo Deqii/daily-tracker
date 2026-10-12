@@ -422,6 +422,44 @@ describe('createAppStore', () => {
     empty.teardown();
   });
 
+  it('equips and unequips a title through the engine and persists it', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      userState: {
+        ...createDefaultUserState(TODAY),
+        unlockedTitles: ['streak-7'],
+      },
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    store.equipTitle('streak-7');
+
+    expect(read<AppState>(store).userState.equippedTitle).toBe('streak-7');
+    const persisted = JSON.parse(fake.getItem(STORAGE_KEYS.userState) ?? '{}') as {
+      equippedTitle: string | null;
+    };
+    expect(persisted.equippedTitle).toBe('streak-7');
+
+    store.equipTitle(null);
+
+    expect(read<AppState>(store).userState.equippedTitle).toBeNull();
+
+    store.teardown();
+  });
+
+  it('ignores equipping a title that is not unlocked', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    stubStorage();
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    store.equipTitle('streak-7');
+
+    expect(read<AppState>(store).userState.equippedTitle).toBeNull();
+
+    store.teardown();
+  });
+
   it('reports a blocked rank-up with the gate threshold', () => {
     vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
     const fake = stubStorage();

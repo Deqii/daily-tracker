@@ -12,7 +12,7 @@ import { getRankConfig, rank as levelRankOf, resolveRank } from '../engine/rank'
 import { runRollover as engineRunRollover } from '../engine/run-rollover';
 import type { AppState } from '../engine/state';
 import { displayStreak } from '../engine/streak';
-import { TITLES } from '../engine/titles';
+import { equipTitle as engineEquipTitle, TITLES, type TitleId } from '../engine/titles';
 import { toLocalDate, toTimestamp } from '../lib/date';
 import { buildRewardFromDraft, type RewardFormDraft } from '../lib/reward-form';
 import { selectRewardPreview, type RewardPreviewRow } from '../lib/rewards-preview';
@@ -100,6 +100,7 @@ export interface AppStore extends Readable<AppState> {
   saveTask(draft: TaskFormDraft, editingId: string | null): void;
   saveReward(draft: RewardFormDraft, editingId: string | null): void;
   purchaseReward(rewardId: string): PurchaseResult;
+  equipTitle(id: TitleId | null): void;
   rollover(): void;
   teardown(): void;
   readonly saveError: Readable<StorageFailure | null>;
@@ -493,6 +494,16 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
       }
 
       return result;
+    },
+    equipTitle(id) {
+      const result = engineEquipTitle(current.userState, id);
+
+      if (result.ok) {
+        const next: AppState = { ...current, userState: result.value };
+
+        commit(next);
+        persist(next);
+      }
     },
     rollover: runRollover,
     teardown() {
