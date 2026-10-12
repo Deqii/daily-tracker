@@ -35,6 +35,32 @@ export function taskTag(task: Task): 'Anchor' | 'Rotating' {
 }
 
 /**
+ * Whether a task renders as a family (a heading row with indented effort-variant sub-rows) rather
+ * than a single row. Exactly one variant is single-tier (PRD §2.1, design §5).
+ */
+export function hasEffortVariants(task: Task): boolean {
+  return task.variants.length > 1;
+}
+
+/** The points shown for one effort variant on a family sub-row, before the multiplier (design §5). */
+export function variantPointsLabel(points: number): string {
+  return `${points} pts`;
+}
+
+/**
+ * The over-cap marker for one effort variant, or `null` when it is within the rank's per-task cap
+ * (design §7). A stored value above the cap is kept but counts as the cap when awarded (PRD §2.1,
+ * decisions D11). Rank S is uncapped, so `maxPointsPerTask` is `null` and nothing is over cap.
+ */
+export function overCapLabel(points: number, maxPointsPerTask: number | null): string | null {
+  if (maxPointsPerTask === null || points <= maxPointsPerTask) {
+    return null;
+  }
+
+  return `Over cap: counts as ${maxPointsPerTask}`;
+}
+
+/**
  * A task's points shown on its row, before the rank multiplier (design §5). A single-tier task
  * shows one value; a family shows its lowest to highest variant.
  */
