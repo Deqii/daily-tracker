@@ -3,6 +3,7 @@ import {
   groupTasksByStat,
   hasEffortVariants,
   overCapLabel,
+  singleTierVariant,
   statSectionLabel,
   taskCountLabel,
   taskPointsLabel,
@@ -128,6 +129,36 @@ describe('hasEffortVariants', () => {
   it('is true for a task with several variants', () => {
     expect(hasEffortVariants(task('push-up', 'STR', false, [5, 9, 15]))).toBe(true);
     expect(hasEffortVariants(task('stretch', 'VIT', false, [4, 4]))).toBe(true);
+  });
+});
+
+describe('singleTierVariant', () => {
+  it('returns the one variant of a single-tier task', () => {
+    const water = task('water', 'VIT', true, [5]);
+
+    expect(singleTierVariant(water)).toEqual(water.variants[0]);
+  });
+
+  it('returns null for a task with no variants', () => {
+    const empty: Task = {
+      id: 'empty',
+      familyName: 'empty',
+      stat: 'STR',
+      isAnchor: false,
+      variants: [],
+      createdAt: '2026-10-01T08:00:00+07:00',
+    };
+
+    expect(singleTierVariant(empty)).toBeNull();
+  });
+
+  it('does not mutate the input', () => {
+    const water = task('water', 'VIT', true, [5]);
+    const snapshot = structuredClone(water);
+
+    singleTierVariant(water);
+
+    expect(water).toEqual(snapshot);
   });
 });
 
