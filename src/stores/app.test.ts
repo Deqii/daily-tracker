@@ -337,6 +337,9 @@ describe('createAppStore', () => {
     expect(rows[0]?.rows[0]?.task.id).toBe('task0001');
     expect(rows[0]?.rows[0]?.isAnchor).toBe(true);
     expect(rows[0]?.rows[0]?.points).toEqual({ min: 3, max: 3 });
+    expect(rows[0]?.rows[0]?.options).toEqual([
+      { tier: 'ringan', description: '60 seconds', points: 3 },
+    ]);
 
     store.teardown();
   });
@@ -365,6 +368,11 @@ describe('createAppStore', () => {
     const rows = read(store.questRows);
 
     expect(rows[0]?.rows[0]?.points).toEqual({ min: 3, max: 8 });
+    expect(rows[0]?.rows[0]?.options).toEqual([
+      { tier: 'ringan', description: '10x2 set', points: 3 },
+      { tier: 'sedang', description: '20x3 set', points: 5 },
+      { tier: 'berat', description: '30x4 set or jogging 2km', points: 8 },
+    ]);
 
     store.teardown();
   });

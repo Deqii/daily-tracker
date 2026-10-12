@@ -1,4 +1,4 @@
-import type { Stat } from './types';
+import type { Stat, Tier } from './types';
 
 /** One run of a Today copy line; `mono` runs render in the monospace typeface. */
 export interface LineSegment {
@@ -15,9 +15,21 @@ const STAT_LABELS: Record<Stat, string> = {
   SOC: 'Soc',
 };
 
+/** Display labels for the three effort tiers, as written in copy (design §5). */
+const TIER_LABELS: Record<Tier, string> = {
+  ringan: 'Ringan',
+  sedang: 'Sedang',
+  berat: 'Berat',
+};
+
 /** The copy label for a stat: `STR` renders as `Str`, and so on (design §5). */
 export function statLabel(stat: Stat): string {
   return STAT_LABELS[stat];
+}
+
+/** The copy label for an effort tier: `ringan` renders as `Ringan`, and so on (design §5). */
+export function tierLabel(tier: Tier): string {
+  return TIER_LABELS[tier];
 }
 
 /** The freezes-left line under the XP bar (design §5, §7). */

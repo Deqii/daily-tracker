@@ -56,6 +56,13 @@ export interface QuestRowPoints {
   readonly max: number;
 }
 
+/** One effort variant of a quest row, with the points it will award (after cap and multiplier). */
+export interface QuestVariantOption {
+  readonly tier: Tier;
+  readonly description: string;
+  readonly points: number;
+}
+
 /** One row of the open day's Daily Quest (an anchor task or that day's rotating pick). */
 export interface QuestRow {
   readonly task: Task;
@@ -63,6 +70,7 @@ export interface QuestRow {
   readonly isRotating: boolean;
   readonly completionCount: number;
   readonly points: QuestRowPoints;
+  readonly options: QuestVariantOption[];
 }
 
 /** The open day's quest rows for one quest-active stat. */
@@ -209,8 +217,16 @@ function equippedTitleName(id: string | null): string | null {
   return TITLES.find((title) => title.id === id)?.name ?? null;
 }
 
-function toQuestRowPoints(task: Task, rank: Rank): QuestRowPoints {
-  const awarded = task.variants.map((variant) => pointsAwarded(variant.points, rank));
+function toQuestOptions(task: Task, rank: Rank): QuestVariantOption[] {
+  return task.variants.map((variant) => ({
+    tier: variant.tier,
+    description: variant.description,
+    points: pointsAwarded(variant.points, rank),
+  }));
+}
+
+function toQuestRowPoints(options: QuestVariantOption[]): QuestRowPoints {
+  const awarded = options.map((option) => option.points);
 
   return { min: Math.min(...awarded), max: Math.max(...awarded) };
 }
@@ -234,15 +250,20 @@ function toQuestGroups(state: AppState): QuestStatGroup[] {
 
     const rows = state.tasks
       .filter((task) => task.stat === stat && (task.isAnchor || task.id === rotatingTaskId))
-      .map((task) => ({
-        task,
-        isAnchor: task.isAnchor,
-        isRotating: !task.isAnchor && task.id === rotatingTaskId,
-        completionCount: state.completions.filter(
-          (completion) => completion.localDate === openDay.date && completion.taskId === task.id
-        ).length,
-        points: toQuestRowPoints(task, rank),
-      }));
+      .map((task) => {
+        const options = toQuestOptions(task, rank);
+
+        return {
+          task,
+          isAnchor: task.isAnchor,
+          isRotating: !task.isAnchor && task.id === rotatingTaskId,
+          completionCount: state.completions.filter(
+            (completion) => completion.localDate === openDay.date && completion.taskId === task.id
+          ).length,
+          points: toQuestRowPoints(options),
+          options,
+        };
+      });
 
     groups.push({
       stat,
