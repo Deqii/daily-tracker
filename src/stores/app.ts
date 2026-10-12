@@ -13,6 +13,7 @@ import type { AppState } from '../engine/state';
 import { displayStreak } from '../engine/streak';
 import { TITLES } from '../engine/titles';
 import { toLocalDate } from '../lib/date';
+import { selectRewardPreview, type RewardPreviewRow } from '../lib/rewards-preview';
 import { loadState, write, type StorageFailure, type StorageSchema } from '../lib/storage';
 import type { Rank, Stat, Task, Tier } from '../lib/types';
 import { STATS } from '../lib/types';
@@ -107,6 +108,7 @@ export interface AppStore extends Readable<AppState> {
   readonly freezesLeft: Readable<number>;
   readonly questRows: Readable<QuestStatGroup[]>;
   readonly penaltyStats: Readable<Stat[]>;
+  readonly rewardPreview: Readable<RewardPreviewRow[]>;
 }
 
 /** Milliseconds from `now` to the next local midnight. */
@@ -384,6 +386,9 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
     ),
     freezesLeft,
     questRows: derived(base, toQuestGroups),
+    rewardPreview: derived(base, (state) =>
+      selectRewardPreview(state.rewards, state.userState.wallet)
+    ),
     penaltyStats: derived(base, (state) => {
       const openDay = openDayOf(state);
 

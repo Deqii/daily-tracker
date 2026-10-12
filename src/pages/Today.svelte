@@ -4,6 +4,7 @@
   import NotificationBlocks from '../components/NotificationBlocks.svelte';
   import RadarChart from '../components/RadarChart.svelte';
   import RankLevelReadout from '../components/RankLevelReadout.svelte';
+  import RewardsPreview from '../components/RewardsPreview.svelte';
   import TodayStatusLines from '../components/TodayStatusLines.svelte';
   import XpProgressBar from '../components/XpProgressBar.svelte';
 </script>
@@ -16,4 +17,5 @@
   <RadarChart />
   <NotificationBlocks />
   <DailyQuest />
+  <RewardsPreview />
 </section>
