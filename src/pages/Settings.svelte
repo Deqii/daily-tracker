@@ -1,4 +1,5 @@
 <script lang="ts">
+  import RankReference from '../components/RankReference.svelte';
   import ThemeToggle from '../components/ThemeToggle.svelte';
 </script>
 
@@ -10,5 +11,6 @@
       <span class="text-sm text-text">Theme</span>
       <ThemeToggle />
     </li>
+    <RankReference />
   </ul>
 </section>
