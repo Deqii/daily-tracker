@@ -14,7 +14,7 @@
   role="img"
   aria-label={geometry.ariaLabel}
   viewBox={`0 0 ${geometry.width} ${geometry.height}`}
-  class="mt-4 w-full"
+  class="mt-4 w-1/3 mx-auto"
   style="min-width: 240px"
 >
   <g fill="none" stroke="var(--surface)" stroke-width="1">
