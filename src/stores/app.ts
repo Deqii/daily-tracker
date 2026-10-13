@@ -16,7 +16,13 @@ import { equipTitle as engineEquipTitle, TITLES, type TitleId } from '../engine/
 import { toLocalDate, toTimestamp } from '../lib/date';
 import { buildRewardFromDraft, type RewardFormDraft } from '../lib/reward-form';
 import { selectRewardPreview, type RewardPreviewRow } from '../lib/rewards-preview';
-import { loadState, write, type StorageFailure, type StorageSchema } from '../lib/storage';
+import {
+  loadState,
+  write,
+  type StorageFailure,
+  type StorageReport,
+  type StorageSchema,
+} from '../lib/storage';
 import { buildTaskVariants, type TaskFormDraft } from '../lib/task-form';
 import type { Rank, Reward, Stat, Task, Tier } from '../lib/types';
 import { STATS } from '../lib/types';
@@ -104,6 +110,7 @@ export interface AppStore extends Readable<AppState> {
   rollover(): void;
   teardown(): void;
   readonly saveError: Readable<StorageFailure | null>;
+  readonly loadReport: Readable<import('../lib/storage').StorageReport>;
   readonly level: Readable<number>;
   readonly levelProgress: Readable<LevelProgress>;
   readonly rank: Readable<Rank>;
@@ -308,6 +315,7 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
   const initial = toAppState(loaded.state);
   const { subscribe, set } = writable<AppState>(initial);
   const saveError = writable<StorageFailure | null>(null);
+  const loadReport = writable<StorageReport>(loaded.report);
 
   let current = initial;
   let timer: TimerHandle | null = null;
@@ -381,6 +389,7 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
   return {
     subscribe,
     saveError,
+    loadReport,
     level,
     levelProgress: derived(base, toLevelProgress),
     rank,
