@@ -5,7 +5,7 @@
   import { getRankConfig } from '../engine/rank';
 
   const pending = $derived(pendingRankUpReveals($app.milestoneEvents));
-  const current = $derived(pending[0] ?? null) as ReturnType<typeof pendingRankUpReveals>[0] | null;
+  const current = $derived(pending[0] ?? null);
   const config = $derived(current ? getRankConfig(current.to) : null);
 
   let continueButton = $state<HTMLButtonElement | null>(null);
