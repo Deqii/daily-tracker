@@ -14,6 +14,7 @@ import type { AppState } from '../engine/state';
 import { displayStreak } from '../engine/streak';
 import { equipTitle as engineEquipTitle, TITLES, type TitleId } from '../engine/titles';
 import { toLocalDate, toTimestamp } from '../lib/date';
+import type { ExportState } from '../lib/export';
 import { buildRewardFromDraft, type RewardFormDraft } from '../lib/reward-form';
 import { selectRewardPreview, type RewardPreviewRow } from '../lib/rewards-preview';
 import {
@@ -107,6 +108,7 @@ export interface AppStore extends Readable<AppState> {
   saveReward(draft: RewardFormDraft, editingId: string | null): void;
   purchaseReward(rewardId: string): PurchaseResult;
   equipTitle(id: TitleId | null): void;
+  importState(state: ExportState): void;
   rollover(): void;
   teardown(): void;
   readonly saveError: Readable<StorageFailure | null>;
@@ -513,6 +515,10 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
         commit(next);
         persist(next);
       }
+    },
+    importState(state) {
+      commit(state);
+      persist(state);
     },
     rollover: runRollover,
     teardown() {
