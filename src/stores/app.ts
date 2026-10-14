@@ -528,9 +528,8 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
         return;
       }
 
-      const milestoneEvents = current.milestoneEvents.map(
-        (event): MilestoneEvent =>
-          event.id === eventId ? { ...event, seen: true } : event
+      const milestoneEvents = current.milestoneEvents.map((event): MilestoneEvent =>
+        event.id === eventId ? { ...event, seen: true } : event
       );
       const next: AppState = { ...current, milestoneEvents };
 

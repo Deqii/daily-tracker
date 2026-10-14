@@ -26,11 +26,7 @@ export interface StreakClose {
  * left, and (5) otherwise the streak resets to 0. Freezes protect only the streak; penalties are
  * handled separately. The input is never mutated.
  */
-export function closeDayStreak(
-  streakState: StreakState,
-  day: StreakDay,
-  rank: Rank
-): StreakClose {
+export function closeDayStreak(streakState: StreakState, day: StreakDay, rank: Rank): StreakClose {
   const startOfWeek = weekStart(day.date);
   const isNewWeek = startOfWeek > streakState.lastFreezeWeekReset;
 

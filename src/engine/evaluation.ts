@@ -81,7 +81,9 @@ export function nextPenaltyStats(
     flagged.add(stat);
   }
 
-  return STATS.filter((stat) => questActive.has(stat) && flagged.has(stat) && !satisfiedSet.has(stat));
+  return STATS.filter(
+    (stat) => questActive.has(stat) && flagged.has(stat) && !satisfiedSet.has(stat)
+  );
 }
 
 export interface PenaltyState {

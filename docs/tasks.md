@@ -134,8 +134,8 @@ Full bodies with acceptance criteria are in the GitHub issues.
 ### UI additions
 
 - [ ] `feat(ui)`: implement the freezes-left line and the rank-up-blocked line on Today — `area:frontend` (U1)
-- [ ] `feat(ui)`: implement the title picker row in Settings — `area:frontend` (U2)
-- [ ] `feat(ui)`: implement the storage-failure notice — `area:frontend` (U3)
+- [ ] `feat(ui)`: implement the title picker row in Settings — `area:frontend` (U2 = #136)
+- [ ] `feat(ui)`: implement the storage notices (write failure and data recovery) — `area:frontend` (U3 = #137)
 - [ ] `feat(ui)`: implement responsive layouts for all pages — `area:frontend` (U4)
 - [ ] `chore(a11y)`: keyboard, focus, and contrast pass in both themes — `area:frontend` (U5)
 
@@ -212,18 +212,18 @@ All engine issues are blocked by C1 and C3, and include tests for the code they 
 
 ## Notes for later issues
 
-| Issue    | Note                                                                                                                                                          |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| #26      | Needs S1 first (chips read derived stores).                                                                                                                   |
-| #27      | Hash router, no library: `#/today`, `#/tasks`, `#/rewards`, `#/history`, `#/settings`; default `#/today`; unknown hash goes to Today (D13).                   |
-| #28      | Theme stored under `daily-tracker:theme`, default dark, sets `data-theme` on `<html>` (D16).                                                                  |
-| #31      | Implement `design.md` §2 verbatim (dark and light). `data-rank` on `<html>` follows the effective rank (set by S1). Fonts per D15.                            |
-| #35, #49 | In-house SVG with the accessible labels from `design.md` §9 (D14).                                                                                            |
-| #37, #38 | The checklist and completion call `completeTask` through the stores. No game logic in components.                                                             |
-| #40      | "Active-count header" means the task count shown in `design.md` ("11 tasks").                                                                                 |
-| #48      | Buying calls `purchaseReward` through the stores.                                                                                                             |
-| #54, #55 | Export and import the keys in PRD §6 except the theme. Import validates `schemaVersion` and shapes without a validation library; any failure changes nothing. |
-| #56–#59  | `design.md` §6.                                                                                                                                               |
-| #60      | Copy in `design.md` §7.                                                                                                                                       |
-| #61      | Both themes. Contrast already follows `design.md` §2 and §9.                                                                                                  |
-| #62      | Human-only (domain, DNS). The agent may prepare static-hosting config only.                                                                                   |
+| Issue    | Note                                                                                                                                                                                                                                                                                                                   |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #26      | Needs S1 first (chips read derived stores).                                                                                                                                                                                                                                                                            |
+| #27      | Hash router, no library: `#/today`, `#/tasks`, `#/rewards`, `#/history`, `#/settings`; default `#/today`; unknown hash goes to Today (D13).                                                                                                                                                                            |
+| #28      | Theme stored under `daily-tracker:theme`, default dark, sets `data-theme` on `<html>` (D16).                                                                                                                                                                                                                           |
+| #31      | Implement `design.md` §2 verbatim (dark and light). `data-rank` on `<html>` follows the effective rank (set by S1). Fonts per D15.                                                                                                                                                                                     |
+| #35, #49 | In-house SVG with the accessible labels from `design.md` §9 (D14).                                                                                                                                                                                                                                                     |
+| #37, #38 | The checklist and completion call `completeTask` through the stores. No game logic in components.                                                                                                                                                                                                                      |
+| #40      | "Active-count header" means the task count shown in `design.md` ("11 tasks").                                                                                                                                                                                                                                          |
+| #48      | Buying calls `purchaseReward` through the stores.                                                                                                                                                                                                                                                                      |
+| #54, #55 | Export and import the keys in PRD §6 except the theme. Export also includes the recovery backup (`daily-tracker:backup`, if present) in a separate `recoveryBackup` field, and import ignores that field (D22). Import validates `schemaVersion` and shapes without a validation library; any failure changes nothing. |
+| #56–#59  | `design.md` §6.                                                                                                                                                                                                                                                                                                        |
+| #60      | Copy in `design.md` §7.                                                                                                                                                                                                                                                                                                |
+| #61      | Both themes. Contrast already follows `design.md` §2 and §9.                                                                                                                                                                                                                                                           |
+| #62      | Human-only (domain, DNS). The agent may prepare static-hosting config only.                                                                                                                                                                                                                                            |

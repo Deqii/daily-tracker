@@ -68,9 +68,7 @@ function isStatCountRecord(value: unknown): boolean {
 }
 
 function isSelectedTaskIdRecord(value: unknown): boolean {
-  return (
-    isRecord(value) && Object.entries(value).every(([key, id]) => isStat(key) && isString(id))
-  );
+  return isRecord(value) && Object.entries(value).every(([key, id]) => isStat(key) && isString(id));
 }
 
 function isTaskVariant(value: unknown): boolean {
