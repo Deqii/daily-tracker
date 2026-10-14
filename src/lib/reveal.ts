@@ -9,6 +9,18 @@ export type LevelUpEvent = Extract<MilestoneEvent, { type: 'levelUp' }>;
  * overlay shows one at a time and marks each seen as it closes, which reveals the next. Pure: the
  * input is not mutated.
  */
+export type RankUpEvent = Extract<MilestoneEvent, { type: 'rankUp' }>;
+
 export function pendingLevelUpReveals(events: readonly MilestoneEvent[]): LevelUpEvent[] {
   return events.filter((event): event is LevelUpEvent => event.type === 'levelUp' && !event.seen);
+}
+
+/**
+ * The rank-up events still waiting to be revealed, oldest first (design §6). `milestoneEvents`
+ * are appended in the order they happen, so filtering keeps the oldest event at the front: the
+ * overlay shows one at a time and marks each seen as it closes, which reveals the next. Pure: the
+ * input is not mutated.
+ */
+export function pendingRankUpReveals(events: readonly MilestoneEvent[]): RankUpEvent[] {
+  return events.filter((event): event is RankUpEvent => event.type === 'rankUp' && !event.seen);
 }

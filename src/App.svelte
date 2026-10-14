@@ -1,6 +1,7 @@
 <script lang="ts">
   import StorageNotices from './components/StorageNotices.svelte';
   import LevelUpReveal from './components/LevelUpReveal.svelte';
+  import RankUpReveal from './components/RankUpReveal.svelte';
   import TopBar from './components/TopBar.svelte';
   import Today from './pages/Today.svelte';
   import Tasks from './pages/Tasks.svelte';
@@ -22,6 +23,7 @@
 <TopBar />
 <StorageNotices />
 <LevelUpReveal />
+<RankUpReveal />
 
 <main>
   <svelte:component this={routes[$currentRoute]} />
