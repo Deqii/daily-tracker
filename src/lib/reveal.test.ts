@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { MilestoneEvent } from './types';
-import { pendingLevelUpReveals } from './reveal';
+import { pendingLevelUpReveals, pendingRankUpReveals } from './reveal';
 
 function levelUp(id: string, to: number, seen = false): MilestoneEvent {
   return { id, type: 'levelUp', localDate: '2026-10-11', from: to - 1, to, seen };
@@ -35,6 +35,36 @@ describe('pendingLevelUpReveals', () => {
     const copy = structuredClone(events);
 
     pendingLevelUpReveals(events);
+
+    expect(events).toEqual(copy);
+  });
+});
+
+describe('pendingRankUpReveals', () => {
+  it('returns an empty list when there are no events', () => {
+    expect(pendingRankUpReveals([])).toEqual([]);
+  });
+
+  it('keeps only unseen rank-up events, oldest first', () => {
+    const first = rankUp('a');
+    const second = rankUp('b');
+    const seen = rankUp('c', true);
+
+    expect(pendingRankUpReveals([first, seen, second])).toEqual([first, second]);
+  });
+
+  it('ignores level events', () => {
+    const rank = rankUp('a');
+    const level = levelUp('b', 2);
+
+    expect(pendingRankUpReveals([level, rank])).toEqual([rank]);
+  });
+
+  it('does not mutate the input', () => {
+    const events = [rankUp('a'), rankUp('b', true)];
+    const copy = structuredClone(events);
+
+    pendingRankUpReveals(events);
 
     expect(events).toEqual(copy);
   });
