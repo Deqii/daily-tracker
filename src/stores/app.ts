@@ -25,7 +25,7 @@ import {
   type StorageSchema,
 } from '../lib/storage';
 import { buildTaskVariants, type TaskFormDraft } from '../lib/task-form';
-import type { Rank, Reward, Stat, Task, Tier } from '../lib/types';
+import type { MilestoneEvent, Rank, Reward, Stat, Task, Tier } from '../lib/types';
 import { STATS } from '../lib/types';
 
 export type TimerHandle = ReturnType<typeof setTimeout>;
@@ -109,6 +109,7 @@ export interface AppStore extends Readable<AppState> {
   purchaseReward(rewardId: string): PurchaseResult;
   equipTitle(id: TitleId | null): void;
   importState(state: ExportState): void;
+  markMilestoneSeen(eventId: string): void;
   rollover(): void;
   teardown(): void;
   readonly saveError: Readable<StorageFailure | null>;
@@ -519,6 +520,22 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
     importState(state) {
       commit(state);
       persist(state);
+    },
+    markMilestoneSeen(eventId) {
+      const target = current.milestoneEvents.find((event) => event.id === eventId);
+
+      if (target === undefined || target.seen) {
+        return;
+      }
+
+      const milestoneEvents = current.milestoneEvents.map(
+        (event): MilestoneEvent =>
+          event.id === eventId ? { ...event, seen: true } : event
+      );
+      const next: AppState = { ...current, milestoneEvents };
+
+      commit(next);
+      persist(next);
     },
     rollover: runRollover,
     teardown() {
