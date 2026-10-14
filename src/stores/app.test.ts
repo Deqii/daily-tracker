@@ -460,6 +460,52 @@ describe('createAppStore', () => {
     store.teardown();
   });
 
+  it('marks a milestone event seen and persists it', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      milestoneEvents: [
+        { id: 'evt1', type: 'levelUp', localDate: TODAY, from: 1, to: 2, seen: false },
+        { id: 'evt2', type: 'levelUp', localDate: TODAY, from: 2, to: 3, seen: false },
+      ],
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    store.markMilestoneSeen('evt2');
+
+    const state = read<AppState>(store);
+    expect(state.milestoneEvents).toEqual([
+      { id: 'evt1', type: 'levelUp', localDate: TODAY, from: 1, to: 2, seen: false },
+      { id: 'evt2', type: 'levelUp', localDate: TODAY, from: 2, to: 3, seen: true },
+    ]);
+    const persisted = JSON.parse(fake.getItem(STORAGE_KEYS.milestoneEvents) ?? '[]') as {
+      id: string;
+      seen: boolean;
+    }[];
+    expect(persisted.find((event) => event.id === 'evt2')?.seen).toBe(true);
+
+    store.teardown();
+  });
+
+  it('ignores marking an unknown milestone event seen', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      milestoneEvents: [
+        { id: 'evt1', type: 'levelUp', localDate: TODAY, from: 1, to: 2, seen: false },
+      ],
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    store.markMilestoneSeen('missing');
+
+    expect(read<AppState>(store).milestoneEvents).toEqual([
+      { id: 'evt1', type: 'levelUp', localDate: TODAY, from: 1, to: 2, seen: false },
+    ]);
+
+    store.teardown();
+  });
+
   it('replaces the live state from an imported file, leaves the theme, and persists it', () => {
     vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
     const fake = stubStorage();
