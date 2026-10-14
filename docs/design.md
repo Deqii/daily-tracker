@@ -245,6 +245,7 @@ These are the only strings allowed beyond sections 1–6.
 | Import confirm                                 | Replace all current data with this file? Buttons: Replace data and Cancel                                                                                                     |
 | Import failed                                  | Import failed. {reason}. Your data was not changed. Reasons: The file is not valid JSON · The file is from a newer version · Some data is missing or invalid                  |
 | Storage failure (persistent banner at the top) | Your data could not be saved. Export it now so you don't lose progress. Button: Export data                                                                                   |
+| Recovery notice (dismissible, at the top)      | Some saved data could not be used, so it was reset. A copy was kept. Buttons: Export data and Dismiss                                                                         |     |
 | Title unlock conditions (Settings)             | Reach a 7-day streak · Reach a 30-day streak · Buy your first reward · Reach Rank D (and so on up to Rank S) · Complete 100 tasks                                             |
 
 ## 8. Responsive

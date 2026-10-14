@@ -26,6 +26,7 @@ Never edit `docs/`. If a doc is wrong or incomplete, say so in your report.
 ## Workflow
 
 - Work on exactly one issue: the number given in the prompt. If no number is given, ask. Never pick one yourself.
+- If the same command fails after two fix attempts, stop and report the exact error. Do not keep retrying.
 - One issue = one branch = one PR. Never combine issues. A Milestone heading is an ordering label, not a unit of work.
 - Never create, edit, close, comment on, or label an issue. The human creates issues. An issue closes only through `Closes #N` in a merged PR.
 - Before starting: `git switch main && git pull --ff-only`. Check that the issues this one depends on are closed (the issue's "Blocked by", or the execution order in `docs/tasks.md`). If not, stop and report. If the issue already has an open PR or a branch, stop and report.
