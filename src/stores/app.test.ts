@@ -460,6 +460,33 @@ describe('createAppStore', () => {
     store.teardown();
   });
 
+  it('replaces the live state from an imported file, leaves the theme, and persists it', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, { theme: 'light' });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    store.importState({
+      tasks: [anchorTask()],
+      completions: [],
+      dailyQuestLog: [],
+      rewards: [aReward(10)],
+      rewardPurchases: [],
+      userState: { ...createDefaultUserState(TODAY), wallet: 100, lifetimeXP: 250 },
+      milestoneEvents: [],
+    });
+
+    const state = read<AppState>(store);
+
+    expect(state.tasks).toEqual([anchorTask()]);
+    expect(state.rewards).toEqual([aReward(10)]);
+    expect(state.userState.wallet).toBe(100);
+    expect(JSON.parse(fake.getItem(STORAGE_KEYS.tasks) ?? '[]')).toEqual([anchorTask()]);
+    expect(fake.getItem(STORAGE_KEYS.theme)).toBe(JSON.stringify('light'));
+
+    store.teardown();
+  });
+
   it('reports a blocked rank-up with the gate threshold', () => {
     vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
     const fake = stubStorage();
