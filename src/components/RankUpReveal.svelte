@@ -45,7 +45,7 @@
       <PanelFrame class="p-6 text-center">
         <p id="rank-up-label" class="text-xs font-semibold text-muted">Rank up</p>
         <p
-          class="glow-text reveal-rank mt-3 font-mono text-5xl font-semibold leading-none text-accent"
+          class="glow-text reveal-glow mt-3 font-mono text-5xl font-semibold leading-none text-accent"
         >
           {current.to}
         </p>
@@ -82,59 +82,3 @@
     </div>
   </div>
 {/if}
-
-<style>
-  .reveal-backdrop {
-    background-color: color-mix(in srgb, var(--bg) 80%, transparent);
-    animation: reveal-fade 200ms ease-out both;
-  }
-
-  .reveal-panel {
-    animation: reveal-panel-in 400ms ease-out both;
-  }
-
-  .reveal-rank {
-    animation: reveal-glow-pulse 400ms ease-out;
-  }
-
-  @keyframes reveal-fade {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes reveal-panel-in {
-    from {
-      opacity: 0;
-      transform: scale(0.96);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes reveal-glow-pulse {
-    0%,
-    100% {
-      text-shadow: 0 0 var(--glow-px)
-        color-mix(in srgb, var(--accent) var(--glow-alpha), transparent);
-    }
-    50% {
-      text-shadow: 0 0 calc(var(--glow-px) * 1.8) color-mix(in srgb, var(--accent) 90%, transparent);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .reveal-panel {
-      animation: reveal-fade 200ms ease-out both;
-    }
-
-    .reveal-rank {
-      animation: none;
-    }
-  }
-</style>
