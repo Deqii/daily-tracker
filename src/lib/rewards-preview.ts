@@ -25,7 +25,10 @@ function mostExpensive(rewards: readonly Reward[]): Reward | undefined {
  * and either may be absent. A reward costing exactly the Wallet balance is affordable. Ties keep the
  * reward that appears first in the list. Pure: it only reads the rewards and never mutates them.
  */
-export function selectRewardPreview(rewards: readonly Reward[], wallet: number): RewardPreviewRow[] {
+export function selectRewardPreview(
+  rewards: readonly Reward[],
+  wallet: number
+): RewardPreviewRow[] {
   const affordable = mostExpensive(rewards.filter((reward) => reward.cost <= wallet));
   const locked = mostExpensive(rewards.filter((reward) => reward.cost > wallet));
   const rows: RewardPreviewRow[] = [];

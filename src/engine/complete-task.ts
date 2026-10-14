@@ -7,10 +7,7 @@ import type { AppState, Result } from './state';
 import { applyTitleUnlocks } from './titles';
 
 export type CompleteTaskError =
-  | 'NO_OPEN_DAY'
-  | 'TASK_NOT_IN_QUEST'
-  | 'VARIANT_NOT_FOUND'
-  | 'ROW_LIMIT_REACHED';
+  'NO_OPEN_DAY' | 'TASK_NOT_IN_QUEST' | 'VARIANT_NOT_FOUND' | 'ROW_LIMIT_REACHED';
 
 export interface CompleteTaskInput {
   readonly taskId: string;

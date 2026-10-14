@@ -4,7 +4,12 @@
   import { app } from '../stores/app';
 
   function handleExport(): void {
-    const { filename, contents } = buildExport($app, SCHEMA_VERSION, readBackupRecord(), new Date());
+    const { filename, contents } = buildExport(
+      $app,
+      SCHEMA_VERSION,
+      readBackupRecord(),
+      new Date()
+    );
     const url = URL.createObjectURL(new Blob([contents], { type: 'application/json' }));
     const anchor = document.createElement('a');
 

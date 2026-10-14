@@ -6,7 +6,7 @@ export function normalizeRoute(hash: string): Route {
   const stripped = hash.startsWith('#') ? hash.slice(1) : hash;
   const path = stripped.startsWith('/') ? stripped.slice(1) : stripped;
   const lower = path.toLowerCase();
-  
+
   switch (lower) {
     case 'today':
       return 'today';

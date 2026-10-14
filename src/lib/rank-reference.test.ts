@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  rankLevelRange,
-  rankMaxPoints,
-  rankMultiplier,
-  rankReferenceRows,
-} from './rank-reference';
+import { rankLevelRange, rankMaxPoints, rankMultiplier, rankReferenceRows } from './rank-reference';
 
 describe('rankLevelRange', () => {
   it('joins a closed range with an en dash', () => {

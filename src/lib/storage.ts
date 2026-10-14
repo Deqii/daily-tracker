@@ -157,10 +157,7 @@ export function createDefaultUserState(today?: string): UserState {
 }
 
 /** Validated write. Storage failures are reported, never thrown (PRD 2.2). */
-export function write<K extends keyof StorageSchema>(
-  key: K,
-  value: StorageSchema[K]
-): WriteResult {
+export function write<K extends keyof StorageSchema>(key: K, value: StorageSchema[K]): WriteResult {
   let raw: string;
 
   try {

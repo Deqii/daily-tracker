@@ -48,7 +48,11 @@ const openDayEntry = (
  * changes nothing except ensuring the open day's log entry exists, so a second call with the same
  * `today` returns the same state. The input state is never mutated.
  */
-export function runRollover(state: AppState, today: LocalDate, newId: () => string): RolloverResult {
+export function runRollover(
+  state: AppState,
+  today: LocalDate,
+  newId: () => string
+): RolloverResult {
   const { userState } = state;
 
   if (today < userState.lastRolloverDate) {

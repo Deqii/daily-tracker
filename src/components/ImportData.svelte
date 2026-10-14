@@ -66,10 +66,7 @@
 />
 
 {#if error !== null}
-  <div
-    class="w-full rounded-sm border border-danger bg-surface p-3 text-sm text-text"
-    role="alert"
-  >
+  <div class="w-full rounded-sm border border-danger bg-surface p-3 text-sm text-text" role="alert">
     <p>Import failed. {REASON[error]}. Your data was not changed.</p>
     <button
       type="button"

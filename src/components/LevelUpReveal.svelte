@@ -104,8 +104,7 @@
         color-mix(in srgb, var(--accent) var(--glow-alpha), transparent);
     }
     50% {
-      text-shadow: 0 0 calc(var(--glow-px) * 1.8)
-        color-mix(in srgb, var(--accent) 90%, transparent);
+      text-shadow: 0 0 calc(var(--glow-px) * 1.8) color-mix(in srgb, var(--accent) 90%, transparent);
     }
   }
 
