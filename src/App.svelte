@@ -1,4 +1,5 @@
 <script lang="ts">
+  import StorageNotices from './components/StorageNotices.svelte';
   import TopBar from './components/TopBar.svelte';
   import Today from './pages/Today.svelte';
   import Tasks from './pages/Tasks.svelte';
@@ -7,7 +8,7 @@
   import Settings from './pages/Settings.svelte';
   import { currentRoute, type Route } from './lib/router';
   import type { Component } from 'svelte';
-  
+
   const routes: Record<Route, Component> = {
     today: Today,
     tasks: Tasks,
@@ -18,6 +19,7 @@
 </script>
 
 <TopBar />
+<StorageNotices />
 
 <main>
   <svelte:component this={routes[$currentRoute]} />
