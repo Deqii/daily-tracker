@@ -2,3 +2,11 @@ node_modules
 dist
 .DS_Store
 *.local
+
+# The prototypes are the visual spec and must stay byte-identical to what the
+# fidelity harness diffs against. Never reformat them.
+docs/prototype/*.html
+
+# Generated: sha256-pinned copies of the @fontsource woff2 files.
+tests/visual/fonts/*.woff2
+tests/visual/fonts/manifest.json

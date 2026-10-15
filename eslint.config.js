@@ -66,5 +66,29 @@ export default [
       ],
     },
   },
+  {
+    files: ['**/*.mjs'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+        // The history dump evaluates code inside the page, so browser globals
+        // are legitimately referenced from the callback body.
+        ...globals.browser,
+      },
+    },
+  },
+  {
+    files: ['tests/visual/**/*.ts', 'playwright.config.ts'],
+    languageOptions: {
+      parser: tsParser,
+      globals: {
+        ...globals.node,
+        // fidelity.spec.ts walks both DOM trees inside page.evaluate.
+        ...globals.browser,
+      },
+    },
+  },
   prettier,
 ];

@@ -1,0 +1,53 @@
+{
+  "fonts": [
+    {
+      "family": "Chakra Petch",
+      "weight": 500,
+      "file": "chakra-petch-latin-500-normal.woff2",
+      "bytes": 9956,
+      "sha256": "36ad966cb653de70ba37355c41003b02de8940b2df6cbcd46480a6ad8cadd65d"
+    },
+    {
+      "family": "Chakra Petch",
+      "weight": 600,
+      "file": "chakra-petch-latin-600-normal.woff2",
+      "bytes": 9968,
+      "sha256": "a5888696e9eb1b4bbbecc8eb3922b8369f49d4bddb72263e033cbd17f399be76"
+    },
+    {
+      "family": "Chakra Petch",
+      "weight": 700,
+      "file": "chakra-petch-latin-700-normal.woff2",
+      "bytes": 9900,
+      "sha256": "ce5095dc1cb200aaa939e38067a0677018d10e9f26ec38cdcf1557ac524fc775"
+    },
+    {
+      "family": "Manrope",
+      "weight": 400,
+      "file": "manrope-latin-400-normal.woff2",
+      "bytes": 14108,
+      "sha256": "849290ef12a2eeb9af5c11924120d11aa4ae8b435ed3347d7fc8bc240c293ca3"
+    },
+    {
+      "family": "Manrope",
+      "weight": 500,
+      "file": "manrope-latin-500-normal.woff2",
+      "bytes": 14044,
+      "sha256": "19874318747181a650eda439c37955220b849d9c4797c9e0718ee67d4bf929bc"
+    },
+    {
+      "family": "Manrope",
+      "weight": 700,
+      "file": "manrope-latin-700-normal.woff2",
+      "bytes": 14212,
+      "sha256": "d2a12c85a831e4b5db341767d0347fa3d1361d22a1fcb3e361a16b6c90080f71"
+    },
+    {
+      "family": "JetBrains Mono",
+      "weight": 500,
+      "file": "jetbrains-mono-latin-500-normal.woff2",
+      "bytes": 21832,
+      "sha256": "cb182feeed4d798ff6961d3c79f7026279448fca0676438aaecb21f3fc39553a"
+    }
+  ]
+}
