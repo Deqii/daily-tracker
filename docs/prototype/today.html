@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Tracker – Today (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* ===== DESIGN TOKENS (extract to src/app.css) ===== */
+:root{
+  --bg:#05070d; --panel:rgba(12,20,40,.58); --panel-solid:#0b1324;
+  --line:rgba(61,169,255,.26); --line-strong:rgba(61,169,255,.7);
+  --blue:#3da9ff; --cyan:#8adbff; --text:#e6eef9; --muted:#93a6c2;
+  --danger:#ff5468; --gold:#f5c451; --monarch:#8b6cff; --ok:#4ade9a;
+  --stat-str:#ff7a59; --stat-vit:#4ade9a; --stat-int:#3da9ff; --stat-disc:#b79cff; --stat-soc:#f5c451;
+  --font-display:'Chakra Petch',system-ui,sans-serif;
+  --font-body:'Manrope',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --r-panel:4px; --r-chip:3px; --glow:0 0 24px rgba(61,169,255,.18);
+  --ease:cubic-bezier(.2,.8,.2,1); --t-fast:.15s; --t-base:.35s; --t-slow:.7s; --stagger:70ms;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--text);font:400 15px/1.5 var(--font-body);min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;
+  background:radial-gradient(900px 520px at 30% 22%,rgba(61,169,255,.16),transparent 70%),
+  radial-gradient(700px 500px at 85% 80%,rgba(139,108,255,.10),transparent 70%),
+  linear-gradient(rgba(61,169,255,.045) 1px,transparent 1px) 0 0/48px 48px,
+  linear-gradient(90deg,rgba(61,169,255,.045) 1px,transparent 1px) 0 0/48px 48px}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.65))}
+#fx{position:fixed;inset:0;z-index:-1;pointer-events:none}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+/* HUD */
+header{display:flex;align-items:center;gap:28px;padding:14px 32px;border-bottom:1px solid var(--line);background:rgba(5,7,13,.7);backdrop-filter:blur(10px);position:sticky;top:0;z-index:5}
+.logo{font:700 18px var(--font-display);letter-spacing:.04em}
+nav{display:flex;gap:6px;flex:1}
+nav a{color:var(--muted);text-decoration:none;padding:6px 12px;position:relative;font-weight:500}
+nav a:hover{color:var(--text)}
+nav a[aria-current]{color:var(--text)}
+nav a[aria-current]::after{content:"";position:absolute;left:12px;right:12px;bottom:-15px;height:2px;background:var(--blue);box-shadow:0 0 12px var(--blue)}
+.chips{display:flex;gap:8px}
+.chip{border:1px solid var(--line);border-radius:var(--r-chip);padding:4px 12px;font:500 13px var(--font-mono);background:var(--panel);display:flex;gap:8px;align-items:center}
+.chip b{font-family:var(--font-mono);color:var(--text)} .chip span{color:var(--muted);font-family:var(--font-body)}
+.coin{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b8,var(--gold) 55%,#b8860b)}
+/* Layout */
+main{max-width:1280px;margin:0 auto;padding:28px 32px 48px;display:grid;grid-template-columns:320px 1fr 380px;gap:20px}
+.panel{position:relative;background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:var(--r-panel);padding:22px;box-shadow:var(--glow)}
+@property --arm{syntax:'<length>';inherits:false;initial-value:14px}
+.panel,.penalty,.stat,.rw{position:relative}
+.panel::before,.penalty::before,.stat::before,.rw::before{content:"";position:absolute;inset:-1px;pointer-events:none;
+  --k:var(--bc,var(--blue));--a0:14px;--a1:26px;--w:2px;
+  background:
+  linear-gradient(var(--k),var(--k)) 0 0/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 0 0/var(--w) var(--arm) no-repeat,
+  linear-gradient(var(--k),var(--k)) 100% 0/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 100% 0/var(--w) var(--arm) no-repeat,
+  linear-gradient(var(--k),var(--k)) 0 100%/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 0 100%/var(--w) var(--arm) no-repeat,
+  linear-gradient(var(--k),var(--k)) 100% 100%/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 100% 100%/var(--w) var(--arm) no-repeat;
+  animation:brk-in .9s var(--ease) backwards,brk-breathe 2.8s ease-in-out .9s infinite alternate;
+  animation-delay:calc(var(--i,0)*var(--stagger) + 300ms),calc(var(--i,0)*var(--stagger) + 1200ms)}
+.stat::before,.rw::before{--a0:7px;--a1:13px;--w:1.5px}
+.stat{--bc:var(--c)}.penalty{--bc:var(--danger)}.penalty.clear{--bc:var(--ok)}
+@keyframes brk-in{from{--arm:0px;filter:drop-shadow(0 0 10px var(--k))}to{--arm:var(--a0)}}
+@keyframes brk-breathe{from{--arm:var(--a0);filter:drop-shadow(0 0 2px var(--k))}to{--arm:var(--a1);filter:drop-shadow(0 0 7px var(--k))}}
+h2{font:600 17px var(--font-display);letter-spacing:.02em}
+.sub{color:var(--muted);font-size:13px}
+/* Boot sequence: the one orchestrated page-load moment */
+.boot{opacity:0;animation:boot var(--t-slow) var(--ease) forwards;animation-delay:calc(var(--i)*var(--stagger) + 120ms)}
+@keyframes boot{from{opacity:0;transform:translateY(10px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+.scan{position:fixed;left:0;right:0;top:0;height:120px;z-index:4;pointer-events:none;background:linear-gradient(transparent,rgba(61,169,255,.12),transparent);animation:scan 1.3s var(--ease) 1 forwards}
+@keyframes scan{from{transform:translateY(-120px)}to{transform:translateY(100vh);opacity:0}}
+/* Status window */
+.status{display:flex;flex-direction:column;gap:18px}
+.emblem{position:relative;width:150px;height:150px;margin:4px auto 0;display:grid;place-items:center}
+.emblem svg{position:absolute;inset:0;animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rank{font:700 76px/1 var(--font-display);color:var(--cyan);text-shadow:0 0 28px var(--blue),0 0 4px var(--blue)}
+.lv{text-align:center}.lv b{font:700 34px var(--font-display);margin-left:6px}
+.title{align-self:center;border:1px solid rgba(139,108,255,.55);color:#c9bbff;padding:3px 12px;border-radius:var(--r-chip);font-size:13px;background:rgba(139,108,255,.1)}
+.xpbar{height:8px;background:rgba(61,169,255,.12);border:1px solid var(--line);overflow:hidden;position:relative}
+.xpbar i{display:block;height:100%;background:linear-gradient(90deg,#1e6fd0,var(--cyan));box-shadow:0 0 12px var(--blue);transition:width var(--t-slow) var(--ease);position:relative}
+.xpbar i::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55),transparent 70%);transform:translateX(-100%);animation:shine 3.2s ease-in-out infinite}
+@keyframes shine{60%,100%{transform:translateX(100%)}}
+.row{display:flex;justify-content:space-between;align-items:center}
+.pips{display:flex;gap:6px}.pips i{width:22px;height:8px;background:rgba(61,169,255,.14);border:1px solid var(--line)}
+.pips i.on{background:var(--blue);box-shadow:0 0 8px var(--blue)} .pips i.today{border-color:var(--cyan);animation:pulse 2s infinite}
+.shield{display:inline-flex;align-items:center;gap:6px;color:var(--cyan);font-size:13px}
+/* Radar */
+.radar-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+#radar{width:100%;max-width:440px;overflow:visible}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--muted)}
+.legend s{display:inline-block;width:18px;border-top:2px dashed var(--monarch);margin-right:6px;vertical-align:middle;text-decoration:none}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;margin-top:6px}
+.stat{border:1px solid var(--line);border-top:2px solid var(--c);padding:8px 10px;background:rgba(5,7,13,.4);transition:transform var(--t-fast),border-color var(--t-fast)}
+.stat:hover{transform:translateY(-2px);border-color:var(--c)}
+.stat small{color:var(--muted);font-size:12px;display:block}.stat b{font:700 20px var(--font-display);color:var(--c)}
+.stat .bar{height:3px;background:rgba(255,255,255,.08);margin-top:4px}.stat .bar i{display:block;height:100%;background:var(--c);transition:width var(--t-slow) var(--ease)}
+/* Quest column */
+.quest{display:flex;flex-direction:column;gap:14px}
+.sys{border:1px solid var(--line);padding:12px 14px;background:rgba(61,169,255,.06)}
+.sys small{color:var(--cyan);font-size:12px}.sys p{min-height:24px}
+.caret{display:inline-block;width:7px;height:15px;background:var(--cyan);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.penalty{border:1px solid var(--danger);background:rgba(255,84,104,.07);padding:12px 14px;display:flex;justify-content:space-between;gap:12px;animation:pen 2.4s ease-in-out infinite}
+.penalty.clear{border-color:var(--ok);background:rgba(74,222,154,.07);animation:none}
+.penalty strong{color:var(--danger);font-weight:700}.penalty.clear strong{color:var(--ok)}
+.timer{font:500 20px var(--font-mono);color:var(--danger);text-align:right;line-height:1.1}.timer small{display:block;font:400 11px var(--font-body);color:var(--muted)}
+@keyframes pen{50%{box-shadow:0 0 22px rgba(255,84,104,.35)}}
+@keyframes pulse{50%{box-shadow:0 0 10px var(--cyan)}}
+.qrow{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:1px solid var(--line);border-left:3px solid var(--c);background:rgba(5,7,13,.45);cursor:pointer;transition:background var(--t-fast),transform var(--t-fast)}
+.qrow:hover{background:rgba(61,169,255,.09);transform:translateX(3px)}
+.qrow:focus-visible{outline:2px solid var(--cyan)}
+.box{width:20px;height:20px;border:1.5px solid var(--c);display:grid;place-items:center;position:relative;flex:none}
+.box svg{width:14px;stroke:var(--bg);stroke-width:3;fill:none;stroke-dasharray:20;stroke-dashoffset:20;transition:stroke-dashoffset .3s var(--ease) .05s}
+.qrow.done .box{background:var(--c);box-shadow:0 0 14px var(--c)}.qrow.done .box svg{stroke-dashoffset:0}
+.qrow.done .nm{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(147,166,194,.5)}
+.nm{flex:1}.nm small{display:block;color:var(--muted);font-size:12px;text-decoration:none}
+.pts{font:500 13px var(--font-mono);color:var(--cyan)}.need{font:500 13px var(--font-mono);color:var(--danger)}
+.qrow.done .need{color:var(--ok)}
+.float{position:fixed;z-index:20;font:700 18px var(--font-display);color:var(--cyan);text-shadow:0 0 10px var(--blue);pointer-events:none;animation:fl 1s var(--ease) forwards}
+@keyframes fl{to{transform:translateY(-54px);opacity:0}}
+.ring{position:fixed;z-index:19;width:20px;height:20px;border:2px solid var(--c);border-radius:50%;pointer-events:none;animation:rg .6s var(--ease) forwards}
+@keyframes rg{from{transform:translate(-50%,-50%) scale(.5)}to{transform:translate(-50%,-50%) scale(3);opacity:0}}
+/* Bottom strip */
+.bottom{grid-column:1/-1;display:grid;grid-template-columns:320px 1fr;gap:20px}
+.heat{display:grid;grid-template-columns:repeat(14,1fr);gap:5px;margin-top:12px}
+.heat i{aspect-ratio:1;background:rgba(61,169,255,.08);border:1px solid var(--line);transition:transform var(--t-fast)}
+.heat i:hover{transform:scale(1.25)}
+.heat i[data-l="1"]{background:rgba(61,169,255,.3)}.heat i[data-l="2"]{background:rgba(61,169,255,.6)}.heat i[data-l="3"]{background:var(--blue);box-shadow:0 0 8px var(--blue)}.heat i[data-l="x"]{background:rgba(255,84,104,.35);border-color:var(--danger)}
+.rewards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:12px}
+.rw{border:1px solid var(--line);padding:12px 14px;background:rgba(5,7,13,.45);display:flex;flex-direction:column;gap:8px}
+.rw .row b{font-weight:600}
+.price{display:inline-flex;align-items:center;gap:6px}.rw .price{color:var(--gold)}.rw .coin,.price .coin{width:15px;height:15px;box-shadow:0 0 8px rgba(245,196,81,.5)}
+.btn{all:unset;box-sizing:border-box;cursor:pointer;background:var(--blue);color:#04101f;font:700 13px var(--font-display);padding:5px 16px;border-radius:var(--r-chip);transition:box-shadow var(--t-fast),transform var(--t-fast)}
+.btn:hover{box-shadow:0 0 16px var(--blue)}.btn:active{transform:scale(.95)}.btn[disabled]{background:rgba(147,166,194,.2);color:var(--muted);cursor:not-allowed;box-shadow:none}
+.prog{height:5px;background:rgba(255,255,255,.08)}.prog i{display:block;height:100%;background:var(--gold);transition:width var(--t-slow) var(--ease)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);opacity:0;z-index:30;background:var(--panel-solid);border:1px solid var(--line-strong);padding:10px 14px;display:flex;gap:16px;align-items:center;transition:all var(--t-base) var(--ease);box-shadow:var(--glow)}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.toast button{all:unset;cursor:pointer;color:var(--cyan);font-weight:700}.toast button:hover{text-decoration:underline}
+@media(max-width:1100px){main{grid-template-columns:1fr 1fr}.quest{grid-column:1/-1;order:-1}.bottom{grid-template-columns:1fr}}
+@media(max-width:700px){header{padding:12px 16px;gap:12px}nav{display:none}main{grid-template-columns:1fr;padding:16px}.stats{grid-template-columns:repeat(3,1fr)}.chips .chip:first-child{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="scan" aria-hidden="true"></div>
+<header>
+  <div class="logo">Daily Tracker</div>
+  <nav aria-label="Navigasi utama"><a href="#" aria-current="page">Today</a><a href="#">Tasks</a><a href="#">Rewards</a><a href="#">History</a><a href="#">Settings</a></nav>
+  <div class="chips"><div class="chip"><span>Rank</span><b>E</b></div><div class="chip"><span>Streak</span><b id="streakChip">5</b></div><div class="chip"><span>Wallet</span><i class="coin"></i><b id="walletChip">65</b></div></div>
+</header>
+
+<main>
+  <section class="panel status boot" style="--i:0" aria-label="Status">
+    <div class="emblem">
+      <svg viewBox="0 0 150 150" aria-hidden="true"><polygon points="75,4 140,40 140,110 75,146 10,110 10,40" fill="none" stroke="#3da9ff" stroke-opacity=".6" stroke-width="1.5"/><polygon points="75,16 128,46 128,104 75,134 22,104 22,46" fill="none" stroke="#8adbff" stroke-opacity=".25" stroke-dasharray="4 6"/></svg>
+      <div class="rank">E</div>
+    </div>
+    <div class="lv"><span class="sub">Level</span><b id="lvl">3</b></div>
+    <div class="title">Hadiah pertama</div>
+    <div><div class="row sub" style="margin-bottom:6px"><span id="xpTxt">9 / 70 XP</span><span id="xpNext">ke Level 4</span></div><div class="xpbar"><i id="xpFill" style="width:0"></i></div></div>
+    <div><div class="row sub" style="margin-bottom:6px"><span>Streak minggu ini</span><span class="shield"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1l5.5 2v5c0 3.5-2.4 6-5.5 7C3.9 14 1.5 11.500 1.500 8V3z"/></svg>Freeze 1 tersisa</span></div>
+      <div class="pips" aria-label="Streak 5 hari"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on today"></i><i></i><i></i></div></div>
+  </section>
+
+  <section class="panel radar-wrap boot" style="--i:1" aria-label="Stat">
+    <div class="row" style="width:100%"><h2>Stat</h2><span class="sub" id="gateTxt"></span></div>
+    <svg id="radar" viewBox="-60 -30 440 380" role="img" aria-label="Radar lima stat"></svg>
+    <div class="legend"><span><s></s>Batas balance gate (50% rata-rata)</span></div>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="quest boot" style="--i:2" aria-label="Daily quest">
+    <div class="sys panel" style="padding:12px 14px"><small>Pesan sistem</small><p><span id="typed"></span><span class="caret"></span></p></div>
+    <div class="penalty" id="penalty"><div><strong id="penTitle">Penalty zone aktif</strong><div class="sub" id="penSub">Soc butuh 2 penyelesaian hari ini.</div></div><div class="timer"><span id="timer">--:--:--</span><small>sampai rollover</small></div></div>
+    <div class="row"><h2>Daily quest</h2><span class="sub" id="qCount">3/5 stat terpenuhi</span></div>
+    <div id="quests" style="display:flex;flex-direction:column;gap:8px"></div>
+  </section>
+
+  <div class="bottom">
+    <section class="panel boot" style="--i:3"><h2>14 hari terakhir</h2><div class="heat" id="heat"></div><p class="sub" style="margin-top:10px">Merah = hari dengan stat terlewat.</p></section>
+    <section class="panel boot" style="--i:4"><div class="row"><h2>Rewards</h2><span class="sub price">Wallet <span id="wal2" style="color:var(--text)">65</span><i class="coin"></i></span></div><div class="rewards" id="rewards"></div></section>
+  </div>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span><button id="undo">Batalkan</button></div>
+
+<script>
+const STATS=[{k:'STR',n:'Str',c:'--stat-str'},{k:'VIT',n:'Vit',c:'--stat-vit'},{k:'INT',n:'Int',c:'--stat-int'},{k:'DISC',n:'Disc',c:'--stat-disc'},{k:'SOC',n:'Soc',c:'--stat-soc'}];
+const S={xp:65,wallet:65,stat:{STR:16,VIT:12,INT:20,DISC:10,SOC:7},mult:.5};
+const Q=[{s:'STR',n:'Squat 15x2 set',nom:5,need:1,done:1},{s:'VIT',n:'Minum air 2L',nom:5,need:1,done:1},{s:'INT',n:'Baca 10 halaman',nom:5,need:1,done:0},{s:'DISC',n:'Ibadah',nom:5,need:1,done:1},{s:'SOC',n:'Chat 1 teman',nom:5,need:2,done:0}];
+const R=[{n:'Main game 2 jam',cost:60},{n:'Kopi susu santai',cost:35},{n:'Nonton bioskop',cost:800}];
+const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const award=n=>Math.ceil(n*S.mult), lvOf=x=>Math.floor(Math.sqrt(x/14))+1;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let disp={...S.stat},dispW=S.wallet,last=null,tt;
+
+/* number tween */
+function tween(from,to,fn,ms=600){if(reduce){fn(to);return}const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-p,3);fn(from+(to-from)*e);if(p<1)requestAnimationFrame(f)})(t0)}
+
+/* radar */
+const CX=160,CY=160,RR=118,MAX=30;
+const ang=i=>-Math.PI/2+i*2*Math.PI/5, pt=(i,v)=>[CX+Math.cos(ang(i))*RR*v/MAX,CY+Math.sin(ang(i))*RR*v/MAX];
+const gate=()=>{const v=Object.values(S.stat);return Math.ceil(v.reduce((a,b)=>a+b,0)/(2*v.length))};
+function drawRadar(vals){
+  let h='';
+  [.25,.5,.75,1].forEach(r=>h+=`<polygon points="${STATS.map((_,i)=>pt(i,MAX*r).join(',')).join(' ')}" fill="none" stroke="#3da9ff" stroke-opacity="${r==1?.35:.14}"/>`);
+  STATS.forEach((s,i)=>{const[x,y]=pt(i,MAX);h+=`<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" stroke="#3da9ff" stroke-opacity=".14"/>`});
+  h+=`<polygon points="${STATS.map((_,i)=>pt(i,gate()).join(',')).join(' ')}" fill="rgba(139,108,255,.06)" stroke="#8b6cff" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  h+=`<polygon points="${STATS.map((s,i)=>pt(i,vals[s.k]).join(',')).join(' ')}" fill="rgba(61,169,255,.22)" stroke="#8adbff" stroke-width="2" style="filter:drop-shadow(0 0 8px #3da9ff)"/>`;
+  STATS.forEach((s,i)=>{const[x,y]=pt(i,vals[s.k]);h+=`<circle cx="${x}" cy="${y}" r="4" fill="${css(s.c)}"/>`;
+    const[lx,ly]=pt(i,MAX*1.2);h+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" fill="#e6eef9" font-family="Chakra Petch" font-weight="600" font-size="15">${s.n} <tspan fill="${css(s.c)}">${Math.round(vals[s.k])}</tspan></text>`});
+  $('radar').innerHTML=h;
+}
+function stats(){$('stats').innerHTML=STATS.map(s=>`<div class="stat" style="--c:var(${s.c})"><small>${s.n}</small><b>${S.stat[s.k]}</b><div class="bar"><i style="width:${Math.min(100,S.stat[s.k]/MAX*100)}%"></i></div></div>`).join('');
+  $('gateTxt').textContent=`Ambang gate: ${gate()} XP`}
+
+/* quests */
+const sat=k=>{const q=Q.find(x=>x.s===k);return q.done>=q.need};
+function quests(){
+  $('quests').innerHTML=Q.map((q,i)=>{const st=STATS.find(s=>s.k===q.s);const d=q.done>=q.need;
+   return `<button class="qrow${d?' done':''}" style="--c:var(${st.c})" data-i="${i}" role="checkbox" aria-checked="${d}"><span class="box"><svg viewBox="0 0 14 14"><path d="M2 7.5l3.2 3L12 3.500"/></svg></span><span class="nm">${q.n}<small>${st.n}</small></span>${q.need>1?`<span class="need">${q.done}/${q.need}</span>`:''}<span class="pts">+${award(q.nom)}</span></button>`}).join('');
+  const n=STATS.filter(s=>sat(s.k)).length;$('qCount').textContent=`${n}/5 stat terpenuhi`;
+  const p=$('penalty'),ok=sat('SOC');p.classList.toggle('clear',ok);
+  $('penTitle').textContent=ok?'Penalty dibersihkan':'Penalty zone aktif';$('penSub').textContent=ok?'Soc memenuhi 2 penyelesaian.':'Soc butuh 2 penyelesaian hari ini.';
+  $('timer').style.color=ok?'var(--ok)':'';
+  msg(n===5?'Semua stat terpenuhi. Daily quest selesai.':ok?'Penalty hilang. Selesaikan stat yang tersisa.':'Selesaikan minimal 1 task di setiap stat hari ini.');
+}
+function apply(i,dir,ev){
+  const q=Q[i];const pts=award(q.nom)*dir;
+  q.done+=dir;S.xp+=pts;S.wallet+=pts;S.stat[q.s]+=pts;
+  const from={...disp},fw=dispW;
+  tween(0,1,p=>{STATS.forEach(s=>disp[s.k]=from[s.k]+(S.stat[s.k]-from[s.k])*p);drawRadar(disp)});
+  tween(fw,S.wallet,v=>{dispW=v;$('walletChip').textContent=$('wal2').textContent=Math.round(v)},500);
+  quests();stats();xp();rewards();
+  if(dir>0&&ev){fx(ev,q.s,pts);last=i;toast(`${q.n} selesai`)}
+}
+$('quests').addEventListener('click',e=>{const b=e.target.closest('.qrow');if(!b)return;const i=+b.dataset.i;if(Q[i].done<Q[i].need)apply(i,1,e)});
+$('undo').onclick=()=>{if(last!=null&&Q[last].done>0){apply(last,-1);last=null}hide()};
+function fx(e,k,pts){const r=e.currentTarget?.getBoundingClientRect?.()||{left:e.clientX,top:e.clientY,width:0};const x=e.clientX||r.left+30,y=e.clientY||r.top;
+  const c=css(STATS.find(s=>s.k===k).c);
+  const a=document.createElement('div');a.className='ring';a.style.cssText=`left:${x}px;top:${y}px;--c:${c}`;
+  const f=document.createElement('div');f.className='float';f.textContent='+'+pts+' XP';f.style.cssText=`left:${x+14}px;top:${y-12}px`;
+  document.body.append(a,f);setTimeout(()=>{a.remove();f.remove()},1100)}
+function toast(t){$('toastTxt').textContent=t;$('toast').classList.add('show');clearTimeout(tt);tt=setTimeout(hide,8000)}
+function hide(){$('toast').classList.remove('show')}
+
+/* xp / level */
+function xp(){const L=lvOf(S.xp),a=14*(L-1)**2,b=14*L*L;$('lvl').textContent=L;$('xpTxt').textContent=`${S.xp-a} / ${b-a} XP`;$('xpNext').textContent=`ke Level ${L+1}`;$('xpFill').style.width=((S.xp-a)/(b-a)*100)+'%'}
+
+/* rewards */
+function rewards(){$('rewards').innerHTML=R.map((r,i)=>{const can=S.wallet>=r.cost;return `<div class="rw"><div class="row"><b>${r.n}</b><span class="pts price">${r.cost}<i class="coin"></i></span></div>${can?`<button class="btn" data-r="${i}">Beli</button>`:`<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${r.cost}" aria-valuenow="${S.wallet}"><i style="width:${S.wallet/r.cost*100}%"></i></div><span class="sub">Kurang ${r.cost-S.wallet} koin</span>`}</div>`}).join('')}
+$('rewards').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b)return;const r=R[+b.dataset.r];if(S.wallet<r.cost)return;
+  const fw=S.wallet;S.wallet-=r.cost;tween(fw,S.wallet,v=>{$('walletChip').textContent=$('wal2').textContent=Math.round(v)},500);last=null;rewards();toast(`${r.n} dibeli (−${r.cost})`)});
+
+/* typing message */
+let mt;function msg(t){clearInterval(mt);const el=$('typed');if(reduce){el.textContent=t;return}el.textContent='';let i=0;mt=setInterval(()=>{el.textContent=t.slice(0,++i);if(i>=t.length)clearInterval(mt)},18)}
+
+/* countdown to local midnight */
+function tick(){const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);let s=Math.floor((m-n)/1e3);const f=v=>String(v).padStart(2,'0');$('timer').textContent=`${f(s/3600|0)}:${f(s%3600/60|0)}:${f(s%60)}`}
+setInterval(tick,1000);tick();
+
+/* heat strip */
+$('heat').innerHTML=[3,2,3,1,'x',3,3,2,3,3,'x',2,3,1].map((l,i)=>`<i data-l="${l}" title="${14-i} hari lalu"></i>`).join('');
+
+/* particles (cheap, paused when hidden) */
+const cv=$('fx'),cx=cv.getContext('2d');let P=[],raf;
+function size(){cv.width=innerWidth;cv.height=innerHeight}
+function loop(){cx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.y-=p.v;if(p.y<-5){p.y=cv.height+5;p.x=Math.random()*cv.width}cx.fillStyle=`rgba(138,219,255,${p.a})`;cx.fillRect(p.x,p.y,p.r,p.r)});raf=requestAnimationFrame(loop)}
+if(!reduce){size();addEventListener('resize',size);P=Array.from({length:36},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*2+1,v:Math.random()*.25+.08,a:Math.random()*.4+.1}));loop();
+  document.addEventListener('visibilitychange',()=>document.hidden?cancelAnimationFrame(raf):loop())}
+
+/* init */
+drawRadar({STR:0,VIT:0,INT:0,DISC:0,SOC:0});
+setTimeout(()=>{const from={STR:0,VIT:0,INT:0,DISC:0,SOC:0};tween(0,1,p=>{STATS.forEach(s=>disp[s.k]=S.stat[s.k]*p);drawRadar(disp)},1100)},500);
+quests();stats();xp();rewards();
+</script>
+</body>
+</html>

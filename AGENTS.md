@@ -79,3 +79,39 @@ src/
   app.css       Tailwind + design tokens
 docs/           PRD.md, decisions.md, design.md, tasks.md, stitch-notes.md (human-owned)
 ```
+
+## UI Fidelity Contract (UI Revamp milestone)
+
+### Source of truth
+
+- `docs/prototype/*.html` is the visual and interaction spec. For anything visual (layout, spacing, color, type, motion, copy, ARIA), the prototype beats `design.md` and any other description.
+- `docs/PRD.md` still wins for behavior and rules (points, rank, gate, penalties, validation). The prototypes use simplified demo logic. If a prototype and the PRD disagree on behavior, follow the PRD and log it in `docs/prototype/DEVIATIONS.md`. Never resolve a conflict silently.
+- Never edit files in `docs/prototype/`.
+
+### Scope
+
+- UI only. Do not change the engine (`src/lib/engine/**`) or its tests, except to expose already-computed values.
+- No new dependencies except `@fontsource/chakra-petch`, `@fontsource/manrope`, `@fontsource/jetbrains-mono`, and dev-only `pixelmatch` and `pngjs`. Ask before adding anything else.
+
+### Port rules (these are what make the result identical)
+
+1. **Tokens:** copy the `:root` block (and `[data-theme=light]` from settings.html) verbatim into `src/app.css`. Keep the custom property names exactly (`--blue`, `--panel`, `--ease`, `--t-base`, ...).
+2. **CSS:** copy declarations verbatim. Do not "clean up", reorder values, convert px to rem, merge rules, rename classes, or replace rules with utility classes. Keep `@property --arm`, every `@keyframes`, and the media queries (1100px, 700px, `prefers-reduced-motion`, `[data-motion=off]`).
+3. **Where the CSS lives:** global stylesheets (`src/styles/ui/*.css`) imported once. Do not use Svelte scoped `<style>` for ported rules, because scoping rewrites selectors and breaks `::before`/`::after` and cross-component class selectors.
+4. **DOM:** same elements, same order, same class names, same attributes (`role`, `aria-*`, `tabindex`, `data-*`), same copy text (Indonesian, as written). Component boundaries are free, but the rendered DOM must be identical.
+5. **Fonts:** Chakra Petch 500/600/700, Manrope 400/500/700, JetBrains Mono 500 via `@fontsource` (latin subset). Remove the Google Fonts `<link>`. Keep the same fallback stacks.
+6. **Behavior vs demo logic:** the prototype's inline JS contains demo logic (`award()`, `lvOf()`, `gate()`, the History simulation, hardcoded `CAP`, `MULT`, `AVG`, `thr`). Never copy that as business logic. Read every value from the engine or store. Copy only the UI mechanics: tweening, floating numbers, ring/coin bursts, drawer open/close, focus management, undo toasts, keyboard handling.
+7. **Motion:** reproduce every animation with the same durations, easing, delays, and stagger (`--i`). Honor `prefers-reduced-motion` and `data-motion="off"` exactly as the prototypes do. Particle canvas: same count, speed, and pause-on-hidden behavior.
+8. **Allowed deviations:** only those written in `docs/prototype/DEVIATIONS.md` (reason + which PRD rule). Any other difference is a bug.
+
+### Done means (per page)
+
+- `npm run test:visual` passes for that page at 1280×800 and 390×844 (pixel diff + computed-style diff, see `docs/UI-REVAMP.md` §3).
+- Interaction checklist in the page's issue is fully ticked and manually verified.
+- No console errors or warnings; `npm run check`, `npm run lint`, `npm test`, `npm run build` all pass.
+- Keyboard-only and `prefers-reduced-motion` verified.
+- A short report is added to the PR: diff ratios, deviations (if any), anything uncertain.
+
+### When unsure
+
+Stop and ask. Do not guess a value, redesign a component, or "improve" the prototype.
