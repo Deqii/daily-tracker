@@ -27,3 +27,34 @@ Fidelity Contract, any difference not listed here is a bug.
 3. **Prototype-only affordances.** The "Demo: buka title berikutnya" button in
    `settings.html` is marked as prototype-only and must not ship. Issue 6 covers
    it.
+
+## Open questions
+
+From the "Likely entries" list in `docs/UI-REVAMP.md`. None of these are decided;
+each needs an answer before the page named ships.
+
+| #   | Page     | Question                                                                                                                         | Recommendation                                                                                                                            |
+| --- | -------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Q1  | Rewards  | The prototype offers an undo toast after a purchase that refunds it. The PRD defines no refund.                                  | Drop the purchase undo. Delete-with-undo is not a refund and stays.                                                                       |
+| Q2  | Settings | The animation and sound switches are not in the PRD.                                                                             | Keep both as local preferences. They read `daily-tracker:motion` and are not part of Export.                                              |
+| Q3  | Settings | The "Demo: buka title berikutnya" button is prototype-only.                                                                      | Do not ship it. Already recorded as note 3.                                                                                               |
+| Q4  | Tasks    | The prototype deletes immediately with an undo toast; the PRD says delete. An archive option is unspecified.                     | Keep delete + undo. Do not add archiving; it would change the data model.                                                                 |
+| Q5  | Settings | Only `settings.html` defines light-theme tokens. Whether the other four pages must support light in this milestone is undecided. | Support it globally. The tokens live in `:root` / `[data-theme=light]`, so every page follows for free; only the settings demo proves it. |
+
+Two more found while building the harness:
+
+| #   | Page    | Question                                                                                                            | Recommendation                                                                        |
+| --- | ------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Q6  | Today   | The heat strip and the streak chip cannot both match the prototype from one state (note 1).                         | Re-derive the heat strip from end-of-day satisfaction, accept the streak chip moving. |
+| Q7  | Rewards | "Total dibelanjakan" sums the prototype's truncated five-row log; the app sums all fifteen purchases (deviation 2). | Keep the PRD-correct total. The log panel scrolls, so layout is unaffected.           |
+
+## Harness note
+
+The issue asks for the Playwright Docker image to be pinned. This repo is
+checked out on Windows, so a Docker pin is not usable locally. Instead
+`@playwright/test` is pinned to an exact version (1.64.1),
+`npx playwright install chromium` resolves a single Chromium build
+(156.0.8078.4, chromium-headless-shell v1248), and that build is recorded in
+`tests/visual/README.md`. CI should use the same pinned Playwright on a fixed
+Ubuntu image. Text rasterisation is not bit-identical across operating systems,
+so a CI baseline must be generated on the image the job runs.
