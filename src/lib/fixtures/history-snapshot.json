@@ -1,0 +1,451 @@
+{
+  "source": "docs/prototype/history.html",
+  "note": "Prototype simulation: ignores the balance gate, freezes and 2x requirements. Not engine output.",
+  "fixedTime": "2026-10-15T09:00:00+07:00",
+  "chips": {
+    "rank": "D",
+    "streak": "13"
+  },
+  "days": [
+    {
+      "index": 0,
+      "date": "2026-09-16",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 15,
+      "lifetimeXPEnd": 315,
+      "levelEnd": 5,
+      "rankEnd": "E",
+      "streakEnd": 1,
+      "events": []
+    },
+    {
+      "index": 1,
+      "date": "2026-09-17",
+      "mask": "11011",
+      "satisfiedStats": 4,
+      "netPointsChange": 7,
+      "lifetimeXPEnd": 322,
+      "levelEnd": 5,
+      "rankEnd": "E",
+      "streakEnd": 2,
+      "events": []
+    },
+    {
+      "index": 2,
+      "date": "2026-09-18",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 15,
+      "lifetimeXPEnd": 337,
+      "levelEnd": 5,
+      "rankEnd": "E",
+      "streakEnd": 3,
+      "events": []
+    },
+    {
+      "index": 3,
+      "date": "2026-09-19",
+      "mask": "11110",
+      "satisfiedStats": 4,
+      "netPointsChange": 7,
+      "lifetimeXPEnd": 344,
+      "levelEnd": 5,
+      "rankEnd": "E",
+      "streakEnd": 4,
+      "events": []
+    },
+    {
+      "index": 4,
+      "date": "2026-09-20",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 15,
+      "lifetimeXPEnd": 359,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 5,
+      "events": [
+        {
+          "kind": "up",
+          "title": "Rank naik: E ke D",
+          "subtitle": "Level 6 · 359 XP"
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "date": "2026-09-21",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 379,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 6,
+      "events": []
+    },
+    {
+      "index": 6,
+      "date": "2026-09-22",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 399,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 7,
+      "events": [
+        {
+          "kind": "ms",
+          "title": "Title baru: Konsisten 7 hari",
+          "subtitle": "Streak mencapai 7"
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "date": "2026-09-23",
+      "mask": "10101",
+      "satisfiedStats": 3,
+      "netPointsChange": -4,
+      "lifetimeXPEnd": 395,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 8,
+      "events": []
+    },
+    {
+      "index": 8,
+      "date": "2026-09-24",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 415,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 9,
+      "events": []
+    },
+    {
+      "index": 9,
+      "date": "2026-09-25",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 435,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 10,
+      "events": []
+    },
+    {
+      "index": 10,
+      "date": "2026-09-26",
+      "mask": "11011",
+      "satisfiedStats": 4,
+      "netPointsChange": 8,
+      "lifetimeXPEnd": 443,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 11,
+      "events": []
+    },
+    {
+      "index": 11,
+      "date": "2026-09-27",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 463,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 12,
+      "events": []
+    },
+    {
+      "index": 12,
+      "date": "2026-09-28",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 483,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 13,
+      "events": []
+    },
+    {
+      "index": 13,
+      "date": "2026-09-29",
+      "mask": "00100",
+      "satisfiedStats": 1,
+      "netPointsChange": -28,
+      "lifetimeXPEnd": 455,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 14,
+      "events": []
+    },
+    {
+      "index": 14,
+      "date": "2026-09-30",
+      "mask": "00000",
+      "satisfiedStats": 0,
+      "netPointsChange": -40,
+      "lifetimeXPEnd": 415,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 0,
+      "events": []
+    },
+    {
+      "index": 15,
+      "date": "2026-10-01",
+      "mask": "00000",
+      "satisfiedStats": 0,
+      "netPointsChange": -40,
+      "lifetimeXPEnd": 375,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 0,
+      "events": []
+    },
+    {
+      "index": 16,
+      "date": "2026-10-02",
+      "mask": "00000",
+      "satisfiedStats": 0,
+      "netPointsChange": -40,
+      "lifetimeXPEnd": 335,
+      "levelEnd": 5,
+      "rankEnd": "E",
+      "streakEnd": 0,
+      "events": [
+        {
+          "kind": "down",
+          "title": "Rank turun: D ke E",
+          "subtitle": "Level 5 · 335 XP"
+        }
+      ]
+    },
+    {
+      "index": 17,
+      "date": "2026-10-03",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 15,
+      "lifetimeXPEnd": 350,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 1,
+      "events": [
+        {
+          "kind": "up",
+          "title": "Rank naik: E ke D",
+          "subtitle": "Level 6 · 350 XP"
+        }
+      ]
+    },
+    {
+      "index": 18,
+      "date": "2026-10-04",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 370,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 2,
+      "events": []
+    },
+    {
+      "index": 19,
+      "date": "2026-10-05",
+      "mask": "11101",
+      "satisfiedStats": 4,
+      "netPointsChange": 8,
+      "lifetimeXPEnd": 378,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 3,
+      "events": []
+    },
+    {
+      "index": 20,
+      "date": "2026-10-06",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 398,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 4,
+      "events": []
+    },
+    {
+      "index": 21,
+      "date": "2026-10-07",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 418,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 5,
+      "events": []
+    },
+    {
+      "index": 22,
+      "date": "2026-10-08",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 438,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 6,
+      "events": []
+    },
+    {
+      "index": 23,
+      "date": "2026-10-09",
+      "mask": "01111",
+      "satisfiedStats": 4,
+      "netPointsChange": 8,
+      "lifetimeXPEnd": 446,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 7,
+      "events": []
+    },
+    {
+      "index": 24,
+      "date": "2026-10-10",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 466,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 8,
+      "events": []
+    },
+    {
+      "index": 25,
+      "date": "2026-10-11",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 486,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 9,
+      "events": [
+        {
+          "kind": "ms",
+          "title": "Title baru: 100 tugas selesai",
+          "subtitle": "Total 100 penyelesaian"
+        }
+      ]
+    },
+    {
+      "index": 26,
+      "date": "2026-10-12",
+      "mask": "11110",
+      "satisfiedStats": 4,
+      "netPointsChange": 8,
+      "lifetimeXPEnd": 494,
+      "levelEnd": 6,
+      "rankEnd": "D",
+      "streakEnd": 10,
+      "events": []
+    },
+    {
+      "index": 27,
+      "date": "2026-10-13",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 514,
+      "levelEnd": 7,
+      "rankEnd": "D",
+      "streakEnd": 11,
+      "events": [
+        {
+          "kind": "lv",
+          "title": "Level naik: 6 ke 7",
+          "subtitle": "514 XP"
+        }
+      ]
+    },
+    {
+      "index": 28,
+      "date": "2026-10-14",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 534,
+      "levelEnd": 7,
+      "rankEnd": "D",
+      "streakEnd": 12,
+      "events": []
+    },
+    {
+      "index": 29,
+      "date": "2026-10-15",
+      "mask": "11111",
+      "satisfiedStats": 5,
+      "netPointsChange": 20,
+      "lifetimeXPEnd": 554,
+      "levelEnd": 7,
+      "rankEnd": "D",
+      "streakEnd": 13,
+      "events": []
+    }
+  ],
+  "events": [
+    {
+      "kind": "up",
+      "title": "Rank naik: E ke D",
+      "subtitle": "Level 6 · 359 XP",
+      "dayIndex": 4,
+      "date": "2026-09-20"
+    },
+    {
+      "kind": "ms",
+      "title": "Title baru: Konsisten 7 hari",
+      "subtitle": "Streak mencapai 7",
+      "dayIndex": 6,
+      "date": "2026-09-22"
+    },
+    {
+      "kind": "down",
+      "title": "Rank turun: D ke E",
+      "subtitle": "Level 5 · 335 XP",
+      "dayIndex": 16,
+      "date": "2026-10-02"
+    },
+    {
+      "kind": "up",
+      "title": "Rank naik: E ke D",
+      "subtitle": "Level 6 · 350 XP",
+      "dayIndex": 17,
+      "date": "2026-10-03"
+    },
+    {
+      "kind": "ms",
+      "title": "Title baru: 100 tugas selesai",
+      "subtitle": "Total 100 penyelesaian",
+      "dayIndex": 25,
+      "date": "2026-10-11"
+    },
+    {
+      "kind": "lv",
+      "title": "Level naik: 6 ke 7",
+      "subtitle": "514 XP",
+      "dayIndex": 27,
+      "date": "2026-10-13"
+    }
+  ]
+}
