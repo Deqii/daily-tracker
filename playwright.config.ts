@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import { CHROMIUM_ARGS } from './tests/visual/harness';
 
 /**
  * Determinism notes (UI Revamp Issue 0).
@@ -26,11 +27,14 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${APP_PORT}`,
     trace: 'retain-on-failure',
+    launchOptions: { args: CHROMIUM_ARGS },
   },
   webServer: [
     {
       // `build:visual` compiles the ?fixture= seeder in; `npm run build` never does.
-      command: `npm run build:visual && npm run preview -- --port ${APP_PORT} --strictPort`,
+      // `--outDir` must match the visual build, because `vite preview` resolves
+      // the production config otherwise and would serve `dist`.
+      command: `npm run build:visual && npm run preview -- --port ${APP_PORT} --outDir dist-visual --strictPort`,
       port: APP_PORT,
       reuseExistingServer: !process.env.CI,
       timeout: 180_000,

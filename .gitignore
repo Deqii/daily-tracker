@@ -1,6 +1,7 @@
 node_modules
 dist
 dist-ssr
+dist-visual
 *.local
 .DS_Store
 .vite
