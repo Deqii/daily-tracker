@@ -121,7 +121,8 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 64px;display:flex;flex-dir
 .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);opacity:0;z-index:60;background:var(--panel-solid);border:1px solid var(--line-strong);padding:10px 14px;display:flex;gap:16px;align-items:center;transition:all var(--t-base) var(--ease);box-shadow:var(--glow)}
 .toast.show{transform:translate(-50%,0);opacity:1}.toast button{all:unset;cursor:pointer;color:var(--cyan);font-weight:700}.toast button:hover{text-decoration:underline}
 @media(max-width:1000px){.layout{grid-template-columns:1fr}.side{position:static;order:-1}.head{flex-direction:column;align-items:flex-start}}
-@media(max-width:700px){header{padding:12px 16px}nav{display:none}main{padding:16px}.sep{display:none}}
+@media(max-width:700px){header{padding:12px 16px;gap:12px}nav{display:none}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{padding:16px}.sep{display:none}}
+@media(max-width:380px){.chips .chip:first-child{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan,.cn{display:none}}
 </style>
 </head>
@@ -174,7 +175,7 @@ const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&q
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,AVG=13,C=2*Math.PI*26;
 let wallet=65,shownW=65,sort='afford',only=false,edit=null,undoFn=null,tt,opener=null,nid=6;
 let R=[{id:1,t:'Main game 2 jam',c:60,b:4},{id:2,t:'Kopi susu santai',c:35,b:8},{id:3,t:'Beli buku baru',c:150,b:0},{id:4,t:'Jajan favorit',c:250,b:1},{id:5,t:'Nonton bioskop',c:800,b:2}];
-let L=[{t:'Main game 2 jam',c:60,w:'Kemarin'},{t:'Kopi susu santai',c:35,w:'2 hari lalu'},{t:'Nonton bioskop',c:800,w:'5 hari lalu'},{t:'Kopi susu santai',c:35,w:'6 hari lalu'},{t:'Jajan favorit',c:250,w:'9 hari lalu'}];
+let L=[{t:'Main game 2 jam',c:60,w:'Kemarin'},{t:'Kopi susu santai',c:35,w:'2 hari lalu'},{t:'Kopi susu santai',c:35,w:'4 hari lalu'},{t:'Nonton bioskop',c:800,w:'5 hari lalu'},{t:'Kopi susu santai',c:35,w:'6 hari lalu'},{t:'Main game 2 jam',c:60,w:'8 hari lalu'},{t:'Jajan favorit',c:250,w:'9 hari lalu'},{t:'Kopi susu santai',c:35,w:'11 hari lalu'},{t:'Kopi susu santai',c:35,w:'13 hari lalu'},{t:'Main game 2 jam',c:60,w:'15 hari lalu'},{t:'Kopi susu santai',c:35,w:'17 hari lalu'},{t:'Nonton bioskop',c:800,w:'19 hari lalu'},{t:'Kopi susu santai',c:35,w:'21 hari lalu'},{t:'Main game 2 jam',c:60,w:'24 hari lalu'},{t:'Kopi susu santai',c:35,w:'27 hari lalu'}];
 const SORTS=[['afford','Terjangkau dulu'],['cheap','Termurah'],['most','Paling sering dibeli']];
 const ico={e:'<svg viewBox="0 0 16 16"><path d="M11 2l3 3-8 8H3v-3z"/></svg>',d:'<svg viewBox="0 0 16 16"><path d="M3 4h10M6 4V2h4v2M5 4l.6 9h4.800L11 4"/></svg>',k:'<svg width="13" height="14" viewBox="0 0 13 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.500" y="6" width="10" height="7" rx="1"/><path d="M4 6V4a2.500 2.500 0 015 0v2"/></svg>'};
 

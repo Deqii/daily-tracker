@@ -136,7 +136,8 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
 .toast.show{transform:translate(-50%,0);opacity:1}
 .toast button{all:unset;cursor:pointer;color:var(--cyan);font-weight:700}.toast button:hover{text-decoration:underline}
 @media(max-width:1100px){main{grid-template-columns:1fr 1fr}.quest{grid-column:1/-1;order:-1}.bottom{grid-template-columns:1fr}}
-@media(max-width:700px){header{padding:12px 16px;gap:12px}nav{display:none}main{grid-template-columns:1fr;padding:16px}.stats{grid-template-columns:repeat(3,1fr)}.chips .chip:first-child{display:none}}
+@media(max-width:700px){header{padding:12px 16px;gap:12px}nav{display:none}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{grid-template-columns:1fr;padding:16px}.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:380px){.chips .chip:first-child{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}}
 </style>
 </head>
@@ -259,7 +260,7 @@ function tick(){const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);let s=Math
 setInterval(tick,1000);tick();
 
 /* heat strip */
-$('heat').innerHTML=[3,2,3,1,'x',3,3,2,3,3,'x',2,3,1].map((l,i)=>`<i data-l="${l}" title="${14-i} hari lalu"></i>`).join('');
+$('heat').innerHTML=[3,2,3,1,'x',3,3,2,'x',3,2,2,3,1].map((l,i)=>`<i data-l="${l}" title="${14-i} hari lalu"></i>`).join('');
 
 /* particles (cheap, paused when hidden) */
 const cv=$('fx'),cx=cv.getContext('2d');let P=[],raf;

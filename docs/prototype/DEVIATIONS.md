@@ -3,22 +3,34 @@
 Allowed differences between `docs/prototype/*.html` and the app. Per the UI
 Fidelity Contract, any difference not listed here is a bug.
 
-| #   | Page    | Element / rule            | Prototype                                          | App                                                  | Reason                                                                                                                     | PRD reference | Approved by |
-| --- | ------- | ------------------------- | -------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------- | ----------- |
-| 1   | Today   | Streak chip and week pips | Streak 5, pips 5 on / 2 off                        | Streak derived from the engine over the 14 heat days | The prototype's heat strip and its streak chip are independent demo data that cannot both come from one state. See note 1. | §2.1 Streaks  |             |
-| 2   | Rewards | "Total dibelanjakan"      | 1.180, the sum of the five rows the demo log shows | 2.370, the sum of all purchases                      | The prototype's `L` is a truncated demo list; the app logs every purchase as the PRD requires.                             | §2.1 Rewards  |             |
+| #   | Page | Element / rule | Prototype | App | Reason | PRD reference | Approved by |
+| --- | ---- | -------------- | --------- | --- | ------ | ------------- | ----------- |
+
+No deviations are currently approved. Deviations 1 and 2 were withdrawn on
+2026-10-17; see "Withdrawn deviations" below.
+
+## Withdrawn deviations
+
+| #   | Page    | What it was                                                                              | Why it was withdrawn                                                                                            |
+| --- | ------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| 1   | Today   | Streak chip and week pips differed between the prototype (Streak 5) and the engine state | The prototype's heat strip was corrected so that it agrees with Streak 5 under the PRD rule. See note 1 and Q6. |
+| 2   | Rewards | "Total dibelanjakan" was 1.180 in the prototype and 2.370 in the app                     | The prototype's purchase log now holds all fifteen purchases, so both sides show 2.370. See Q7.                 |
 
 ## Notes
 
-1. **Today, streak versus heat strip.** `today.html` paints fourteen heat cells
-   with levels `3 2 3 1 x 3 3 2 3 3 x 2 3 1` and separately shows Streak 5. Under
-   the PRD a day counts toward the streak when it has at least one completion,
-   so any non-`x` heat cell forces the streak to at least 12. No single
-   `UserState` produces both. The `today` fixture seeds the engine-true state
-   (twelve counting days), which moves the chip and two pips. Decide before
-   Issue 2 whether the heat strip should instead be derived from something that
-   does not extend the streak, or whether the streak chip is the thing that
-   changes.
+1. **Today, streak versus heat strip (resolved 2026-10-17).** The original
+   strip (`3 2 3 1 x 3 3 2 3 3 x 2 3 1`) could not agree with Streak 5. Under
+   PRD §2.1 a day counts toward the streak when it has at least one completion,
+   and the displayed streak is the closed days plus today when today already has
+   a completion. Streak 5 therefore means four closed days plus today, preceded
+   by a day with no completions. `today.html` now uses
+   `3 2 3 1 x 3 3 2 x 3 2 2 3 1`: the two red cells are days with no completions
+   (nine and five days ago), and the last five days contain no red cell. With the
+   fixed test clock (Thursday 2026-10-15), both red days fall in the previous
+   week: the first consumes that week's single Rank E freeze and the second finds
+   none left, so the streak resets. The current week's freeze is unused, which
+   matches "Freeze 1 tersisa". The `today` fixture must seed the same fourteen
+   days.
 2. **Prototype-local scales.** `today.html` uses `MAX = 30` for the radar,
    `settings.html` uses `MAXV = 20` for the gate bars, and `history.html` uses
    `350` for the Rank D threshold line. These are drawing scales, not rules; the
@@ -41,12 +53,26 @@ each needs an answer before the page named ships.
 | Q4  | Tasks    | The prototype deletes immediately with an undo toast; the PRD says delete. An archive option is unspecified.                     | Keep delete + undo. Do not add archiving; it would change the data model.                                                                 |
 | Q5  | Settings | Only `settings.html` defines light-theme tokens. Whether the other four pages must support light in this milestone is undecided. | Support it globally. The tokens live in `:root` / `[data-theme=light]`, so every page follows for free; only the settings demo proves it. |
 
-Two more found while building the harness:
+Two more were found while building the harness. Both are resolved:
 
-| #   | Page    | Question                                                                                                            | Recommendation                                                                        |
-| --- | ------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Q6  | Today   | The heat strip and the streak chip cannot both match the prototype from one state (note 1).                         | Re-derive the heat strip from end-of-day satisfaction, accept the streak chip moving. |
-| Q7  | Rewards | "Total dibelanjakan" sums the prototype's truncated five-row log; the app sums all fifteen purchases (deviation 2). | Keep the PRD-correct total. The log panel scrolls, so layout is unaffected.           |
+| #   | Page    | Question                                                                                  | Resolution (2026-10-17)                                                                                                                                                                                                            |
+| --- | ------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q6  | Today   | The heat strip and the streak chip could not both match the prototype from one state.     | Resolved by correcting the prototype, not by accepting a deviation (this replaces the earlier recommendation). `today.html` now agrees with Streak 5; see note 1. The app seeds the same strip and the chip stays 5.               |
+| Q7  | Rewards | "Total dibelanjakan" summed a truncated five-row log; the app sums all fifteen purchases. | Resolved by correcting the prototype. `rewards.html` now logs all fifteen purchases (Main game 2 jam x4, Kopi susu santai x8, Jajan favorit x1, Nonton bioskop x2), so the total is 2.370 and agrees with the counts on the cards. |
+
+Remaining caveat for Q7 (demo data only, not a UI deviation): 2.370 coins spent
+is far above the lifetime XP shown on Today (65). It comes from the purchase
+counts in the original screenshots.
+
+## Prototype revision log
+
+| Date       | Files                        | Change                                                                                                                                                                                                                                            |
+| ---------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-17 | all five                     | Mobile header unified (viewport <= 700px): compact logo (16px) and chips (padding 3x8, 12px text), no horizontal overflow. At <= 380px the Rank chip is hidden on every page. The Today-only rule that hid the Rank chip at <= 700px was removed. |
+| 2026-10-17 | `today.html`, `rewards.html` | Q6 and Q7 data corrections (see note 1, Q6, Q7).                                                                                                                                                                                                  |
+
+Fixtures derived from these values (the `today` heat strip and the `rewards`
+purchase log) must be regenerated before Issue 2 and Issue 4 are diffed.
 
 ## Harness note
 

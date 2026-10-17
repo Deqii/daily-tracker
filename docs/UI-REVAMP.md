@@ -15,7 +15,7 @@ Each issue = one PR. Order matters: 0 → 1 → (2–6 in any order) → 7.
 - [ ] Add dev deps `pixelmatch`, `pngjs`; Playwright ≥ 1.45 (needs `page.clock`).
 - [ ] Pin the Playwright Docker image (or a fixed OS and browser version) for local and CI runs, so rendering is deterministic.
 - [ ] Copy the font files (`woff2`, latin) from `@fontsource/*` into `tests/visual/fonts/`.
-- [ ] Fixtures: `?fixture=today|tasks|rewards|history|settings` (dev/test builds only, never in production) seeds `localStorage` and returns. Values are extracted from each prototype's script block (`T`, `R`, `L`, `MASKS`, `SX`, `TT`, ...).
+- [ ] Fixtures: `?fixture=today|tasks|rewards|history|settings` read from `location.search` (so the harness URL is `/?fixture=<name>#/<route>`, query **before** the hash, never `/#/<route>?fixture=<name>`), dev/test builds only (never in production), seed `localStorage` and return before the stores and router initialize. Values are extracted from each prototype's script block (`T`, `R`, `L`, `MASKS`, `SX`, `TT`, ...).
 - [ ] History fixture: run `history.html` in Playwright, dump `{ D, EV }` with `page.evaluate(() => ({ D, EV }))` to JSON, and store explicit per-day snapshots (`lifetimeXPEnd`, `levelEnd`, `rankEnd`, `netPointsChange`) plus rank events. Do **not** recompute them with the engine, because the prototype's simulation ignores gate, freeze, and 2x.
 - [ ] Add the tests from §3 and the scripts `test:visual` and `test:visual:update`.
 - Acceptance: the harness runs against the current (old) UI and fails with a readable diff.
@@ -133,14 +133,23 @@ const VIEWPORTS = [
   { width: 390, height: 844 },
 ];
 
-// Adjust the app routes to the real hash routes.
+// Adjust the app routes to the real hash routes. `heading` is the first
+// `h1`/`h2` the prototype shows inside `<main>`: the guard below fails fast when
+// the app rendered the default page instead of the requested one.
 const PAGES = [
-  { name: 'today', proto: 'today.html', route: '/#/today' },
-  { name: 'tasks', proto: 'tasks.html', route: '/#/tasks' },
-  { name: 'rewards', proto: 'rewards.html', route: '/#/rewards' },
-  { name: 'history', proto: 'history.html', route: '/#/history' },
-  { name: 'settings', proto: 'settings.html', route: '/#/settings' },
+  { name: 'today', proto: 'today.html', route: 'today', heading: 'Stat' },
+  { name: 'tasks', proto: 'tasks.html', route: 'tasks', heading: 'Task library' },
+  { name: 'rewards', proto: 'rewards.html', route: 'rewards', heading: 'Rewards' },
+  { name: 'history', proto: 'history.html', route: 'history', heading: 'History' },
+  { name: 'settings', proto: 'settings.html', route: 'settings', heading: 'Settings' },
 ];
+
+// The query string must come BEFORE the hash. `/#/tasks?fixture=tasks` puts the
+// parameter inside the fragment, so `location.search` is empty and the router
+// sees `/tasks?fixture=tasks`, matches nothing and falls back to the default page.
+function appUrl(p: (typeof PAGES)[number]): string {
+  return `${APP}/?fixture=${p.name}#/${p.route}`;
+}
 
 test.use({
   reducedMotion: 'reduce',
@@ -177,6 +186,21 @@ async function open(page: Page, url: string, proto: boolean) {
   await page.waitForTimeout(100);
 }
 
+async function readPageHeading(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const h = document.querySelector('main h1, main h2');
+    return h?.textContent?.trim() ?? '';
+  });
+}
+
+// Cheap guard: a wrong route must fail here, not as a mystery pixel diff.
+async function expectPageHeading(page: Page, p: (typeof PAGES)[number]): Promise<void> {
+  const heading = await readPageHeading(page);
+  expect(heading, `expected the ${p.name} page heading (${page.url()}), got "${heading}"`).toBe(
+    p.heading
+  );
+}
+
 for (const vp of VIEWPORTS) {
   for (const p of PAGES) {
     test.describe(`${p.name} @ ${vp.width}`, () => {
@@ -194,7 +218,8 @@ for (const vp of VIEWPORTS) {
         ).newPage();
 
         await open(protoPage, `${PROTO}/${p.proto}`, true);
-        await open(page, `${APP}${p.route}?fixture=${p.name}`, false);
+        await open(page, appUrl(p), false);
+        await expectPageHeading(page, p);
 
         const a = PNG.sync.read(
           await protoPage.screenshot({ fullPage: true, animations: 'disabled' })
@@ -236,7 +261,8 @@ for (const vp of VIEWPORTS) {
           })
         ).newPage();
         await open(protoPage, `${PROTO}/${p.proto}`, true);
-        await open(page, `${APP}${p.route}?fixture=${p.name}`, false);
+        await open(page, appUrl(p), false);
+        await expectPageHeading(page, p);
 
         const A = await protoPage.evaluate(collect);
         const B = await page.evaluate(collect);

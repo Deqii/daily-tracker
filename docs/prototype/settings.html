@@ -128,7 +128,8 @@ span.ok{color:var(--ok)}span.bad{color:var(--danger)}
 .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);opacity:0;z-index:60;background:var(--panel-solid);border:1px solid var(--line-strong);padding:10px 16px;transition:all var(--t-base) var(--ease);box-shadow:var(--glow)}
 .toast.show{transform:translate(-50%,0);opacity:1}
 @media(max-width:1100px){.g2,.go{grid-template-columns:1fr}.ranks{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:700px){header{padding:12px 16px}nav{display:none}main{padding:16px}.ranks{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){header{padding:12px 16px;gap:12px}nav{display:none}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{padding:16px}.ranks{grid-template-columns:1fr 1fr}}
+@media(max-width:380px){.chips .chip:first-child{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}}
 [data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
 [data-motion=off] #fx,[data-motion=off] .scan{display:none}
