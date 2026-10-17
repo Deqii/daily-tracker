@@ -9,18 +9,26 @@ import { FIXTURES, FIXTURE_NAMES, type FixtureName } from './data';
  * production build. The visual harness builds with `--mode visual` for exactly
  * that reason; see `docs/UI-REVAMP.md` §2.
  */
+/**
+ * Unique marker for `npm run check:no-fixtures`.
+ *
+ * `scripts/assert-no-fixtures.mjs` scans a production `dist/` for this string.
+ * It is declared *and used* here, so Rollup cannot tree-shake it out of a
+ * `--mode visual` build - otherwise the check would pass vacuously because the
+ * string was never there in the first place.
+ */
+export const FIXTURE_MARKER = 'DT_PROTOTYPE_FIXTURE_DO_NOT_SHIP';
+
 export function isFixtureEnabled(): boolean {
   return import.meta.env.DEV || import.meta.env.MODE === 'visual';
 }
 
 /**
- * The harness navigates to `/#/today?fixture=today`, so the parameter sits in
- * the hash fragment, not in `location.search`. Both are accepted.
+ * The harness navigates to `/?fixture=<name>#/<page>`, so the parameter is in
+ * `location.search` and the hash stays a clean route the router can match.
  */
 function readRequestedName(): FixtureName | null {
-  const hash = window.location.hash;
-  const hashQuery = hash.includes('?') ? hash.slice(hash.indexOf('?') + 1) : '';
-  const requested = new URLSearchParams(`${window.location.search}&${hashQuery}`).get('fixture');
+  const requested = new URLSearchParams(window.location.search).get('fixture');
 
   if (requested === null) return null;
 
@@ -38,6 +46,10 @@ function clearStorage(): void {
 /** Writes the fixture and returns. No-op when the build has fixtures disabled. */
 export function applyFixture(): void {
   if (!isFixtureEnabled()) return;
+
+  // Marks the document so a build can be proven to contain the fixtures.
+  // `FIXTURE_MARKER` is only ever a data attribute, never anything visible.
+  document.documentElement.dataset.prototypeFixture = FIXTURE_MARKER;
 
   const name = readRequestedName();
   if (name === null) return;
