@@ -123,7 +123,8 @@ const SETTLE_MS = 2500;
  *   - the Google Fonts request is replaced with the same local woff2 bytes;
  *   - animations are collapsed by `prefers-reduced-motion` and then given
  *     `SETTLE_MS` to reach their end state, so the screenshot freezes nothing;
- *   - `#fx` (particle canvas) and `.scan` (the sweep) are display:none;
+ *   - `#fx` (particle canvas), `.scan` (the sweep) and `#demo` (the
+ *     prototype-only demo button) are display:none;
  *   - fonts are awaited and a frame is committed before capture.
  */
 export async function open(page: Page, url: string): Promise<void> {
@@ -136,7 +137,10 @@ export async function open(page: Page, url: string): Promise<void> {
 
   await page.goto(url);
   await page.evaluate(() => document.fonts.ready);
-  await page.addStyleTag({ content: '#fx,.scan{display:none!important}' });
+  // `#demo` is the prototype-only "Demo: buka title berikutnya" button in
+  // settings.html (DEVIATIONS.md note 3). It is prototype affordance, not UI, so
+  // it is hidden on both sides rather than diffed.
+  await page.addStyleTag({ content: '#fx,.scan,#demo{display:none!important}' });
   await page.waitForTimeout(SETTLE_MS);
   await settleFrames(page);
 }
