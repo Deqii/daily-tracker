@@ -46,6 +46,33 @@ No deviations are currently approved. Deviations 1 and 2 were withdrawn on
    weekday reading gives 4 pips, not 5. Issue 2 implements this in the Today
    component; no engine API is needed.
 
+## Mechanical renames
+
+Added 2026-10-18 (Issue 2, Today page). `@keyframes` names are global CSS, and the
+five prototypes are five standalone documents that reuse the same names for
+different animations. The app has one global stylesheet, so a page's own
+keyframes carry a page prefix. The bodies of the animations and every other
+declaration are the prototype's, unchanged, and `npm run check:ui-css` compares
+them by the prototype's name.
+
+| Old name | New name      | Page  |
+| -------- | ------------- | ----- |
+| `spin`   | `today-spin`  | Today |
+| `shine`  | `today-shine` | Today |
+| `blink`  | `today-blink` | Today |
+| `pen`    | `today-pen`   | Today |
+| `pulse`  | `today-pulse` | Today |
+| `fl`     | `today-fl`    | Today |
+| `rg`     | `today-rg`    | Today |
+
+The shared keyframes `brk-in`, `brk-breathe`, `boot` and `scan` are identical in
+all five prototypes and are NOT renamed; they live in the shared shell CSS.
+
+This is also the only textual difference from the prototype anywhere else on the
+page. Today-specific rules are wrapped in `@scope (body[data-page="today"])` and
+`document.body.dataset.page` carries the current route; `@scope` changes where a
+rule applies and not what it says.
+
 ## Open questions
 
 From the "Likely entries" list in `docs/UI-REVAMP.md`. Q2 and Q5 are resolved; the rest are not decided;

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
   import { currentRoute, type Route } from '../lib/router';
   import { app } from '../stores/app';
 
@@ -15,6 +16,28 @@
     { route: 'history', label: 'History' },
     { route: 'settings', label: 'Settings' },
   ];
+
+  /**
+   * `document.body.dataset.page` is the route name, and it is what every page's
+   * `@scope (body[data-page="<route>"])` block in `src/styles/ui/*.css` matches
+   * on (UI Fidelity Contract: page rules are isolated, not rewritten).
+   *
+   * The first assignment runs during component initialisation, before this
+   * component's markup is inserted and therefore before the first paint: a page
+   * must never paint once with its rules missing and then restyle. `$effect`
+   * keeps it equal to the route afterwards, on every `hashchange`.
+   */
+  function syncPageAttribute(route: Route): void {
+    if (typeof document !== 'undefined') {
+      document.body.dataset.page = route;
+    }
+  }
+
+  syncPageAttribute(get(currentRoute));
+
+  $effect(() => {
+    syncPageAttribute($currentRoute);
+  });
 
   /**
    * Every header value is read from the store, never hardcoded. `rank` is the
