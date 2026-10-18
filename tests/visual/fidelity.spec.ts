@@ -11,6 +11,7 @@ import {
   fullPagePng,
   openApp,
   openPrototype,
+  overlapNote,
   protoUrl,
   appUrl,
   sideBySide,
@@ -57,12 +58,21 @@ for (const vp of VIEWPORTS) {
         await emit('app.png', PNG.sync.write(b), 'image/png');
         await emit('side-by-side.png', PNG.sync.write(sideBySide(a, b)), 'image/png');
 
+        // The overlap ratio is computed either way and attached either way, so a
+        // size mismatch explains how far apart the two are as well as how far
+        // apart in size. It is never the pass/fail number - see `overlapRatio`.
+        const note = overlapNote(a, b);
+        const overlapBody = Buffer.from(`${note}\n`, 'utf8');
+
+        await emit('overlap-ratio.txt', overlapBody, 'text/plain');
+
         // Dimensions first. Comparing an overlap would turn a wrong page height
         // into a plausible-looking ratio and hide the real cause.
         expect(
           { w: a.width, h: a.height },
-          `page dimensions must match the prototype: prototype ${a.width}x${a.height}, app ${b.width}x${b.height}` +
-            ` (see prototype.png, app.png and side-by-side.png in test-results/visual/${slugName}/)`
+          `page dimensions must match the prototype: prototype ${a.width}x${a.height}, app ${b.width}x${b.height}; ` +
+            `${note} ` +
+            `(see prototype.png, app.png and side-by-side.png in test-results/visual/${slugName}/)`
         ).toEqual({ w: b.width, h: b.height });
 
         const { ratio, diff } = comparePixels(a, b);
