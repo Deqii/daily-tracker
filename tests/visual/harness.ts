@@ -235,6 +235,28 @@ export async function fullPagePng(page: Page): Promise<PNG> {
   return captureFullPage(page);
 }
 
+/**
+ * Captures one element by selector, for region tests.
+ *
+ * The header sits at the top of both pages, so `scrollIntoViewIfNeeded` is a
+ * no-op in practice and the capture comes straight out of the viewport
+ * compositor. It goes through the same `open()` context as the full-page path
+ * (frozen clock, local fonts, `#fx` and `.scan` hidden, reduced motion, settle
+ * time), so a region diff and a page diff are cut from the same cloth.
+ */
+export async function captureRegion(page: Page, selector: string): Promise<PNG> {
+  const el = page.locator(selector).first();
+
+  if ((await el.count()) === 0) {
+    throw new Error(`captureRegion: no element matches ${selector}`);
+  }
+
+  await el.scrollIntoViewIfNeeded();
+  await settleFrames(page);
+
+  return PNG.sync.read(await el.screenshot({ animations: 'disabled' }));
+}
+
 /* ------------------------------------------------------------------ pixels */
 
 /**
@@ -280,6 +302,61 @@ export function comparePixels(a: PNG, b: PNG, threshold = 0.1): PixelResult {
   return { ratio: bad / (a.width * a.height), bad, total: a.width * a.height, diff };
 }
 
+/** Top-left copy of `src` clipped to `w` x `h`. */
+function crop(src: PNG, w: number, h: number): PNG {
+  const out = new PNG({ width: w, height: h });
+
+  for (let y = 0; y < h; y++) {
+    src.data.copy(out.data, y * w * 4, y * src.width * 4, y * src.width * 4 + w * 4);
+  }
+
+  return out;
+}
+
+/**
+ * Mismatch ratio over the region both images have in common, i.e. over
+ * `min(width) x min(height)` from the top-left corner.
+ *
+ * INFORMATIONAL ONLY. A size mismatch is always the finding: reporting an
+ * overlap ratio as a pass/fail number would let a page of the right size but
+ * the wrong content pass, and would let a wrong-size page hide behind a small
+ * ratio. This number only helps a human judge *how* two mismatched things
+ * differ, so no test may branch on it.
+ */
+export function overlapRatio(a: PNG, b: PNG, threshold = PIXEL_THRESHOLD): number {
+  const width = Math.min(a.width, b.width);
+  const height = Math.min(a.height, b.height);
+
+  if (width === 0 || height === 0) return NaN;
+
+  const bad = pixelmatch(
+    crop(a, width, height).data,
+    crop(b, width, height).data,
+    new PNG({ width, height }).data,
+    width,
+    height,
+    { threshold }
+  );
+
+  return bad / (width * height);
+}
+
+/** The one-line form of `overlapRatio`, safe to paste into a failure message. */
+export function overlapNote(a: PNG, b: PNG, threshold = PIXEL_THRESHOLD): string {
+  const width = Math.min(a.width, b.width);
+  const height = Math.min(a.height, b.height);
+  const ratio = overlapRatio(a, b, threshold);
+
+  if (Number.isNaN(ratio)) {
+    return `overlap region min(${a.width},${b.width}) x min(${a.height},${b.height}) is empty (informational, not used for pass/fail)`;
+  }
+
+  return (
+    `overlap ratio ${(ratio * 100).toFixed(3)}% over min(w)=${width} x min(h)=${height} ` +
+    `(informational, not used for pass/fail)`
+  );
+}
+
 /** Prototype on the left, app on the right, on a neutral background. */
 export function sideBySide(a: PNG, b: PNG): PNG {
   const gap = 12;
@@ -323,8 +400,14 @@ export type StyleEntry = { path: string; st: Record<string, string> };
 /**
  * Runs inside the browser: must stay serialisable and closure-free. Playwright
  * ships `fn.toString()`, so this cannot close over anything in this module.
+ *
+ * `rootSelector` narrows the walk to one subtree (the header, in
+ * `shell.spec.ts`). It travels as the `page.evaluate` argument, which is how a
+ * serialised function receives it. A selector that matches nothing yields an
+ * empty report rather than a crash, so the caller's dimension assertion is
+ * always the first thing it sees.
  */
-export function collect(): StyleEntry[] {
+export function collect(rootSelector = 'body'): StyleEntry[] {
   const PROPS = [
     'display',
     'position',
@@ -407,7 +490,7 @@ export function collect(): StyleEntry[] {
     for (const child of Array.from(el.children)) walk(child, path);
   };
 
-  walk(document.body, '');
+  walk(document.querySelector(rootSelector) ?? document.body, '');
 
   return out;
 }
