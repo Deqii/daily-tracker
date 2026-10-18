@@ -4,30 +4,47 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Daily Tracker – History (prototype)</title>
+<script>try{var d=document.documentElement,t=localStorage.getItem('daily-tracker:theme');d.dataset.theme=t==='light'?'light':'dark';if(localStorage.getItem('daily-tracker:motion')==='off')d.dataset.motion='off'}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
 /* ===== DESIGN TOKENS (identik dengan halaman lain) ===== */
 :root{
-  --bg:#05070d; --panel:rgba(12,20,40,.58); --panel-solid:#0b1324;
+  --bg:#05070d; --panel:rgba(12,20,40,.58); --panel-solid:#0b1324; --ins:rgba(5,7,13,.45); --hdr:rgba(5,7,13,.7);
   --line:rgba(61,169,255,.26); --line-strong:rgba(61,169,255,.7);
-  --blue:#3da9ff; --cyan:#8adbff; --text:#e6eef9; --muted:#93a6c2;
-  --danger:#ff5468; --gold:#f5c451; --monarch:#8b6cff; --ok:#4ade9a;
+  --blue:#3da9ff; --cyan:#8adbff; --text:#e6eef9; --muted:#93a6c2; --on-accent:#04101f;
+  --danger:#ff5468; --gold:#f5c451; --monarch:#8b6cff; --ok:#4ade9a; --warn:#ffb454;
   --stat-str:#ff7a59; --stat-vit:#4ade9a; --stat-int:#3da9ff; --stat-disc:#b79cff; --stat-soc:#f5c451;
+  --rk-e:#8adbff; --rk-d:#3da9ff; --rk-c:#4ade9a; --rk-b:#a78bfa; --rk-a:#ff9f43; --rk-s:#f5c451;
+  --grid:rgba(61,169,255,.045); --glow1:rgba(61,169,255,.16); --glow2:rgba(139,108,255,.10); --vig:rgba(0,0,0,.65);
   --font-display:'Chakra Petch',system-ui,sans-serif; --font-body:'Manrope',system-ui,sans-serif; --font-mono:'JetBrains Mono',ui-monospace,monospace;
   --r-panel:4px; --r-chip:3px; --glow:0 0 24px rgba(61,169,255,.18);
   --ease:cubic-bezier(.2,.8,.2,1); --t-fast:.15s; --t-base:.35s; --t-slow:.7s; --stagger:70ms;
+  --ins2:rgba(5,7,13,.6); --scan:rgba(61,169,255,.12); --track:rgba(255,255,255,.08); --lock-text:#c3d0e4; --monarch-soft:#b7a4ff;
+  --tier-r:#4ade9a; --tier-s:#3da9ff; --tier-b:#ff8a9a;
+}
+[data-theme=light]{
+  --bg:#edf2fa; --panel:rgba(255,255,255,.74); --panel-solid:#ffffff; --ins:rgba(22,115,201,.05); --hdr:rgba(237,242,250,.8);
+  --line:rgba(22,115,201,.28); --line-strong:rgba(22,115,201,.8);
+  --blue:#1673c9; --cyan:#0a63ad; --text:#0c1730; --muted:#495b78; --on-accent:#ffffff;
+  --danger:#c81e3a; --gold:#a86a00; --monarch:#5b3fd6; --ok:#12804a; --warn:#a85a00;
+  --stat-str:#d9481f; --stat-vit:#12804a; --stat-int:#1673c9; --stat-disc:#6d4de0; --stat-soc:#a86a00;
+  --rk-e:#0a7fb8; --rk-d:#1673c9; --rk-c:#12804a; --rk-b:#6d4de0; --rk-a:#c4560a; --rk-s:#a86a00;
+  --grid:rgba(22,115,201,.07); --glow1:rgba(22,115,201,.14); --glow2:rgba(109,77,224,.08); --vig:rgba(0,0,0,0);
+  --glow:0 4px 24px rgba(22,115,201,.12);
+  --ins2:rgba(22,115,201,.07); --scan:rgba(22,115,201,.1); --track:rgba(12,23,48,.1); --lock-text:#25364f; --monarch-soft:#5b3fd6;
+  --tier-r:#12804a; --tier-s:#1673c9; --tier-b:#c8365a;
 }
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);color:var(--text);font:400 15px/1.5 var(--font-body);min-height:100vh;overflow-x:hidden}
 body::before{content:"";position:fixed;inset:0;z-index:-2;
-  background:radial-gradient(900px 520px at 30% 22%,rgba(61,169,255,.16),transparent 70%),radial-gradient(700px 500px at 85% 80%,rgba(139,108,255,.10),transparent 70%),
-  linear-gradient(rgba(61,169,255,.045) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,rgba(61,169,255,.045) 1px,transparent 1px) 0 0/48px 48px}
-body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.65))}
+  background:radial-gradient(900px 520px at 30% 22%,var(--glow1),transparent 70%),radial-gradient(700px 500px at 85% 80%,var(--glow2),transparent 70%),
+  linear-gradient(var(--grid) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,var(--grid) 1px,transparent 1px) 0 0/48px 48px}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,var(--vig))}
 #fx{position:fixed;inset:0;z-index:-1;pointer-events:none}
 :focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 button{font:inherit;color:inherit}
-header{display:flex;align-items:center;gap:28px;padding:14px 32px;border-bottom:1px solid var(--line);background:rgba(5,7,13,.7);backdrop-filter:blur(10px);position:sticky;top:0;z-index:5}
+header{display:flex;align-items:center;gap:28px;padding:14px 32px;border-bottom:1px solid var(--line);background:var(--hdr);backdrop-filter:blur(10px);position:sticky;top:0;z-index:5}
 .logo{font:700 18px var(--font-display);letter-spacing:.04em}
 nav{display:flex;gap:6px;flex:1}nav a{color:var(--muted);text-decoration:none;padding:6px 12px;position:relative;font-weight:500}nav a:hover,nav a[aria-current]{color:var(--text)}
 nav a[aria-current]::after{content:"";position:absolute;left:12px;right:12px;bottom:-15px;height:2px;background:var(--blue);box-shadow:0 0 12px var(--blue)}
@@ -47,7 +64,7 @@ nav a[aria-current]::after{content:"";position:absolute;left:12px;right:12px;bot
 @keyframes brk-breathe{from{--arm:var(--a0);filter:drop-shadow(0 0 2px var(--k))}to{--arm:var(--a1);filter:drop-shadow(0 0 7px var(--k))}}
 .boot{opacity:0;animation:boot var(--t-slow) var(--ease) forwards;animation-delay:calc(var(--i)*var(--stagger) + 120ms)}
 @keyframes boot{from{opacity:0;transform:translateY(10px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
-.scan{position:fixed;left:0;right:0;top:0;height:120px;z-index:4;pointer-events:none;background:linear-gradient(transparent,rgba(61,169,255,.12),transparent);animation:scan 1.3s var(--ease) 1 forwards}
+.scan{position:fixed;left:0;right:0;top:0;height:120px;z-index:4;pointer-events:none;background:linear-gradient(transparent,var(--scan),transparent);animation:scan 1.3s var(--ease) 1 forwards}
 @keyframes scan{from{transform:translateY(-120px)}to{transform:translateY(100vh);opacity:0}}
 h1{font:700 30px var(--font-display)}h2{font:600 17px var(--font-display)}.sub{color:var(--muted);font-size:13px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
@@ -78,7 +95,7 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 64px;display:flex;flex-dir
 .leg i{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px}
 /* events */
 .evs{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto}
-.ev{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-left:3px solid var(--ec);padding:10px 12px;background:rgba(5,7,13,.45);transition:transform var(--t-fast),background var(--t-fast);cursor:pointer;width:100%;text-align:left}
+.ev{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-left:3px solid var(--ec);padding:10px 12px;background:var(--ins);transition:transform var(--t-fast),background var(--t-fast);cursor:pointer;width:100%;text-align:left}
 .ev:hover{transform:translateX(3px);background:rgba(61,169,255,.08)}.ev:focus-visible{outline:2px solid var(--cyan)}
 .ev.big{background:linear-gradient(90deg,color-mix(in srgb,var(--ec) 16%,transparent),transparent);box-shadow:0 0 16px color-mix(in srgb,var(--ec) 22%,transparent)}
 .ev .g{font-size:18px;color:var(--ec);width:22px;text-align:center;text-shadow:0 0 10px var(--ec)}
@@ -88,7 +105,7 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 64px;display:flex;flex-dir
 .cal span{font-size:11px;color:var(--muted);text-align:center}
 .cal button{all:unset;aspect-ratio:1;border:1px solid var(--line);background:rgba(61,169,255,.06);display:grid;place-items:center;font:500 11px var(--font-mono);color:var(--muted);cursor:pointer;transition:transform var(--t-fast)}
 .cal button:hover{transform:scale(1.12);z-index:1}.cal button:focus-visible{outline:2px solid var(--cyan)}
-.cal button[data-l="1"]{background:rgba(61,169,255,.28)}.cal button[data-l="2"]{background:rgba(61,169,255,.55);color:var(--text)}.cal button[data-l="3"]{background:var(--blue);color:#04101f;box-shadow:0 0 8px var(--blue)}
+.cal button[data-l="1"]{background:rgba(61,169,255,.28)}.cal button[data-l="2"]{background:rgba(61,169,255,.55);color:var(--text)}.cal button[data-l="3"]{background:var(--blue);color:var(--on-accent);box-shadow:0 0 8px var(--blue)}
 .cal button[data-l="x"]{background:rgba(255,84,104,.3);border-color:var(--danger);color:var(--text)}
 .cal button.sel{outline:2px solid var(--cyan);outline-offset:1px}
 .cal i{visibility:hidden}
@@ -108,6 +125,8 @@ tr.e td:last-child{text-align:right}
 @media(max-width:700px){header{padding:12px 16px;gap:12px}nav{display:none}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{padding:16px}td:nth-child(n+2):nth-child(-n+6),th:nth-child(n+2):nth-child(-n+6){padding:8px 2px}}
 @media(max-width:380px){.chips .chip:first-child{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}.ln{stroke-dashoffset:0}.ar,.mk{opacity:1}}
+[data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+[data-motion=off] #fx,[data-motion=off] .scan{display:none}
 </style>
 </head>
 <body>
@@ -138,7 +157,7 @@ tr.e td:last-child{text-align:right}
 </main>
 
 <script>
-const $=id=>document.getElementById(id),reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $=id=>document.getElementById(id),reduce=(matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.motion==='off');
 /* ===== Simulasi kecil dari aturan PRD (data demo; di app semua ini berasal dari engine) ===== */
 const MASKS='11111 11011 11111 11110 11111 11111 11111 10101 11111 11111 11011 11111 11111 00100 00000 00000 00000 11111 11111 11101 11111 11111 11111 01111 11111 11111 11110 11111 11111 11111'.split(' ');
 const MULT={E:.5,D:.7,C:.85,B:1,A:1.15,S:1.3},PEN={E:5,D:8,C:13,B:20,A:30,S:45},ORD='EDCBAS';
@@ -179,17 +198,17 @@ function chart(){const v=view(),n=v.length;
   const mn=Math.min(...v.map(d=>d.xp)),mx=Math.max(...v.map(d=>d.xp));
   let step=Math.max(25,Math.ceil((mx-mn+40)/4/25)*25),lo=Math.floor((mn-10)/step)*step,hi=lo+step*4;while(hi<mx+8){hi+=step}
   const x=i=>PL+(n===1?0:i*(W-PL-PR)/(n-1)),y=val=>PT+(1-(val-lo)/(hi-lo))*(H-PT-PB);lay={x,n,v};
-  let h='<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3da9ff" stop-opacity=".45"/><stop offset="1" stop-color="#3da9ff" stop-opacity="0"/></linearGradient></defs>';
-  for(let t=lo;t<=hi;t+=step)h+=`<line x1="${PL}" x2="${W-PR}" y1="${y(t)}" y2="${y(t)}" stroke="#3da9ff" stroke-opacity=".12" stroke-dasharray="2 5"/><text x="${PL-8}" y="${y(t)+4}" text-anchor="end" fill="#93a6c2" font-size="12" font-family="JetBrains Mono">${t}</text>`;
-  if(350>lo&&350<hi)h+=`<line x1="${PL}" x2="${W-PR}" y1="${y(350)}" y2="${y(350)}" stroke="#8b6cff" stroke-width="1.4" stroke-dasharray="6 5"/><text x="${W-PR-4}" y="${y(350)-6}" text-anchor="end" fill="#b7a4ff" font-size="12">Level 6 · Rank D</text>`;
+  let h='<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--blue)" stop-opacity=".45"/><stop offset="1" stop-color="var(--blue)" stop-opacity="0"/></linearGradient></defs>';
+  for(let t=lo;t<=hi;t+=step)h+=`<line x1="${PL}" x2="${W-PR}" y1="${y(t)}" y2="${y(t)}" stroke="var(--blue)" stroke-opacity=".12" stroke-dasharray="2 5"/><text x="${PL-8}" y="${y(t)+4}" text-anchor="end" fill="var(--muted)" font-size="12" font-family="JetBrains Mono">${t}</text>`;
+  if(350>lo&&350<hi)h+=`<line x1="${PL}" x2="${W-PR}" y1="${y(350)}" y2="${y(350)}" stroke="var(--monarch)" stroke-width="1.4" stroke-dasharray="6 5"/><text x="${W-PR-4}" y="${y(350)-6}" text-anchor="end" fill="var(--monarch-soft)" font-size="12">Level 6 · Rank D</text>`;
   const every=n>16?Math.ceil(n/8):n>8?2:1;
-  v.forEach((d,i)=>{if(i%every===0||i===n-1)h+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" fill="#93a6c2" font-size="12">${fmt(d.date)}</text>`});
+  v.forEach((d,i)=>{if(i%every===0||i===n-1)h+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" fill="var(--muted)" font-size="12">${fmt(d.date)}</text>`});
   const pts=v.map((d,i)=>`${x(i).toFixed(1)},${y(d.xp).toFixed(1)}`);
   h+=`<polygon class="ar" points="${PL},${y(lo)} ${pts.join(' ')} ${x(n-1)},${y(lo)}" fill="url(#ag)"/><polyline class="ln" pathLength="1" points="${pts.join(' ')}"/>`;
   v.forEach((d,i)=>d.ev.forEach(e=>{const cx=x(i),cy=y(d.xp),c=`var(${EC[e.k]})`;
-    if(e.k==='up'||e.k==='down'){const u=e.k==='up';h+=`<g class="mk" style="--d:${i}"><circle cx="${cx}" cy="${cy}" r="7" fill="#05070d" stroke="${c}" stroke-width="2.2"/><path d="M${cx-4} ${cy+(u?-15:15)} L${cx} ${cy+(u?-21:21)} L${cx+4} ${cy+(u?-15:15)}" fill="none" stroke="${c}" stroke-width="2"/></g>`}
-    else h+=`<rect class="mk" style="--d:${i}" x="${cx-5}" y="${cy-5}" width="10" height="10" transform="rotate(45 ${cx} ${cy})" fill="#05070d" stroke="${c}" stroke-width="2"/>`}));
-  h+=`<g id="cur" style="display:none"><line id="cl" y1="${PT}" y2="${H-PB}" stroke="#8adbff" stroke-opacity=".55" stroke-dasharray="3 4"/><circle id="cc" r="5" fill="#8adbff" style="filter:drop-shadow(0 0 8px #3da9ff)"/></g>`;
+    if(e.k==='up'||e.k==='down'){const u=e.k==='up';h+=`<g class="mk" style="--d:${i}"><circle cx="${cx}" cy="${cy}" r="7" fill="var(--bg)" stroke="${c}" stroke-width="2.2"/><path d="M${cx-4} ${cy+(u?-15:15)} L${cx} ${cy+(u?-21:21)} L${cx+4} ${cy+(u?-15:15)}" fill="none" stroke="${c}" stroke-width="2"/></g>`}
+    else h+=`<rect class="mk" style="--d:${i}" x="${cx-5}" y="${cy-5}" width="10" height="10" transform="rotate(45 ${cx} ${cy})" fill="var(--bg)" stroke="${c}" stroke-width="2"/>`}));
+  h+=`<g id="cur" style="display:none"><line id="cl" y1="${PT}" y2="${H-PB}" stroke="var(--cyan)" stroke-opacity=".55" stroke-dasharray="3 4"/><circle id="cc" r="5" fill="var(--cyan)" style="filter:drop-shadow(0 0 8px var(--blue))"/></g>`;
   $('chart').innerHTML=h;lay.y=y;
   $('chart').setAttribute('aria-label',`Grafik Lifetime XP ${range} hari: dari ${v[0].xp-v[0].net} ke ${v[n-1].xp} XP, ${v.reduce((a,d)=>a+d.ev.length,0)} peristiwa penting`)}
 function cursor(i){const v=lay.v;if(i<0||i>=v.length)return;const d=v[i],cx=lay.x(i),cy=lay.y(d.xp);
@@ -227,7 +246,7 @@ $('ranges').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;range=
   document.querySelectorAll('.sum .panel').forEach(p=>p.style.animation='none');render()};
 /* particles */
 const cv=$('fx'),cx=cv.getContext('2d');let P=[],raf;const size=()=>{cv.width=innerWidth;cv.height=innerHeight};
-function loop(){cx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.y-=p.v;if(p.y<-5){p.y=cv.height+5;p.x=Math.random()*cv.width}cx.fillStyle=`rgba(138,219,255,${p.a})`;cx.fillRect(p.x,p.y,p.r,p.r)});raf=requestAnimationFrame(loop)}
+function loop(){cx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.y-=p.v;if(p.y<-5){p.y=cv.height+5;p.x=Math.random()*cv.width}cx.fillStyle=`rgba(${document.documentElement.dataset.theme==='light'?'22,115,201':'138,219,255'},${p.a})`;cx.fillRect(p.x,p.y,p.r,p.r)});raf=requestAnimationFrame(loop)}
 if(!reduce){size();addEventListener('resize',size);P=Array.from({length:36},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*2+1,v:Math.random()*.25+.08,a:Math.random()*.4+.1}));loop();document.addEventListener('visibilitychange',()=>document.hidden?cancelAnimationFrame(raf):loop())}
 render();
 </script>
