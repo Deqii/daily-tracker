@@ -17,10 +17,11 @@
     "format:check": "prettier --check .",
     "test:visual:fonts": "node scripts/copy-visual-fonts.mjs",
     "test:visual:prototypes": "node scripts/serve-prototypes.mjs --port 4174",
-    "test:visual:history-fixture": "node scripts/dump-history-fixture.mjs",
+    "test:visual:fixtures": "node scripts/dump-fixtures.mjs",
+    "check:fixtures": "node scripts/check-fixtures.mjs",
     "pretest:visual": "npm run test:visual:fonts",
     "test:visual": "playwright test",
-    "test:visual:update": "npm run test:visual:fonts && npm run test:visual:history-fixture"
+    "test:visual:update": "npm run test:visual:fonts && npm run test:visual:fixtures"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

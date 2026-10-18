@@ -7,6 +7,7 @@ import {
   SELF_TEST_MAX_EXACT_RATIO,
   VIEWPORTS,
   captureFullPage,
+  captureRegion,
   collect,
   comparePixels,
   compareStyleReports,
@@ -36,6 +37,9 @@ import {
  */
 
 test.use(CONTEXT_OPTIONS);
+
+/** The subtree `shell.spec.ts` captures; see the test below. */
+const HEADER = 'header';
 
 for (const vp of VIEWPORTS) {
   for (const p of PAGES) {
@@ -80,6 +84,57 @@ for (const vp of VIEWPORTS) {
 
         const stylesA = await pageA.evaluate(collect);
         const stylesB = await pageB.evaluate(collect);
+        const problems = compareStyleReports(stylesA, stylesB);
+
+        expect(problems, problems.join('\n')).toEqual([]);
+
+        await first.close();
+        await second.close();
+      });
+
+      /**
+       * The same proof for the capture path `shell.spec.ts` uses.
+       *
+       * `captureRegion()` is not `captureFullPage()`: it screenshots one
+       * element out of the viewport compositor instead of stitching scroll
+       * slices, so it is a different code path and needs its own proof that two
+       * identical loads of it agree. Same pages, same tolerances, same budget.
+       */
+      test('header renders identically twice', async ({ browser }) => {
+        const first = await newIsolatedContext(browser, vp);
+        const second = await newIsolatedContext(browser, vp);
+        const pageA = await first.newPage();
+        const pageB = await second.newPage();
+
+        await open(pageA, protoUrl(p));
+        await open(pageB, protoUrl(p));
+
+        const a = await captureRegion(pageA, HEADER);
+        const b = await captureRegion(pageB, HEADER);
+
+        expect(
+          { w: a.width, h: a.height },
+          `header run 1 ${a.width}x${a.height} vs run 2 ${b.width}x${b.height}`
+        ).toEqual({ w: b.width, h: b.height });
+
+        const total = a.width * a.height;
+        const exact = comparePixels(a, b, 0);
+        const { bad } = comparePixels(a, b, PIXEL_THRESHOLD);
+
+        expect(
+          bad,
+          `${bad} of ${total} header pixels differ between two identical renders ` +
+            `(threshold ${PIXEL_THRESHOLD}); clock ${FIXED_TIME.toISOString()}`
+        ).toBe(0);
+
+        expect(
+          exact.ratio,
+          `header exact mismatch ${(exact.ratio * 100).toFixed(4)}% of ${total} pixels, ` +
+            `budget ${(SELF_TEST_MAX_EXACT_RATIO * 100).toFixed(2)}%`
+        ).toBeLessThanOrEqual(SELF_TEST_MAX_EXACT_RATIO);
+
+        const stylesA = await pageA.evaluate(collect, HEADER);
+        const stylesB = await pageB.evaluate(collect, HEADER);
         const problems = compareStyleReports(stylesA, stylesB);
 
         expect(problems, problems.join('\n')).toEqual([]);

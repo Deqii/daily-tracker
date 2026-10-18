@@ -1,4 +1,5 @@
 import { addDays, weekStart, type LocalDate } from '../date';
+import { closeDayStreak, type StreakState } from '../../engine/streak';
 import type {
   Completion,
   DailyQuestDay,
@@ -12,14 +13,21 @@ import type {
 import { STATS } from '../types';
 import { SCHEMA_VERSION, type StorageSchema } from '../storage';
 import historySnapshot from './history-snapshot.json';
+import rewardsSnapshot from './rewards-snapshot.json';
+import todaySnapshot from './today-snapshot.json';
 
 /**
  * Deterministic seed data for the visual-diff harness.
  *
- * Every number here is copied out of a prototype's `<script>` block, so the app
- * under test renders the same values the prototype renders. Where the prototype
- * hardcodes something the engine owns (CAP, multipliers, rank thresholds), the
- * app reads the engine instead and the numbers are only kept in sync by hand.
+ * Every number here comes from a snapshot under this folder, and every snapshot
+ * is produced by running the prototype in Playwright and reading what it
+ * rendered (`scripts/dump-fixtures.mjs`). Never hand-copy a value out of a
+ * prototype `<script>` into this file: that is how the heat strip and the
+ * purchase log went stale when PR #157 corrected the prototypes.
+ *
+ * Where the prototype hardcodes something the engine owns (CAP, multipliers, rank
+ * thresholds), the app reads the engine instead and the numbers are only kept in
+ * sync by hand.
  *
  * Never import this module from production code paths; `src/lib/fixtures/index.ts`
  * is loaded through a build-mode gated dynamic import.
@@ -128,25 +136,78 @@ const TODAY_QUEST: { taskId: string; stat: Stat; done: boolean }[] = [
 ];
 
 /**
- * The fourteen levels the prototype's heat strip paints, oldest first.
- * `null` is today.html's `data-l="x"`: a day on which nothing was completed.
+ * The fourteen levels the prototype's heat strip paints, oldest first, dumped
+ * from the rendered `#heat i[data-l]` cells. `null` is today.html's `data-l="x"`:
+ * a day on which nothing was completed (DEVIATIONS.md note 1).
+ *
+ * The strip's LAST cell is today, not yesterday: it paints `1`, and today is the
+ * one day with three of five stats done, which is `data-l="1"` under the mapping
+ * below. That is the reading DEVIATIONS.md note 1 takes ("four closed days plus
+ * today"), and it is the only one under which the strip, Streak 5 and the two
+ * red days all hold at the fixed clock. The prototype's per-cell `title`
+ * attributes count the strip 14..1 hari lalu, one more than the array spans;
+ * the titles are a labelling slip in the prototype, not a rule.
  */
-const HEAT_LEVELS: (number | null)[] = [3, 2, 3, 1, null, 3, 3, 2, 3, 3, null, 2, 3, 1];
+const HEAT_LEVELS: (number | null)[] = (
+  todaySnapshot as unknown as {
+    heatLevels: (number | null)[];
+  }
+).heatLevels;
 
 const HEAT_DAYS = HEAT_LEVELS.length;
 
-interface DaySeed {
+/**
+ * `data-l` -> how many of the five stats were satisfied, using the same mapping
+ * as `history.html`: `c >= 5 ? 3 : c === 4 ? 2 : c === 3 ? 1 : 'x'`.
+ *
+ * `x` means "not enough stat satisfied to be green", which for the Today strip
+ * is a day with no completions at all - the two red cells are days the streak
+ * had to be rescued on or reset by.
+ */
+function satisfiedForLevel(level: number | null): number {
+  if (level === 3) return 5;
+  if (level === 2) return 4;
+  if (level === 1) return 3;
+
+  return 0;
+}
+
+interface HeatCell {
   date: LocalDate;
+  /** 0 for today, 1 for yesterday, and so on. */
+  daysAgo: number;
   satisfied: number;
 }
 
-function heatSeeds(): DaySeed[] {
-  const first = addDays(FIXED_TODAY, -(HEAT_DAYS - 1));
+function heatCells(): HeatCell[] {
+  return HEAT_LEVELS.map((level, i) => {
+    const daysAgo = HEAT_DAYS - 1 - i;
 
-  return HEAT_LEVELS.map((level, i) => ({
-    date: addDays(first, i),
-    satisfied: level ?? 0,
-  }));
+    return {
+      date: addDays(FIXED_TODAY, -daysAgo),
+      daysAgo,
+      satisfied: satisfiedForLevel(level),
+    };
+  });
+}
+
+/** Every cell except today's, which is the open day rather than a closed one. */
+function closedHeatCells(): HeatCell[] {
+  return heatCells().filter((cell) => cell.daysAgo > 0);
+}
+
+/**
+ * The freeze week the streak walk starts from: the week the seeded window opens
+ * in. Anything before the first seeded day is outside the fixture, and the walk
+ * has to begin somewhere; beginning in that same week is what lets the second
+ * half of the window roll over into the current week and free the freeze.
+ */
+function heatWindowWeekStart(): LocalDate {
+  const first = closedHeatCells()[0];
+
+  if (first === undefined) throw new Error('today heat strip has no closed cells');
+
+  return weekStart(first.date);
 }
 
 function dayNet(satisfied: number): number {
@@ -158,7 +219,7 @@ function dayNet(satisfied: number): number {
 function lifetimeXpBeforeHeatWindow(): number {
   let xp = 56;
 
-  for (const seed of [...heatSeeds()].reverse()) {
+  for (const seed of [...closedHeatCells()].reverse()) {
     xp -= dayNet(seed.satisfied);
   }
 
@@ -170,16 +231,21 @@ interface BuiltDay {
   completions: Completion[];
   xpAfterLastClosedDay: number;
   totalCompletions: number;
-  streak: number;
+  /** Where the PRD §2.1 streak walk over the heat window ends up. */
+  streakState: StreakState;
 }
 
 function buildHeatDays(): BuiltDay {
-  const seeds = heatSeeds();
+  const seeds = closedHeatCells();
   const days: DailyQuestDay[] = [];
   const completions: Completion[] = [];
 
   let xp = lifetimeXpBeforeHeatWindow();
-  let streak = 0;
+  let streakState: StreakState = {
+    currentStreak: 0,
+    freezesUsedThisWeek: 0,
+    lastFreezeWeekReset: heatWindowWeekStart(),
+  };
   let total = 0;
   let seq = 0;
 
@@ -208,9 +274,16 @@ function buildHeatDays(): BuiltDay {
     const net = dayNet(seed.satisfied);
     xp += net;
 
-    if (seed.satisfied > 0) {
-      streak += 1;
-    }
+    // Replayed through the engine rather than counted here, so the seeded
+    // `currentStreak`, `freezesUsedThisWeek` and each day's `freezeUsed` cannot
+    // drift away from the completions that are seeded beside them.
+    const close = closeDayStreak(
+      streakState,
+      { date: seed.date, completionCount: seed.satisfied, hasQuestStats: true },
+      'E'
+    );
+
+    streakState = close.streakState;
 
     days.push({
       date: seed.date,
@@ -218,7 +291,7 @@ function buildHeatDays(): BuiltDay {
       requiredCompletions: required({ STR: 1, VIT: 1, INT: 1, DISC: 1, SOC: 1 }),
       actualCompletions: actual,
       netPointsChange: net,
-      freezeUsed: false,
+      freezeUsed: close.freezeUsed,
       closed: true,
       lifetimeXPEnd: xp,
       levelEnd: null,
@@ -226,7 +299,7 @@ function buildHeatDays(): BuiltDay {
     });
   }
 
-  return { days, completions, xpAfterLastClosedDay: xp, totalCompletions: total, streak };
+  return { days, completions, xpAfterLastClosedDay: xp, totalCompletions: total, streakState };
 }
 
 function buildToday(): { schema: StorageSchema; heatLevels: (number | null)[] } {
@@ -271,9 +344,9 @@ function buildToday(): { schema: StorageSchema; heatLevels: (number | null)[] } 
     wallet: 65,
     statXP: { STR: 16, VIT: 12, INT: 20, DISC: 10, SOC: 7 },
     rank: 'E',
-    currentStreak: heat.streak,
-    freezesUsedThisWeek: 0,
-    lastFreezeWeekReset: FIXED_WEEK_START,
+    currentStreak: heat.streakState.currentStreak,
+    freezesUsedThisWeek: heat.streakState.freezesUsedThisWeek,
+    lastFreezeWeekReset: heat.streakState.lastFreezeWeekReset,
     penaltyStats: ['SOC'],
     equippedTitle: 'first-reward',
     unlockedTitles: ['first-reward'],
@@ -439,70 +512,67 @@ function baseUserState(): UserState {
 /* rewards.html                                                                */
 /* -------------------------------------------------------------------------- */
 
-/** `R` in rewards.html: cost plus the `b` count of purchases. */
-const REWARD_CATALOG: { id: string; title: string; cost: number; bought: number }[] = [
-  { id: 'r01', title: 'Main game 2 jam', cost: 60, bought: 4 },
-  { id: 'r02', title: 'Kopi susu santai', cost: 35, bought: 8 },
-  { id: 'r03', title: 'Beli buku baru', cost: 150, bought: 0 },
-  { id: 'r04', title: 'Jajan favorit', cost: 250, bought: 1 },
-  { id: 'r05', title: 'Nonton bioskop', cost: 800, bought: 2 },
-];
+/** `R` in rewards.html: cost plus the `b` count of purchases, dumped from the page. */
+interface RewardsSnapshot {
+  readonly catalog: {
+    readonly id: number;
+    readonly title: string;
+    readonly cost: number;
+    readonly bought: number;
+  }[];
+  readonly purchases: { readonly title: string; readonly cost: number; readonly when: string }[];
+  readonly totalSpent: number;
+}
+
+const REWARDS_SNAPSHOT = rewardsSnapshot as unknown as RewardsSnapshot;
 
 /**
- * The five purchases the prototype's log shows, newest first, with the day
- * offsets its relative labels imply. The remaining purchases exist only to make
- * each card's `Dibeli N×` counter match `REWARD_CATALOG`.
+ * The prototype's relative day label -> whole days before the fixed clock.
+ * "Kemarin" is the only label that is not written as a number.
  */
-const PURCHASE_LOG: { rewardId: string; daysAgo: number }[] = [
-  { rewardId: 'r01', daysAgo: 1 },
-  { rewardId: 'r02', daysAgo: 2 },
-  { rewardId: 'r05', daysAgo: 5 },
-  { rewardId: 'r02', daysAgo: 6 },
-  { rewardId: 'r04', daysAgo: 9 },
-];
+function daysAgoFor(label: string): number {
+  if (label === 'Kemarin') return 1;
+
+  const match = /^(\d+) hari lalu$/.exec(label);
+
+  if (match === null) {
+    throw new Error(`rewards-snapshot.json: unknown relative label "${label}"`);
+  }
+
+  return Number(match[1]);
+}
 
 function buildRewards(): StorageSchema {
-  const rewards: Reward[] = REWARD_CATALOG.map(({ id, title, cost }) => ({
-    id,
-    title,
-    cost,
+  const rewards: Reward[] = REWARDS_SNAPSHOT.catalog.map((entry) => ({
+    id: `r${String(entry.id).padStart(2, '0')}`,
+    title: entry.title,
+    cost: entry.cost,
     createdAt: FIXED_NOW,
   }));
 
-  const byId = new Map(rewards.map((r) => [r.id, r]));
-  const purchases: RewardPurchase[] = [];
+  const byTitle = new Map(rewards.map((r) => [r.title, r]));
 
-  const push = (rewardId: string, daysAgo: number, seq: number) => {
-    const reward = byId.get(rewardId);
-    if (reward === undefined) return;
+  // Every purchase the prototype logs, newest first by day offset, with the
+  // title and cost snapshotted on the purchase itself (PRD data model) so a
+  // later cost edit cannot rewrite history.
+  const purchases: RewardPurchase[] = REWARDS_SNAPSHOT.purchases.map((entry, i) => {
+    const reward = byTitle.get(entry.title);
 
-    const date = addDays(FIXED_TODAY, -daysAgo);
+    if (reward === undefined) {
+      throw new Error(`rewards-snapshot.json: purchase "${entry.title}" is not in the catalog`);
+    }
 
-    purchases.push({
-      id: `p${String(seq).padStart(3, '0')}`,
-      rewardId,
-      rewardTitle: reward.title,
-      costAtPurchase: reward.cost,
+    const date = addDays(FIXED_TODAY, -daysAgoFor(entry.when));
+
+    return {
+      id: `p${String(i + 1).padStart(3, '0')}`,
+      rewardId: reward.id,
+      rewardTitle: entry.title,
+      costAtPurchase: entry.cost,
       purchasedAt: `${date}T19:00:00+07:00`,
       localDate: date,
-    });
-  };
-
-  let seq = 0;
-
-  for (const entry of PURCHASE_LOG) {
-    push(entry.rewardId, entry.daysAgo, seq++);
-  }
-
-  // Backfill only the shortfall, so each card's `Dibeli N×` counter matches the
-  // prototype while the log keeps the five entries the prototype shows.
-  for (const { id, bought } of REWARD_CATALOG) {
-    const logged = PURCHASE_LOG.filter((p) => p.rewardId === id).length;
-
-    for (let n = logged; n < bought; n += 1) {
-      push(id, 30 + n - logged, seq++);
-    }
-  }
+    };
+  });
 
   purchases.sort((a, b) => (a.purchasedAt < b.purchasedAt ? 1 : -1));
 

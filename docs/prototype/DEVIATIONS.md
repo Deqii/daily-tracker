@@ -72,7 +72,9 @@ counts in the original screenshots.
 | 2026-10-17 | `today.html`, `rewards.html` | Q6 and Q7 data corrections (see note 1, Q6, Q7).                                                                                                                                                                                                  |
 
 Fixtures derived from these values (the `today` heat strip and the `rewards`
-purchase log) must be regenerated before Issue 2 and Issue 4 are diffed.
+purchase log) were regenerated from the corrected prototypes in PR #158
+(`npm run test:visual:fixtures`); `npm run check:fixtures` now fails if a
+snapshot no longer matches a fresh dump.
 
 ## Harness note
 
@@ -82,5 +84,22 @@ checked out on Windows, so a Docker pin is not usable locally. Instead
 `npx playwright install chromium` resolves a single Chromium build
 (156.0.8078.4, chromium-headless-shell v1248), and that build is recorded in
 `tests/visual/README.md`. CI should use the same pinned Playwright on a fixed
-Ubuntu image. Text rasterisation is not bit-identical across operating systems,
-so a CI baseline must be generated on the image the job runs.
+Ubuntu image. There are no stored baselines. The prototype and the app are
+rendered in the same run on the same machine and compared against each other, so
+cross-OS rasterisation differences cancel out.
+
+What makes the reported ratios trustworthy:
+
+- `tests/visual/selftest.spec.ts` renders each prototype twice, in two separate
+  browser contexts, and requires the two renders to be identical - once over the
+  whole page and once over the `header` region. A reported ratio that two
+  identical loads of the reference disagree on would be unfalsifiable.
+- `tests/visual/shell.spec.ts` diffs the `header` element alone, so the shell can
+  be shown to match before the rest of a page is rebuilt.
+- Full-page captures scroll and stitch instead of using `fullPage: true`: the
+  prototypes paint `position: fixed` background layers and `backdrop-filter`
+  panels, and beyond-viewport capture rasters those differently between two
+  loads of the same page.
+- `#demo`, the prototype-only "Demo: buka title berikutnya" button in
+  `settings.html`, is hidden on both sides (note 3). It is a prototype affordance,
+  not UI, so it must never be diffed.
