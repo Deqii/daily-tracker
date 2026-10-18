@@ -1,4 +1,25 @@
-@import 'tailwindcss';
+/*
+ * Tailwind: theme and utilities, deliberately WITHOUT preflight.
+ *
+ * Preflight sets `border: 0 solid` on `*, ::backdrop, ::after, ::before`, and
+ * the prototypes have no such rule, so they keep the CSS initial
+ * `border-style: none`. Every element in the shell then reports
+ * `[border] 0px none -> 0px solid` in the computed-style diff and the header
+ * can never match, even though nothing is drawn.
+ *
+ * The reset the prototypes actually ship is ported verbatim in
+ * `src/styles/ui/base.css` (`*{box-sizing:border-box;margin:0}`), so dropping
+ * preflight leaves exactly one reset rather than two that disagree. The five
+ * pages still on the pre-revamp markup (Issues 2-6) lose preflight's implicit
+ * defaults with it; they stay functional and they are being rebuilt anyway.
+ *
+ * `base` is declared in the layer order but never imported, so nothing lands
+ * in it and no unlayered prototype rule has to compete with one.
+ */
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
 
 /*
  * Fonts (UI Revamp Issue 1).

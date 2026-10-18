@@ -477,6 +477,12 @@ const TODAY_PICKS: Partial<Record<Stat, string>> = {
 };
 
 function buildTasks(): StorageSchema {
+  const userState = baseUserState();
+
+  // Header chips, as tasks.html's own header renders them: `E`, `5`, `65`.
+  userState.wallet = 65;
+  userState.currentStreak = 5;
+
   return {
     schemaVersion: SCHEMA_VERSION,
     tasks: TASK_LIBRARY,
@@ -484,7 +490,7 @@ function buildTasks(): StorageSchema {
     dailyQuestLog: [],
     rewards: [],
     rewardPurchases: [],
-    userState: baseUserState(),
+    userState,
     milestoneEvents: [],
     theme: 'dark',
   };
@@ -583,6 +589,9 @@ function buildRewards(): StorageSchema {
   userState.equippedTitle = 'first-reward';
   userState.unlockedTitles = ['first-reward'];
   userState.totalPurchases = purchases.length;
+  // Streak chip, as rewards.html's own header renders it: `5`. Nothing is
+  // completed today in this fixture, so the display streak is the stored one.
+  userState.currentStreak = 5;
 
   return {
     schemaVersion: SCHEMA_VERSION,
@@ -669,10 +678,22 @@ function buildHistory(): StorageSchema {
 
   const userState = baseUserState();
   userState.lifetimeXP = last.lifetimeXPEnd;
-  userState.wallet = last.lifetimeXPEnd;
+  // Wallet chip, as history.html's own header renders it: `65`. history.html
+  // hardcodes that chip rather than deriving it from the simulation's running
+  // Lifetime XP, so the prototype's value is the one the header shows.
+  userState.wallet = 65;
   userState.statXP = { STR: 16, VIT: 12, INT: 20, DISC: 10, SOC: 7 };
   userState.rank = SNAPSHOT.chips.rank as UserState['rank'];
-  userState.currentStreak = Number(SNAPSHOT.chips.streak);
+  /**
+   * Streak chip, as history.html's own header renders it: `13`.
+   *
+   * The snapshot's 30 simulated days run 2026-09-16 to 2026-10-15 inclusive, so
+   * its last day IS today, and `streakEnd` on it (13) is the streak at the END
+   * of today. `userState.currentStreak` is the streak entering the open day and
+   * `displayStreak` adds today's completion to it (PRD 7.4), so the stored value
+   * is one less than the end-of-day figure and the header reads 12 + 1 = 13.
+   */
+  userState.currentStreak = last.streakEnd - 1;
   userState.unlockedTitles = ['first-reward', 'streak-7', 'completions-100'];
   userState.equippedTitle = 'first-reward';
 
@@ -734,7 +755,8 @@ function buildSettings(): StorageSchema {
   userState.wallet = 65;
   userState.statXP = SETTINGS_STAT_XP;
   userState.rank = 'E';
-  userState.currentStreak = 4;
+  // Streak chip, as settings.html's own header renders it: `5`.
+  userState.currentStreak = 5;
   userState.equippedTitle = 'first-reward';
   userState.unlockedTitles = ['first-reward'];
   userState.totalCompletions = 1;
