@@ -22,6 +22,7 @@
   --ease:cubic-bezier(.2,.8,.2,1); --t-fast:.15s; --t-base:.35s; --t-slow:.7s; --stagger:70ms;
   --ins2:rgba(5,7,13,.6); --scan:rgba(61,169,255,.12); --track:rgba(255,255,255,.08); --lock-text:#c3d0e4; --monarch-soft:#b7a4ff;
   --tier-r:#4ade9a; --tier-s:#3da9ff; --tier-b:#ff8a9a;
+  color-scheme:dark;
 }
 [data-theme=light]{
   --bg:#edf2fa; --panel:rgba(255,255,255,.74); --panel-solid:#ffffff; --ins:rgba(22,115,201,.05); --hdr:rgba(237,242,250,.8);
@@ -34,9 +35,10 @@
   --glow:0 4px 24px rgba(22,115,201,.12);
   --ins2:rgba(22,115,201,.07); --scan:rgba(22,115,201,.1); --track:rgba(12,23,48,.1); --lock-text:#25364f; --monarch-soft:#5b3fd6;
   --tier-r:#12804a; --tier-s:#1673c9; --tier-b:#c8365a;
+  color-scheme:light;
 }
 *{box-sizing:border-box;margin:0}
-body{background:var(--bg);color:var(--text);font:400 15px/1.5 var(--font-body);min-height:100vh;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font:400 15px/1.5 var(--font-body);min-height:100vh;overflow-x:hidden;transition:background var(--t-base),color var(--t-base)}
 body::before{content:"";position:fixed;inset:0;z-index:-2;
   background:radial-gradient(900px 520px at 30% 22%,var(--glow1),transparent 70%),
   radial-gradient(700px 500px at 85% 80%,var(--glow2),transparent 70%),
@@ -50,22 +52,20 @@ header{display:flex;align-items:center;gap:28px;padding:14px 32px;border-bottom:
 .logo{font:700 18px var(--font-display);letter-spacing:.04em}
 nav{display:flex;gap:6px;flex:1}
 nav a{color:var(--muted);text-decoration:none;padding:6px 12px;position:relative;font-weight:500}
-nav a:hover{color:var(--text)}
-nav a[aria-current]{color:var(--text)}
+nav a:hover,nav a[aria-current]{color:var(--text)}
 nav a[aria-current]::after{content:"";position:absolute;left:12px;right:12px;bottom:-15px;height:2px;background:var(--blue);box-shadow:0 0 12px var(--blue)}
 .chips{display:flex;gap:8px}
 .chip{border:1px solid var(--line);border-radius:var(--r-chip);padding:4px 12px;font:500 13px var(--font-mono);background:var(--panel);display:flex;gap:8px;align-items:center}
-.chip b{font-family:var(--font-mono);color:var(--text)} .chip span{color:var(--muted);font-family:var(--font-body)}
-.coin{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b8,var(--gold) 55%,#b8860b)}
+.chip span{color:var(--muted);font-family:var(--font-body)}
+.coin{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 30%,#fff3b8,var(--gold) 55%,#b8860b)}
 /* Layout */
 main{max-width:1280px;margin:0 auto;padding:28px 32px 48px;display:grid;grid-template-columns:320px 1fr 380px;gap:20px}
-.panel{position:relative;background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:var(--r-panel);padding:22px;box-shadow:var(--glow)}
+.panel,.drawer{position:relative;background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:var(--r-panel);box-shadow:var(--glow)}
+.panel{padding:22px}
 @property --arm{syntax:'<length>';inherits:false;initial-value:14px}
 .panel,.penalty,.stat,.rw{position:relative}
-.panel::before,.penalty::before,.stat::before,.rw::before{content:"";position:absolute;inset:-1px;pointer-events:none;
-  --k:var(--bc,var(--blue));--a0:14px;--a1:26px;--w:2px;
-  background:
-  linear-gradient(var(--k),var(--k)) 0 0/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 0 0/var(--w) var(--arm) no-repeat,
+.panel::before,.drawer::before,.penalty::before,.stat::before,.rw::before{content:"";position:absolute;inset:-1px;pointer-events:none;--k:var(--bc,var(--blue));--a0:14px;--a1:26px;--w:2px;
+  background:linear-gradient(var(--k),var(--k)) 0 0/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 0 0/var(--w) var(--arm) no-repeat,
   linear-gradient(var(--k),var(--k)) 100% 0/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 100% 0/var(--w) var(--arm) no-repeat,
   linear-gradient(var(--k),var(--k)) 0 100%/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 0 100%/var(--w) var(--arm) no-repeat,
   linear-gradient(var(--k),var(--k)) 100% 100%/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 100% 100%/var(--w) var(--arm) no-repeat;
@@ -176,7 +176,7 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
     <div class="lv"><span class="sub">Level</span><b id="lvl">3</b></div>
     <div class="title">Hadiah pertama</div>
     <div><div class="row sub" style="margin-bottom:6px"><span id="xpTxt">9 / 70 XP</span><span id="xpNext">ke Level 4</span></div><div class="xpbar"><i id="xpFill" style="width:0"></i></div></div>
-    <div><div class="row sub" style="margin-bottom:6px"><span>Streak minggu ini</span><span class="shield"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1l5.5 2v5c0 3.5-2.4 6-5.5 7C3.9 14 1.5 11.500 1.500 8V3z"/></svg>Freeze 1 tersisa</span></div>
+    <div><div class="row sub" style="margin-bottom:6px"><span>Streak</span><span class="shield"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1l5.5 2v5c0 3.5-2.4 6-5.5 7C3.9 14 1.5 11.500 1.500 8V3z"/></svg>Freeze 1 tersisa</span></div>
       <div class="pips" aria-label="Streak 5 hari"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on today"></i><i></i><i></i></div></div>
   </section>
 

@@ -112,6 +112,7 @@
   --tier-r: #4ade9a;
   --tier-s: #3da9ff;
   --tier-b: #ff8a9a;
+  color-scheme: dark;
 }
 [data-theme='light'] {
   --bg: #edf2fa;
@@ -155,6 +156,7 @@
   --tier-r: #12804a;
   --tier-s: #1673c9;
   --tier-b: #c8365a;
+  color-scheme: light;
 }
 
 /*

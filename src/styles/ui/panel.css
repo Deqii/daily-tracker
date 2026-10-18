@@ -2,20 +2,29 @@
  * The `.panel` primitive and its animated corner brackets.
  * Copied verbatim from `docs/prototype/today.html` <style>.
  *
- * The selectors carry `.penalty`, `.stat` and `.rw` as well, because the
- * prototype shares one bracket rule across all four and the shared declaration
- * block must not be split. Whether those page-level elements appear is decided
- * by Issues 2-6; the rule itself is the shell's.
+ * The prototype splits the shared surface from the default padding: `.panel` and
+ * `.drawer` get the surface, `.panel` alone gets `padding: 22px`, and a component
+ * that needs different padding overrides it later. Splitting them the other way
+ * round would give `.drawer` a padding it does not have in the prototype.
+ *
+ * The bracket selectors carry `.drawer`, `.penalty`, `.stat` and `.rw` as well,
+ * because the prototype shares one bracket rule across all five and the shared
+ * declaration block must not be split. Whether those page-level elements appear
+ * is decided by Issues 2-6; the rule itself is the shell's.
  */
 
-.panel {
+.panel,
+.drawer {
   position: relative;
   background: var(--panel);
   backdrop-filter: blur(8px);
   border: 1px solid var(--line);
   border-radius: var(--r-panel);
-  padding: 22px;
   box-shadow: var(--glow);
+}
+
+.panel {
+  padding: 22px;
 }
 
 @property --arm {
@@ -32,6 +41,7 @@
 }
 
 .panel::before,
+.drawer::before,
 .penalty::before,
 .stat::before,
 .rw::before {
