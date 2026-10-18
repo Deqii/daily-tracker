@@ -1,32 +1,37 @@
 # Visual fidelity harness (UI Revamp)
 
 Compares each `docs/prototype/*.html` page with the Svelte app at 1280x800 and
-390x844. Three independent specs per page and viewport:
+390x844. Four independent specs per page and viewport:
 
 | Spec               | Asserts                                                                               |
 | ------------------ | ------------------------------------------------------------------------------------- |
 | `health.spec.ts`   | the app booted: no `pageerror` / `console.error`, right route, expected first heading |
 | `fidelity.spec.ts` | **pixel diff** (full-page screenshots vs `pixelmatch`) and **computed-style diff**    |
 | `selftest.spec.ts` | the harness is deterministic: the same page rendered twice agrees                     |
+| `shell.spec.ts`    | the app shell: the `header` region, per page, per viewport, per theme                 |
 
 They are separate on purpose. Health describes whether the app works, the diffs
-describe whether it matches, and the self-test describes whether the diffs can be
-trusted. A failure in one never hides a number from another.
+describe whether it matches, the self-test describes whether the diffs can be
+trusted, and the shell test says the one region Issue 1 owns is already exact
+while the rest of each page is still being rebuilt.
 
 ## Commands
 
 ```
 npm run test:visual                      # run everything
 npm run test:visual -- selftest          # harness self-test only
+npm run test:visual -- shell             # header region only
 npm run test:visual -- fidelity health   # the page diffs and health checks
 npm run test:visual -- --grep "today"    # one page
 npm run test:visual -- --grep "@ 390"    # one viewport
+npm run test:visual -- --grep "light"    # one theme
 MAX_DIFF_RATIO=0 npm run test:visual     # tighten from the 0.001 default
 
 npm run test:visual:update               # refresh fonts + history snapshot
 npm run test:visual:fonts                # re-copy woff2 + manifest
 npm run test:visual:history-fixture      # re-dump history.html's { D, EV }
 npm run test:visual:prototypes           # run the prototype server alone
+npm run check:ui-css                     # the ported CSS is still the prototypes' CSS
 npm run check:no-fixtures [dist]         # prove no build ships the fixtures
 ```
 
@@ -40,17 +45,84 @@ First run only:
 npx playwright install chromium
 ```
 
+## The shell test
+
+`shell.spec.ts` is the required check for Issue 1 and, from Issue 7, for every
+later page. It captures the `header` element from both sides and asserts the
+dimensions match, the pixel diff is within `MAX_DIFF_RATIO`, and the computed-style
+report is empty.
+
+It covers **5 pages x 2 viewports x 2 themes = 20 cases**, because
+`[data-theme=light]` repaints the header itself: the chips' fill and hairline,
+the nav's muted and active text and the active underline all resolve through
+different custom properties in the two token blocks. A header that only ever
+gets tested in the dark theme has not been tested.
+
+Both sides are put into the theme by `context.addInitScript`, which runs before
+any page script on every navigation. It has to be there rather than set after
+`goto`: both the prototypes and `index.html` read `daily-tracker:theme` in a
+blocking head script, so a page that loaded without the value would paint dark
+and then never repaint. The app's fixture seeder runs afterwards and clears
+storage, so it re-applies a theme it finds already set (`readSeededTheme` in
+`src/lib/fixtures/index.ts`) - without that, the app would fall back to the
+fixture's own dark theme while the prototype rendered light.
+
+Output goes to `test-results/visual/<page>-<viewport>-<theme>-header/`.
+
+Every run also logs the header's own numbers before it asserts, so a failure
+still says what it measured:
+
+```
+[header] history @ 1280x800 light prototype 1280x64 app 1280x64 elements 19/19
+[header] history @ 1280x800 light chips Rank D / Streak 13 / Wallet 65
+```
+
+## `check:ui-css`
+
+The UI Fidelity Contract asks for the rules in `src/styles/ui/*.css` and the
+token blocks in `src/app.css` to be copied verbatim from the prototypes. A pixel
+diff cannot enforce that: change `--ease` or drop one corner bracket's `--arm`,
+and by the time the harness captures anything every animation has already
+reached its end state, so the screenshot is identical and the rule is silently
+wrong.
+
+`scripts/check-ui-css.mjs` reads `today.html`'s `<style>` block and the app's own
+CSS, pulls out the rules the shell owns from both, and compares them after
+normalising whitespace, comment removal, quote style, leading and trailing zeros
+and operator spacing. It prints what is missing and what differs, property by
+property:
+
+```
+1 of 55 ported rules do not match docs\prototype\today.html:
+
+    header
+      - gap:28px
+      + gap:24px
+```
+
+It covers the two token blocks, the base and background layers, `.panel` and its
+bracket animation, `.boot` and `.scan`, the header and its two media queries,
+and both motion opt-outs - 55 rules. Page-content rules (`main`, `.stats`, `.sep`,
+`.ranks`, the History table cells) are out of scope and are not compared; they
+belong to Issues 2-6. Keyframes are compared one step at a time, so a changed
+declaration cannot hide inside a brace.
+
 ## What makes the two sides comparable
 
 |                   |                                                                                                                            |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Clock             | `2026-10-15T09:00:00+07:00`, pinned with `page.clock.setFixedTime`                                                         |
 | Timezone / locale | `Asia/Jakarta`, `id-ID`                                                                                                    |
-| Theme             | `dark`                                                                                                                     |
+| Theme             | `dark` and `light`, seeded into `localStorage` on both sides before navigation                                             |
 | Motion            | `reducedMotion: 'reduce'`, `#fx` and `.scan` hidden                                                                        |
 | Settle window     | 2.5 s before capture, plus two committed frames                                                                            |
 | Fonts             | the same woff2 bytes on both sides, via `/__fonts__/`                                                                      |
 | Rasterisation     | `--disable-lcd-text`, `--disable-font-subpixel-positioning`, `--font-render-hinting=none`, `--force-device-scale-factor=1` |
+
+`selftest.spec.ts` now runs 40 cases - the same page, viewport and theme twice -
+for the same reason it already ran 20: a theme that is read from `localStorage` in
+a blocking head script is exactly the kind of thing that can be flaky, and a
+light case that cannot be proved stable cannot be used as a reference.
 
 ## Determinism, and what it cost
 
@@ -109,7 +181,8 @@ is internally consistent, which is all a prototype-vs-app diff needs.
 
 ## How to read a failure
 
-Every failing test writes to `test-results/visual/<page>-<viewport>/`:
+Every failing test writes to `test-results/visual/<page>-<viewport>/` (the shell
+test adds the theme: `<page>-<viewport>-<theme>-header/`):
 
 | File               | What it is                                                         |
 | ------------------ | ------------------------------------------------------------------ |
@@ -137,7 +210,8 @@ Three failure types, and they mean different things:
   trees are not aligned: both element counts, the first 10 differing DOM paths,
   and the class names only one side has) or, when the trees do line up, the
   mismatched properties grouped by element path. Both mean the same thing: the
-  markup or the tokens are not what the prototype has.
+  markup or the tokens are not what the prototype has. The `chips` line in the
+  report says which header number was wrong.
 - **`self-test` failed** - stop and read it before trusting anything else. The
   harness itself moved between two identical renders, so every ratio the other
   specs report is unreliable until this passes again.
@@ -157,6 +231,14 @@ fire.
 The fixture parameter goes **before** the hash: `/?fixture=today#/today`. After
 the hash it lands inside the fragment, the router never matches, and the app
 falls back to the default page.
+
+`src/main.ts` imports `App.svelte` **dynamically**, after `applyFixture()` has
+run, and the order matters: `src/stores/app.ts` creates the store at module scope
+and `loadState()` reads `localStorage` the instant that module is evaluated. With
+a static import the store would be built from an empty storage, `?fixture=` would
+seed `localStorage` too late to be seen, and every page would quietly render its
+first-run defaults - Rank `E`, Streak `0`, Wallet `0` in the header - which is a
+diff that reads like a styling problem and is not one.
 
 | `?fixture=` | Source in the prototype                                           |
 | ----------- | ----------------------------------------------------------------- |
