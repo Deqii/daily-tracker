@@ -1,0 +1,111 @@
+/*
+ * The shared HUD header: logo, nav with the sliding active underline, and the
+ * Rank / Streak / Wallet chips. Copied verbatim from
+ * `docs/prototype/today.html` <style>.
+ *
+ * The two media queries carry only the header, nav, logo, chips and chip rules.
+ * The prototype's 700px block continues into `main` and page-level selectors
+ * (`main`, `.stats`, `.sep`, `.ranks`, the History table cells); those belong to
+ * Issues 2-6 and are not the shell's. Every rule that IS here is copied whole.
+ */
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 14px 32px;
+  border-bottom: 1px solid var(--line);
+  background: var(--hdr);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.logo {
+  font: 700 18px var(--font-display);
+  letter-spacing: 0.04em;
+}
+nav {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+}
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 6px 12px;
+  position: relative;
+  font-weight: 500;
+}
+nav a:hover,
+nav a[aria-current] {
+  color: var(--text);
+}
+nav a[aria-current]::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -15px;
+  height: 2px;
+  background: var(--blue);
+  box-shadow: 0 0 12px var(--blue);
+}
+.chips {
+  display: flex;
+  gap: 8px;
+}
+.chip {
+  border: 1px solid var(--line);
+  border-radius: var(--r-chip);
+  padding: 4px 12px;
+  font: 500 13px var(--font-mono);
+  background: var(--panel);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.chip b {
+  font-family: var(--font-mono);
+  color: var(--text);
+}
+.chip span {
+  color: var(--muted);
+  font-family: var(--font-body);
+}
+.coin {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff3b8, var(--gold) 55%, #b8860b);
+}
+
+@media (max-width: 700px) {
+  header {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  nav {
+    display: none;
+  }
+  .logo {
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .chips {
+    margin-left: auto;
+    gap: 6px;
+  }
+  .chip {
+    padding: 3px 8px;
+    gap: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 380px) {
+  .chips .chip:first-child {
+    display: none;
+  }
+}

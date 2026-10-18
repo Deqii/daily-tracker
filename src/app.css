@@ -1,14 +1,158 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/manrope';
-@import '@fontsource-variable/jetbrains-mono';
 
+/*
+ * Fonts (UI Revamp Issue 1).
+ *
+ * Static @fontsource faces, latin subset, one per weight the prototypes load
+ * from Google Fonts. These are the same seven files `tests/visual/fonts/manifest.json`
+ * serves to the prototype side, so glyph metrics cannot drift between the two
+ * sides of a diff.
+ *
+ * The fallback stacks below are the prototypes' own, from the `:root` block.
+ * The `@fontsource-variable/*` packages are no longer imported; see the note in
+ * the PR report.
+ */
+@import '@fontsource/chakra-petch/latin-500.css';
+@import '@fontsource/chakra-petch/latin-600.css';
+@import '@fontsource/chakra-petch/latin-700.css';
+@import '@fontsource/manrope/latin-400.css';
+@import '@fontsource/manrope/latin-500.css';
+@import '@fontsource/manrope/latin-700.css';
+@import '@fontsource/jetbrains-mono/latin-500.css';
+
+/*
+ * Global UI stylesheets (UI Revamp Issue 1, AGENTS.md UI Fidelity Contract rule 3).
+ *
+ * These carry the ported prototype rules. They are plain global stylesheets
+ * rather than Svelte scoped `<style>` blocks because scoping rewrites
+ * selectors, which breaks the `::before`/`::after` corner brackets and the
+ * cross-component class selectors the prototypes rely on.
+ *
+ * Each rule inside them is copied verbatim from `docs/prototype/*.html`.
+ * `npm run check:ui-css` proves it.
+ */
+@import './styles/ui/base.css';
+@import './styles/ui/layers.css';
+@import './styles/ui/panel.css';
+@import './styles/ui/boot.css';
+@import './styles/ui/header.css';
+@import './styles/ui/motion.css';
+
+/* ===== DESIGN TOKENS (extract to src/app.css) ===== */
 :root {
-  color-scheme: dark;
+  --bg: #05070d;
+  --panel: rgba(12, 20, 40, 0.58);
+  --panel-solid: #0b1324;
+  --ins: rgba(5, 7, 13, 0.45);
+  --hdr: rgba(5, 7, 13, 0.7);
+  --line: rgba(61, 169, 255, 0.26);
+  --line-strong: rgba(61, 169, 255, 0.7);
+  --blue: #3da9ff;
+  --cyan: #8adbff;
+  --text: #e6eef9;
+  --muted: #93a6c2;
+  --on-accent: #04101f;
+  --danger: #ff5468;
+  --gold: #f5c451;
+  --monarch: #8b6cff;
+  --ok: #4ade9a;
+  --warn: #ffb454;
+  --stat-str: #ff7a59;
+  --stat-vit: #4ade9a;
+  --stat-int: #3da9ff;
+  --stat-disc: #b79cff;
+  --stat-soc: #f5c451;
+  --rk-e: #8adbff;
+  --rk-d: #3da9ff;
+  --rk-c: #4ade9a;
+  --rk-b: #a78bfa;
+  --rk-a: #ff9f43;
+  --rk-s: #f5c451;
+  --grid: rgba(61, 169, 255, 0.045);
+  --glow1: rgba(61, 169, 255, 0.16);
+  --glow2: rgba(139, 108, 255, 0.1);
+  --vig: rgba(0, 0, 0, 0.65);
+  --font-display: 'Chakra Petch', system-ui, sans-serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --r-panel: 4px;
+  --r-chip: 3px;
+  --glow: 0 0 24px rgba(61, 169, 255, 0.18);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-fast: 0.15s;
+  --t-base: 0.35s;
+  --t-slow: 0.7s;
+  --stagger: 70ms;
+  --ins2: rgba(5, 7, 13, 0.6);
+  --scan: rgba(61, 169, 255, 0.12);
+  --track: rgba(255, 255, 255, 0.08);
+  --lock-text: #c3d0e4;
+  --monarch-soft: #b7a4ff;
+  --tier-r: #4ade9a;
+  --tier-s: #3da9ff;
+  --tier-b: #ff8a9a;
+}
+[data-theme='light'] {
+  --bg: #edf2fa;
+  --panel: rgba(255, 255, 255, 0.74);
+  --panel-solid: #ffffff;
+  --ins: rgba(22, 115, 201, 0.05);
+  --hdr: rgba(237, 242, 250, 0.8);
+  --line: rgba(22, 115, 201, 0.28);
+  --line-strong: rgba(22, 115, 201, 0.8);
+  --blue: #1673c9;
+  --cyan: #0a63ad;
+  --text: #0c1730;
+  --muted: #495b78;
+  --on-accent: #ffffff;
+  --danger: #c81e3a;
+  --gold: #a86a00;
+  --monarch: #5b3fd6;
+  --ok: #12804a;
+  --warn: #a85a00;
+  --stat-str: #d9481f;
+  --stat-vit: #12804a;
+  --stat-int: #1673c9;
+  --stat-disc: #6d4de0;
+  --stat-soc: #a86a00;
+  --rk-e: #0a7fb8;
+  --rk-d: #1673c9;
+  --rk-c: #12804a;
+  --rk-b: #6d4de0;
+  --rk-a: #c4560a;
+  --rk-s: #a86a00;
+  --grid: rgba(22, 115, 201, 0.07);
+  --glow1: rgba(22, 115, 201, 0.14);
+  --glow2: rgba(109, 77, 224, 0.08);
+  --vig: rgba(0, 0, 0, 0);
+  --glow: 0 4px 24px rgba(22, 115, 201, 0.12);
+  --ins2: rgba(22, 115, 201, 0.07);
+  --scan: rgba(22, 115, 201, 0.1);
+  --track: rgba(12, 23, 48, 0.1);
+  --lock-text: #25364f;
+  --monarch-soft: #5b3fd6;
+  --tier-r: #12804a;
+  --tier-s: #1673c9;
+  --tier-b: #c8365a;
+}
 
+/*
+ * ============================================================================
+ * Legacy tokens (UI Revamp, still in use)
+ *
+ * The five pages have not been rebuilt yet (Issues 2-6). They consume the
+ * pre-revamp token names through the `@theme inline` mapping below, so those
+ * names stay defined until each page is ported.
+ *
+ * `--bg`, `--text` and `--danger` are deliberately NOT redeclared here: they
+ * are owned by the prototype token blocks above and are the single source of
+ * truth for those three. Existing pages therefore pick up the new palette,
+ * which is the intended direction of the revamp.
+ * ============================================================================
+ */
+:root {
   /* surfaces and text */
-  --bg: #0a0e14; /* page and panel background */
   --surface: #1a2230; /* hairlines, dividers, empty bar tracks */
-  --text: #dce8f0;
   --text-muted: #8fa0b2; /* secondary text, labels, helper text */
   --icon-muted: #5b6b7a; /* non-text icons only: empty circle, lock */
 
@@ -16,7 +160,6 @@
   --action: #2fa8e8; /* button fill, at every rank */
   --action-text: #0a0e14; /* text on --action */
   --action-ink: #2fa8e8; /* signal-blue text, check icons, nav underline */
-  --danger: #e8544a; /* penalty and warning states, destructive confirm */
 
   /* effort tiers */
   --tier-easy: #4fd1a8;
@@ -41,15 +184,11 @@
   --glow-alpha: 60%;
 }
 
-:root[data-theme='light'] {
-  color-scheme: light;
-  --bg: #f2f5f8;
+[data-theme='light'] {
   --surface: #dce3ea;
-  --text: #0f1620;
   --text-muted: #4b5967;
   --icon-muted: #667584;
   --action-ink: #0a6aa0; /* --action and --action-text stay the same */
-  --danger: #b83228;
   --tier-easy: #0a7658;
   --tier-medium: #0a6aa0;
   --tier-hard: #b83228;
@@ -103,8 +242,8 @@
   --color-tier-hard: var(--tier-hard);
   --color-coin: var(--coin);
   --color-coin-rim: var(--coin-rim);
-  --font-sans: 'Manrope Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --radius-sm: 2px;
 }
 
@@ -153,15 +292,5 @@
   }
   50% {
     text-shadow: 0 0 calc(var(--glow-px) * 1.8) color-mix(in srgb, var(--accent) 90%, transparent);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal-panel {
-    animation: reveal-fade 200ms ease-out both;
-  }
-
-  .reveal-glow {
-    animation: none;
   }
 }
