@@ -1,0 +1,33 @@
+/*
+ * Motion opt-outs. Copied verbatim from `docs/prototype/today.html` <style>.
+ *
+ * The prototype's `prefers-reduced-motion` block also carries page-level rules
+ * in rewards.html (`.cn`) and history.html (`.ln`, `.ar`, `.mk`). Those are not
+ * the shell's; `#fx` and `.scan` are, and they are identical in all five.
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+  #fx,
+  .scan {
+    display: none;
+  }
+}
+
+[data-motion='off'] *,
+[data-motion='off'] *::before,
+[data-motion='off'] *::after {
+  animation-duration: 0.001s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001s !important;
+}
+[data-motion='off'] #fx,
+[data-motion='off'] .scan {
+  display: none;
+}

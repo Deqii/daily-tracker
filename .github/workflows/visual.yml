@@ -37,10 +37,19 @@ jobs:
       # prototypes' demo data.
       - run: npm run build && npm run check:no-fixtures
       - run: npx playwright install --with-deps chromium
+      # The ported global CSS must still be the prototypes' CSS, rule for rule.
+      # A pixel diff cannot catch a changed --ease or a dropped bracket arm: by
+      # the time anything is captured every animation has finished, so the
+      # screenshot is identical and the rule is silently wrong.
+      - run: npm run check:ui-css
       # Proves the harness itself is deterministic: the same page rendered twice
       # must produce the same pixels. A failure here invalidates every diff the
       # other job reports.
       - run: npx playwright test selftest
+      # The app shell is ported, so the header region is now a hard guarantee:
+      # 5 pages x 2 viewports x 2 themes, dimensions and pixels and computed
+      # styles all against the prototype.
+      - run: npx playwright test shell
 
   visual-fidelity:
     name: visual-fidelity (informational)
@@ -54,8 +63,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      # Expected to fail until each page is ported. Excludes selftest, which the
-      # required job already gates.
+      # Expected to fail until each page is ported. Excludes selftest and
+      # shell, which the required job already gates.
       - run: npx playwright test fidelity health
       - name: Upload visual artifacts
         if: always()

@@ -50,6 +50,15 @@ export function protoUrl(p: PageSpec): string {
 }
 
 /**
+ * The two themes the token blocks cover. Both sides are always rendered in the
+ * same one, because `[data-theme=light]` changes the header's colours, its
+ * background and its hairline, not just a page's body text.
+ */
+export const THEMES = ['dark', 'light'] as const;
+
+export type Theme = (typeof THEMES)[number];
+
+/**
  * The query string must sit before the hash. With `/#/tasks?fixture=tasks` the
  * parameter lands inside the fragment, the router never matches the route and
  * falls back to the default page.
@@ -155,16 +164,45 @@ export async function settleFrames(page: Page): Promise<void> {
 /**
  * A fresh context per page under test. Contexts never share storage or caches,
  * which is what lets the self-test treat two runs as independent.
+ *
+ * `theme` is seeded with `addInitScript`, which runs before any page script on
+ * every navigation. That has to happen on the context rather than after
+ * `goto`, for two reasons: the prototype reads `daily-tracker:theme` in a
+ * blocking head script, so navigating without the value would paint dark and
+ * then never repaint; and the app reads the same key in the equivalent head
+ * script in `index.html`, plus `src/lib/fixtures/` clears storage afterwards
+ * (it re-applies a theme it finds, which is why seeding before is enough).
+ *
+ * The value written is the raw `light` / `dark` the prototypes themselves read.
  */
-export async function newIsolatedContext(browser: Browser, vp: Viewport): Promise<BrowserContext> {
-  return browser.newContext({
+export async function newIsolatedContext(
+  browser: Browser,
+  vp: Viewport,
+  theme: Theme = 'dark'
+): Promise<BrowserContext> {
+  const context = await browser.newContext({
     viewport: { width: vp.width, height: vp.height },
     ...CONTEXT_OPTIONS,
   });
+
+  await context.addInitScript((value) => {
+    try {
+      localStorage.setItem('daily-tracker:theme', value);
+    } catch {
+      // A storage-less context still renders; both sides fall back to dark.
+    }
+  }, theme);
+
+  return context;
 }
 
-export async function openPrototype(browser: Browser, p: PageSpec, vp: Viewport): Promise<Page> {
-  const context = await newIsolatedContext(browser, vp);
+export async function openPrototype(
+  browser: Browser,
+  p: PageSpec,
+  vp: Viewport,
+  theme: Theme = 'dark'
+): Promise<Page> {
+  const context = await newIsolatedContext(browser, vp, theme);
   const page = await context.newPage();
 
   await open(page, protoUrl(p));
@@ -172,8 +210,13 @@ export async function openPrototype(browser: Browser, p: PageSpec, vp: Viewport)
   return page;
 }
 
-export async function openApp(browser: Browser, p: PageSpec, vp: Viewport): Promise<Page> {
-  const context = await newIsolatedContext(browser, vp);
+export async function openApp(
+  browser: Browser,
+  p: PageSpec,
+  vp: Viewport,
+  theme: Theme = 'dark'
+): Promise<Page> {
+  const context = await newIsolatedContext(browser, vp, theme);
   const page = await context.newPage();
 
   await open(page, appUrl(p));

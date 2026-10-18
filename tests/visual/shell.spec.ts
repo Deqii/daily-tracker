@@ -4,6 +4,7 @@ import {
   CONTEXT_OPTIONS,
   MAX_DIFF_RATIO,
   PAGES,
+  THEMES,
   VIEWPORTS,
   appUrl,
   captureRegion,
@@ -35,13 +36,16 @@ import {
  * difference is that the captured region is one element instead of the whole
  * document.
  *
+ * Every page is rendered in both themes, because `[data-theme=light]` repaints
+ * the header: the chips' fill and hairline, the nav's muted and active text,
+ * and the underline all resolve through different custom properties in the two
+ * token blocks. Five pages x two viewports x two themes is 20 tests, and each
+ * one has to pass before the header can be called identical.
+ *
  * Pixel and style are asserted in one test, dimension first, so a report can
  * never be read without the numbers that produced it. This test does not
  * depend on `health.spec.ts`: it always runs and always prints its numbers, so
  * a failing shell is diagnosable on its own.
- *
- * It is expected to fail today: the shipped header predates the prototype's
- * unified mobile header.
  */
 
 const HEADER = 'header';
@@ -50,86 +54,112 @@ test.use(CONTEXT_OPTIONS);
 
 for (const vp of VIEWPORTS) {
   for (const p of PAGES) {
-    test.describe(`${p.name} header @ ${vp.width}`, () => {
-      test.use({ viewport: vp });
+    for (const theme of THEMES) {
+      test.describe(`${p.name} header @ ${vp.width} ${theme}`, () => {
+        test.use({ viewport: vp });
 
-      const slugName = `${slug(p, vp)}-header`;
+        const slugName = `${slug(p, vp)}-${theme}-header`;
 
-      test('pixel and computed-style diff', async ({ browser }) => {
-        const protoPage = await openPrototype(browser, p, vp);
-        const appPage = await openApp(browser, p, vp);
+        test('pixel and computed-style diff', async ({ browser }) => {
+          const protoPage = await openPrototype(browser, p, vp, theme);
+          const appPage = await openApp(browser, p, vp, theme);
 
-        const a = await captureRegion(protoPage, HEADER);
-        const b = await captureRegion(appPage, HEADER);
+          const a = await captureRegion(protoPage, HEADER);
+          const b = await captureRegion(appPage, HEADER);
 
-        const A = await protoPage.evaluate(collect, HEADER);
-        const B = await appPage.evaluate(collect, HEADER);
+          const A = await protoPage.evaluate(collect, HEADER);
+          const B = await appPage.evaluate(collect, HEADER);
 
-        const emit = async (name: string, body: Buffer, contentType: string): Promise<void> => {
-          writeArtifact(slugName, name, body);
-          await test.info().attach(name, { body, contentType });
-        };
+          const emit = async (name: string, body: Buffer, contentType: string): Promise<void> => {
+            writeArtifact(slugName, name, body);
+            await test.info().attach(name, { body, contentType });
+          };
 
-        await emit('prototype.png', PNG.sync.write(a), 'image/png');
-        await emit('app.png', PNG.sync.write(b), 'image/png');
+          await emit('prototype.png', PNG.sync.write(a), 'image/png');
+          await emit('app.png', PNG.sync.write(b), 'image/png');
 
-        const sameSize = a.width === b.width && a.height === b.height;
+          const sameSize = a.width === b.width && a.height === b.height;
 
-        if (sameSize) {
-          const { diff } = comparePixels(a, b);
+          if (sameSize) {
+            const { diff } = comparePixels(a, b);
 
-          await emit('diff.png', PNG.sync.write(diff as PNG), 'image/png');
-        } else {
-          await emit('side-by-side.png', PNG.sync.write(sideBySide(a, b)), 'image/png');
-        }
+            await emit('diff.png', PNG.sync.write(diff as PNG), 'image/png');
+          } else {
+            await emit('side-by-side.png', PNG.sync.write(sideBySide(a, b)), 'image/png');
+          }
 
-        const note = overlapNote(a, b);
-        const overlapBody = Buffer.from(`${note}\n`, 'utf8');
+          const note = overlapNote(a, b);
+          const overlapBody = Buffer.from(`${note}\n`, 'utf8');
 
-        await emit('overlap-ratio.txt', overlapBody, 'text/plain');
+          await emit('overlap-ratio.txt', overlapBody, 'text/plain');
 
-        // Reported before any assertion fails, so a failing run still states
-        // what it measured.
-        console.log(
-          `[header] ${p.name} @ ${vp.width}x${vp.height} ` +
-            `prototype ${a.width}x${a.height} app ${b.width}x${b.height} ` +
-            `elements ${A.length}/${B.length} | ${note}`
-        );
+          const chips = await readChips(appPage);
 
-        // Dimensions first, exactly as the page test does it: an overlap ratio
-        // over two different-sized headers would read as a plausible number and
-        // hide the real cause, which is that these are different boxes.
-        expect(
-          { w: a.width, h: a.height },
-          `header dimensions must match the prototype: prototype ${a.width}x${a.height}, ` +
-            `app ${b.width}x${b.height}; ${note} ` +
-            `(see prototype.png, app.png${sameSize ? '' : ' and side-by-side.png'} in ` +
-            `test-results/visual/${slugName}/)`
-        ).toEqual({ w: b.width, h: b.height });
+          // Reported before any assertion fails, so a failing run still states
+          // what it measured.
+          console.log(
+            `[header] ${p.name} @ ${vp.width}x${vp.height} ${theme} ` +
+              `prototype ${a.width}x${a.height} app ${b.width}x${b.height} ` +
+              `elements ${A.length}/${B.length} | ${note}`
+          );
+          console.log(`[header] ${p.name} @ ${vp.width}x${vp.height} ${theme} chips ${chips}`);
 
-        const { ratio } = comparePixels(a, b);
+          // Dimensions first, exactly as the page test does it: an overlap ratio
+          // over two different-sized headers would read as a plausible number and
+          // hide the real cause, which is that these are different boxes.
+          expect(
+            { w: a.width, h: a.height },
+            `header dimensions must match the prototype: prototype ${a.width}x${a.height}, ` +
+              `app ${b.width}x${b.height}; ${note} ` +
+              `(see prototype.png, app.png${sameSize ? '' : ' and side-by-side.png'} in ` +
+              `test-results/visual/${slugName}/)`
+          ).toEqual({ w: b.width, h: b.height });
 
-        expect(
-          ratio,
-          `header diff ratio ${(ratio * 100).toFixed(3)}% over ${a.width}x${a.height}, ` +
-            `threshold ${(MAX_DIFF_RATIO * 100).toFixed(3)}%`
-        ).toBeLessThanOrEqual(MAX_DIFF_RATIO);
+          const { ratio } = comparePixels(a, b);
 
-        const problems = compareStyleReports(A, B);
-        const report = [
-          `${p.name} header @ ${vp.width}x${vp.height}`,
-          `prototype: ${protoUrl(p)}  ${A.length} elements under <${HEADER}>`,
-          `app:       ${appUrl(p)}  ${B.length} elements under <${HEADER}>`,
-          note,
-          '',
-          ...problems,
-        ];
-        const body = Buffer.from(report.join('\n') + '\n', 'utf8');
+          expect(
+            ratio,
+            `header diff ratio ${(ratio * 100).toFixed(3)}% over ${a.width}x${a.height}, ` +
+              `threshold ${(MAX_DIFF_RATIO * 100).toFixed(3)}%`
+          ).toBeLessThanOrEqual(MAX_DIFF_RATIO);
 
-        await emit('style-report.txt', body, 'text/plain');
+          const problems = compareStyleReports(A, B);
+          const report = [
+            `${p.name} header @ ${vp.width}x${vp.height} ${theme}`,
+            `prototype: ${protoUrl(p)}  ${A.length} elements under <${HEADER}>`,
+            `app:       ${appUrl(p)}  ${B.length} elements under <${HEADER}>`,
+            `chips:     ${chips}`,
+            note,
+            '',
+            ...problems,
+          ];
+          const body = Buffer.from(report.join('\n') + '\n', 'utf8');
 
-        expect(problems, problems.join('\n')).toEqual([]);
+          await emit('style-report.txt', body, 'text/plain');
+
+          expect(problems, problems.join('\n')).toEqual([]);
+        });
       });
-    });
+    }
   }
+}
+
+/**
+ * The three chip labels with the values the header rendered, so a failure says
+ * which number was wrong and not merely that a pixel moved.
+ *
+ * Runs in the browser and must stay closure-free: Playwright ships
+ * `fn.toString()`.
+ */
+function readChips(page: import('@playwright/test').Page): Promise<string> {
+  return page.evaluate(() =>
+    Array.from(document.querySelectorAll('header .chip'))
+      .map((chip) => {
+        const label = chip.querySelector('span')?.textContent?.trim() ?? '?';
+        const value = chip.querySelector('b')?.textContent?.trim() ?? '?';
+
+        return `${label} ${value}`;
+      })
+      .join(' / ')
+  );
 }

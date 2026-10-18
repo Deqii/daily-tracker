@@ -1,0 +1,24 @@
+/*
+ * Base layer. Copied verbatim from `docs/prototype/today.html` <style>.
+ *
+ * `npm run check:ui-css` compares every rule in this file against the
+ * prototype's, normalising only whitespace and comments.
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 400 15px/1.5 var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}

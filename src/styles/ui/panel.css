@@ -1,0 +1,88 @@
+/*
+ * The `.panel` primitive and its animated corner brackets.
+ * Copied verbatim from `docs/prototype/today.html` <style>.
+ *
+ * The selectors carry `.penalty`, `.stat` and `.rw` as well, because the
+ * prototype shares one bracket rule across all four and the shared declaration
+ * block must not be split. Whether those page-level elements appear is decided
+ * by Issues 2-6; the rule itself is the shell's.
+ */
+
+.panel {
+  position: relative;
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  border-radius: var(--r-panel);
+  padding: 22px;
+  box-shadow: var(--glow);
+}
+
+@property --arm {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 14px;
+}
+
+.panel,
+.penalty,
+.stat,
+.rw {
+  position: relative;
+}
+
+.panel::before,
+.penalty::before,
+.stat::before,
+.rw::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  --k: var(--bc, var(--blue));
+  --a0: 14px;
+  --a1: 26px;
+  --w: 2px;
+  background:
+    linear-gradient(var(--k), var(--k)) 0 0 / var(--arm) var(--w) no-repeat,
+    linear-gradient(var(--k), var(--k)) 0 0 / var(--w) var(--arm) no-repeat,
+    linear-gradient(var(--k), var(--k)) 100% 0 / var(--arm) var(--w) no-repeat,
+    linear-gradient(var(--k), var(--k)) 100% 0 / var(--w) var(--arm) no-repeat,
+    linear-gradient(var(--k), var(--k)) 0 100% / var(--arm) var(--w) no-repeat,
+    linear-gradient(var(--k), var(--k)) 0 100% / var(--w) var(--arm) no-repeat,
+    linear-gradient(var(--k), var(--k)) 100% 100% / var(--arm) var(--w) no-repeat,
+    linear-gradient(var(--k), var(--k)) 100% 100% / var(--w) var(--arm) no-repeat;
+  animation:
+    brk-in 0.9s var(--ease) backwards,
+    brk-breathe 2.8s ease-in-out 0.9s infinite alternate;
+  animation-delay:
+    calc(var(--i, 0) * var(--stagger) + 300ms), calc(var(--i, 0) * var(--stagger) + 1200ms);
+}
+
+.stat::before,
+.rw::before {
+  --a0: 7px;
+  --a1: 13px;
+  --w: 1.5px;
+}
+
+@keyframes brk-in {
+  from {
+    --arm: 0px;
+    filter: drop-shadow(0 0 10px var(--k));
+  }
+  to {
+    --arm: var(--a0);
+  }
+}
+
+@keyframes brk-breathe {
+  from {
+    --arm: var(--a0);
+    filter: drop-shadow(0 0 2px var(--k));
+  }
+  to {
+    --arm: var(--a1);
+    filter: drop-shadow(0 0 7px var(--k));
+  }
+}

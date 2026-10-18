@@ -1,5 +1,6 @@
 import { STORAGE_KEYS, type StorageSchema } from '../storage';
 import { FIXTURES, FIXTURE_NAMES, type FixtureName } from './data';
+import type { Theme } from '../../stores/theme';
 
 /**
  * Seeds `localStorage` from `?fixture=<name>` before the app mounts.
@@ -43,6 +44,29 @@ function clearStorage(): void {
   }
 }
 
+/**
+ * The theme seeded before this module ran, if any, as the storage layer's own
+ * value type.
+ *
+ * The head script in `index.html` reads `daily-tracker:theme` before any module
+ * executes, so a test harness can put the page in the light theme with
+ * `context.addInitScript` on a fresh context. It writes the raw `light` the
+ * prototypes use. `clearStorage()` would wipe that and the fixture's own
+ * `theme: 'dark'` would win, putting the app in the dark theme while the
+ * prototype rendered light - so the seeded value is re-applied here, encoded
+ * the way `lib/storage` encodes it, which is what `stores/theme.ts` then reads.
+ */
+function readSeededTheme(): Theme | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.theme);
+    const value = raw !== null && raw.startsWith('"') ? JSON.parse(raw) : raw;
+
+    return value === 'light' || value === 'dark' ? value : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Writes the fixture and returns. No-op when the build has fixtures disabled. */
 export function applyFixture(): void {
   if (!isFixtureEnabled()) return;
@@ -55,6 +79,7 @@ export function applyFixture(): void {
   if (name === null) return;
 
   const fixture = FIXTURES[name];
+  const seededTheme = readSeededTheme();
 
   clearStorage();
 
@@ -67,5 +92,9 @@ export function applyFixture(): void {
 
   for (const extra of fixture.extra ?? []) {
     localStorage.setItem(extra.key, JSON.stringify(extra.value));
+  }
+
+  if (seededTheme !== null) {
+    localStorage.setItem(STORAGE_KEYS.theme, JSON.stringify(seededTheme));
   }
 }

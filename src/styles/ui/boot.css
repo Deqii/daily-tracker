@@ -1,0 +1,46 @@
+/*
+ * The one orchestrated page-load moment: the `.boot` entrance with its `--i`
+ * stagger, and the `.scan` sweep. Copied verbatim from
+ * `docs/prototype/today.html` <style>.
+ */
+
+.boot {
+  opacity: 0;
+  animation: boot var(--t-slow) var(--ease) forwards;
+  animation-delay: calc(var(--i) * var(--stagger) + 120ms);
+}
+
+@keyframes boot {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.scan {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 120px;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(transparent, var(--scan), transparent);
+  animation: scan 1.3s var(--ease) 1 forwards;
+}
+
+@keyframes scan {
+  from {
+    transform: translateY(-120px);
+  }
+  to {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
