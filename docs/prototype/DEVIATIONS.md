@@ -39,6 +39,12 @@ No deviations are currently approved. Deviations 1 and 2 were withdrawn on
 3. **Prototype-only affordances.** The "Demo: buka title berikutnya" button in
    `settings.html` is marked as prototype-only and must not ship. Issue 6 covers
    it.
+4. **Streak pips (decided 2026-10-18).** The Today pips are not weekdays. Pips on
+   = `min(displayStreak, 7)`, and the last lit pip is today (flagged when today
+   has a completion). The label reads "Streak"; the old "Streak minggu ini"
+   wording was dropped because with the fixed test clock (Thursday 2026-10-15) a
+   weekday reading gives 4 pips, not 5. Issue 2 implements this in the Today
+   component; no engine API is needed.
 
 ## Open questions
 
@@ -66,11 +72,12 @@ counts in the original screenshots.
 
 ## Prototype revision log
 
-| Date       | Files                        | Change                                                                                                                                                                                                                                                                                          |
-| ---------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-10-17 | all five                     | Mobile header unified (viewport <= 700px): compact logo (16px) and chips (padding 3x8, 12px text), no horizontal overflow. At <= 380px the Rank chip is hidden on every page. The Today-only rule that hid the Rank chip at <= 700px was removed.                                               |
-| 2026-10-17 | `today.html`, `rewards.html` | Q6 and Q7 data corrections (see note 1, Q6, Q7).                                                                                                                                                                                                                                                |
-| 2026-10-18 | all five                     | Light theme made global (Q5): identical token blocks on every page, hardcoded dark colours replaced by tokens, SVG colours via `var(--...)`, theme and motion init script. `daily-tracker:motion` honoured on every page (Q2). `today.html`: last heat-strip cell tooltip now reads "Hari ini". |
+| Date       | Files                        | Change                                                                                                                                                                                                                                                                                                                        |
+| ---------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-10-17 | all five                     | Mobile header unified (viewport <= 700px): compact logo (16px) and chips (padding 3x8, 12px text), no horizontal overflow. At <= 380px the Rank chip is hidden on every page. The Today-only rule that hid the Rank chip at <= 700px was removed.                                                                             |
+| 2026-10-17 | `today.html`, `rewards.html` | Q6 and Q7 data corrections (see note 1, Q6, Q7).                                                                                                                                                                                                                                                                              |
+| 2026-10-18 | all five                     | Light theme made global (Q5): identical token blocks on every page, hardcoded dark colours replaced by tokens, SVG colours via `var(--...)`, theme and motion init script. `daily-tracker:motion` honoured on every page (Q2). `today.html`: last heat-strip cell tooltip now reads "Hari ini".                               |
+| 2026-10-18 | all five                     | Shared rules normalised across prototypes (body transition, one `.coin`, one `.panel` rule with default padding 22 and component overrides, one bracket selector list, combined nav hover rule, `.scan` via `--scan`); `color-scheme` added to the token blocks; Today pips label renamed "Streak" and pips defined (note 4). |
 
 Fixtures derived from these values (the `today` heat strip and the `rewards`
 purchase log) were regenerated from the corrected prototypes in PR #158
