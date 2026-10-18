@@ -16,6 +16,9 @@ body {
   font: 400 15px/1.5 var(--font-body);
   min-height: 100vh;
   overflow-x: hidden;
+  transition:
+    background var(--t-base),
+    color var(--t-base);
 }
 
 :focus-visible {

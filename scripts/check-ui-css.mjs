@@ -173,13 +173,19 @@ const RULES = [
   { context: '', selector: '#fx' },
 
   // panel.css
+  // The prototype splits the surface from the default padding, so `.panel`
+  // resolves in two blocks. Both are compared; occurrence 1 is the shared
+  // `.panel,.drawer` surface, occurrence 2 the `.panel{padding:22px}` default.
   { context: '', selector: '.panel' },
+  { context: '', selector: '.drawer' },
+  { context: '', selector: '.panel', occurrence: 2 },
   { context: '', selector: '@property --arm' },
-  { context: '', selector: '.panel' },
+  { context: '', selector: '.panel', occurrence: 3 },
   { context: '', selector: '.penalty' },
   { context: '', selector: '.stat' },
   { context: '', selector: '.rw' },
   { context: '', selector: '.panel::before' },
+  { context: '', selector: '.drawer::before' },
   { context: '', selector: '.penalty::before' },
   { context: '', selector: '.stat::before' },
   { context: '', selector: '.rw::before' },
@@ -208,7 +214,6 @@ const RULES = [
   { context: '', selector: 'nav a[aria-current]::after' },
   { context: '', selector: '.chips' },
   { context: '', selector: '.chip' },
-  { context: '', selector: '.chip b' },
   { context: '', selector: '.chip span' },
   { context: '', selector: '.coin' },
   { context: '@media(max-width:700px)', selector: 'header' },
@@ -233,15 +238,21 @@ const RULES = [
 
 /* ------------------------------------------------------------------ indexing */
 
-/** `context + selector` -> declarations, first occurrence wins. */
-function index(records) {
+/**
+ * `context + selector` -> every declaration block that rule name collects, in
+ * source order.
+ *
+ * A stylesheet may legitimately declare the same selector twice: the prototypes
+ * split `.panel,.drawer{...}` (surface) from `.panel{padding:22px}` (default
+ * padding), so the cascade for `.panel` is the union of both. Reporting only
+ * the first block would leave the second unguarded.
+ */
+function indexAll(records) {
   const map = new Map();
 
   for (const record of records) {
     const ctx = record.context === '' ? '' : condition(record.context);
 
-    // An at-rule that holds rules has an outer record whose selector is the
-    // at-rule itself; it is only a container, never a rule to compare.
     if (record.context !== '' && record.selector.startsWith('@')) continue;
     if (record.context === '' && record.selector.startsWith('@') && record.declarations === '')
       continue;
@@ -249,7 +260,9 @@ function index(records) {
     for (const selector of selectorList(record.selector)) {
       const key = `${ctx}|${selector}`;
 
-      if (!map.has(key)) map.set(key, declarations(record.declarations));
+      if (!map.has(key)) map.set(key, []);
+
+      map.get(key).push(declarations(record.declarations));
     }
   }
 
@@ -258,7 +271,10 @@ function index(records) {
 
 /** Where a rule is expected to live, for the failure messages. */
 function label(rule) {
-  return rule.context === '' ? rule.selector : `${rule.context} { ${rule.selector} }`;
+  const where = rule.context === '' ? rule.selector : `${rule.context} { ${rule.selector} }`;
+  const nth = rule.occurrence === undefined ? '' : ` (block ${rule.occurrence})`;
+
+  return `${where}${nth}`;
 }
 
 function diff(expected, actual) {
@@ -289,8 +305,21 @@ const prototypeRecords = parse(
 );
 const appRecords = APP_CSS.flatMap((f) => parse(stripComments(readFileSync(f, 'utf8'))));
 
-const fromPrototype = index(prototypeRecords);
-const fromApp = index(appRecords);
+const allPrototype = indexAll(prototypeRecords);
+const allApp = indexAll(appRecords);
+
+/**
+ * The Nth declaration block for a selector, 1-based. `occurrence` defaults to 1,
+ * which is every rule the checker guarded before it could address a selector
+ * that the prototypes declare more than once.
+ */
+function block(map, key, occurrence) {
+  const blocks = map.get(key);
+
+  if (blocks === undefined) return undefined;
+
+  return blocks[(occurrence ?? 1) - 1] ?? null;
+}
 
 const failures = [];
 const seen = new Set();
@@ -298,12 +327,14 @@ const seen = new Set();
 for (const rule of RULES) {
   const ctx = rule.context === '' ? '' : condition(rule.context);
   const key = `${ctx}|${rule.selector}`;
+  const occurrence = rule.occurrence ?? 1;
+  const seenKey = `${key}#${occurrence}`;
 
-  if (seen.has(key)) continue;
+  if (seen.has(seenKey)) continue;
 
-  seen.add(key);
+  seen.add(seenKey);
 
-  const expected = fromPrototype.get(key);
+  const expected = block(allPrototype, key, occurrence);
 
   if (expected === undefined) {
     failures.push(
@@ -312,10 +343,15 @@ for (const rule of RULES) {
     continue;
   }
 
-  const actual = fromApp.get(key);
+  const actual = block(allApp, key, occurrence);
 
   if (actual === undefined) {
     failures.push(`${label(rule)}\n      missing from the app CSS`);
+    continue;
+  }
+
+  if (actual === null) {
+    failures.push(`${label(rule)}\n      has fewer declaration blocks than ${PROTOTYPE}`);
     continue;
   }
 

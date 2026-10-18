@@ -42,6 +42,11 @@ jobs:
       # the time anything is captured every animation has finished, so the
       # screenshot is identical and the rule is silently wrong.
       - run: npm run check:ui-css
+      # The five prototypes are edited one file at a time and each keeps its own
+      # copy of the token blocks and the shell rules. check:ui-css compares the
+      # app against today.html alone, so drift between the other four would be
+      # invisible to it.
+      - run: npm run check:prototype-shared
       # Proves the harness itself is deterministic: the same page rendered twice
       # must produce the same pixels. A failure here invalidates every diff the
       # other job reports.
