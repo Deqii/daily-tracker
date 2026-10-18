@@ -1,0 +1,115 @@
+{
+  "source": "docs/prototype/rewards.html",
+  "note": "Prototype demo data: R is the reward catalog with its purchase counts, L the purchase log with relative day labels. Not engine output.",
+  "fixedTime": "2026-10-15T09:00:00+07:00",
+  "totalSpent": 2370,
+  "catalog": [
+    {
+      "id": 1,
+      "title": "Main game 2 jam",
+      "cost": 60,
+      "bought": 4
+    },
+    {
+      "id": 2,
+      "title": "Kopi susu santai",
+      "cost": 35,
+      "bought": 8
+    },
+    {
+      "id": 3,
+      "title": "Beli buku baru",
+      "cost": 150,
+      "bought": 0
+    },
+    {
+      "id": 4,
+      "title": "Jajan favorit",
+      "cost": 250,
+      "bought": 1
+    },
+    {
+      "id": 5,
+      "title": "Nonton bioskop",
+      "cost": 800,
+      "bought": 2
+    }
+  ],
+  "purchases": [
+    {
+      "title": "Main game 2 jam",
+      "cost": 60,
+      "when": "Kemarin"
+    },
+    {
+      "title": "Kopi susu santai",
+      "cost": 35,
+      "when": "2 hari lalu"
+    },
+    {
+      "title": "Kopi susu santai",
+      "cost": 35,
+      "when": "4 hari lalu"
+    },
+    {
+      "title": "Nonton bioskop",
+      "cost": 800,
+      "when": "5 hari lalu"
+    },
+    {
+      "title": "Kopi susu santai",
+      "cost": 35,
+      "when": "6 hari lalu"
+    },
+    {
+      "title": "Main game 2 jam",
+      "cost": 60,
+      "when": "8 hari lalu"
+    },
+    {
+      "title": "Jajan favorit",
+      "cost": 250,
+      "when": "9 hari lalu"
+    },
+    {
+      "title": "Kopi susu santai",
+      "cost": 35,
+      "when": "11 hari lalu"
+    },
+    {
+      "title": "Kopi susu santai",
+      "cost": 35,
+      "when": "13 hari lalu"
+    },
+    {
+      "title": "Main game 2 jam",
+      "cost": 60,
+      "when": "15 hari lalu"
+    },
+    {
+      "title": "Kopi susu santai",
+      "cost": 35,
+      "when": "17 hari lalu"
+    },
+    {
+      "title": "Nonton bioskop",
+      "cost": 800,
+      "when": "19 hari lalu"
+    },
+    {
+      "title": "Kopi susu santai",
+      "cost": 35,
+      "when": "21 hari lalu"
+    },
+    {
+      "title": "Main game 2 jam",
+      "cost": 60,
+      "when": "24 hari lalu"
+    },
+    {
+      "title": "Kopi susu santai",
+      "cost": 35,
+      "when": "27 hari lalu"
+    }
+  ]
+}

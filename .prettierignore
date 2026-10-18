@@ -11,3 +11,9 @@ docs/prototype/*.html
 # Generated: sha256-pinned copies of the @fontsource woff2 files.
 tests/visual/fonts/*.woff2
 tests/visual/fonts/manifest.json
+
+# Generated: prototype demo data dumped by scripts/dump-fixtures.mjs. These files
+# are compared byte for byte against a fresh dump by scripts/check-fixtures.mjs,
+# so Prettier must not reformat them - a `npm run format` in between would turn
+# the drift check into a tautology. Never hand-edit them; re-dump instead.
+src/lib/fixtures/*-snapshot.json
