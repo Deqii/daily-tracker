@@ -19,6 +19,7 @@
     "test:visual:prototypes": "node scripts/serve-prototypes.mjs --port 4174",
     "test:visual:fixtures": "node scripts/dump-fixtures.mjs",
     "check:fixtures": "node scripts/check-fixtures.mjs",
+    "check:ui-css": "node scripts/check-ui-css.mjs",
     "pretest:visual": "npm run test:visual:fonts",
     "test:visual": "playwright test",
     "test:visual:update": "npm run test:visual:fonts && npm run test:visual:fixtures"
