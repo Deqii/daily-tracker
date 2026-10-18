@@ -2,7 +2,7 @@
   import StorageNotices from './components/StorageNotices.svelte';
   import LevelUpReveal from './components/LevelUpReveal.svelte';
   import RankUpReveal from './components/RankUpReveal.svelte';
-  import TopBar from './components/TopBar.svelte';
+  import AppShell from './components/AppShell.svelte';
   import Today from './pages/Today.svelte';
   import Tasks from './pages/Tasks.svelte';
   import Rewards from './pages/Rewards.svelte';
@@ -20,7 +20,11 @@
   };
 </script>
 
-<TopBar />
+<!--
+  `#fx`, `.scan` and `header` come first, in the prototypes' body order.
+  `main` follows below; page content is Issues 2-6.
+-->
+<AppShell />
 <StorageNotices />
 <LevelUpReveal />
 <RankUpReveal />

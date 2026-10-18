@@ -4,6 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Daily Tracker</title>
+    <script>
+      /*
+       * Theme and motion, applied before first paint (UI Revamp Issue 1).
+       *
+       * Same behaviour and same keys as `docs/prototype/*.html`: `data-theme`
+       * is `light` only when the stored value says so, everything else is dark;
+       * `data-motion="off"` is set only when the stored value is `off`, so
+       * motion is on by default. The whole body is in a try/catch because a
+       * storage-less environment must still render.
+       *
+       * The stored value is normally the JSON string the app's storage layer
+       * writes (`"light"`), so the quotes are stripped when present. That keeps
+       * one key with two writers - this script and `stores/theme.ts` - readable
+       * by each other, and keeps a raw `light` (what the prototypes write) just
+       * as valid.
+       */
+      try {
+        var d = document.documentElement;
+        var read = function (key) {
+          var v = localStorage.getItem(key);
+          if (v && v.charAt(0) === '"' && v.charAt(v.length - 1) === '"') v = v.slice(1, -1);
+          return v;
+        };
+        d.dataset.theme = read('daily-tracker:theme') === 'light' ? 'light' : 'dark';
+        if (read('daily-tracker:motion') === 'off') d.dataset.motion = 'off';
+      } catch (e) {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>
