@@ -1,10 +1,17 @@
 import { mount } from 'svelte';
 import './app.css';
 
-const target = document.getElementById('app');
+/**
+ * The app mounts into `<body>` itself, not into a wrapper element (UI Revamp
+ * Issue 2): `docs/prototype/today.html` has `#fx`, `.scan`, `header`, `main` and
+ * `.toast` as direct children of `<body>`, and the fidelity test compares DOM
+ * paths, so a wrapper would put every one of the app's elements a level deeper
+ * than the prototype's.
+ */
+const target = document.body;
 
 if (!target) {
-  throw new Error('Mount target #app not found');
+  throw new Error('Mount target <body> not found');
 }
 
 // Visual-diff fixtures (`?fixture=today|tasks|rewards|history|settings`). The

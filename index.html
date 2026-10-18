@@ -35,7 +35,13 @@
     </script>
   </head>
   <body>
-    <div id="app"></div>
+    <!--
+      No mount wrapper. The prototypes are plain documents whose `<body>` holds
+      `#fx`, `.scan`, `header`, `main` and `.toast` as direct children, and the
+      app mounts into `<body>` so the rendered DOM is the same tree (UI Fidelity
+      Contract). The computed-style diff compares DOM paths, so one extra wrapper
+      element would misalign every path on every page.
+    -->
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
