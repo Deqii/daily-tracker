@@ -16,6 +16,7 @@ import {
   openApp,
   openPrototype,
   overlapNote,
+  settleFrames,
   sideBySide,
   writeArtifact,
   type PageSpec,
@@ -244,6 +245,17 @@ for (const theme of THEMES) {
 
         await protoPage.waitForTimeout(AFTER_MS);
         await appPage.waitForTimeout(AFTER_MS);
+
+        // Park the cursor off the page on both sides. The clicked row keeps
+        // `:hover` (a 3px translate and a lighter fill) for as long as the cursor
+        // is over it, and which of the two pages is the foreground window when a
+        // screenshot is taken decides whether that state is still painted. Moving
+        // the cursor is done identically on both sides, so the settled state is
+        // what is compared rather than where the pointer happened to be left.
+        await protoPage.mouse.move(0, 0);
+        await appPage.mouse.move(0, 0);
+        await settleFrames(protoPage);
+        await settleFrames(appPage);
 
         // The engine assertions run first because they read state that expires:
         // the toast hides itself eight seconds after the click, and taking four
