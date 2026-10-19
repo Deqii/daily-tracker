@@ -651,6 +651,24 @@ function pseudoKeys(st: Record<string, string>): string[] {
   return Object.keys(st).filter((k) => k.startsWith('::'));
 }
 
+/**
+ * The page-local keyframe renames (UI Revamp Issue 2), listed in
+ * `docs/prototype/DEVIATIONS.md` under "Mechanical renames".
+ *
+ * `@keyframes` names are global CSS, so the five prototypes' identical names for
+ * five different animations cannot share one global stylesheet: the app's page
+ * keyframes carry a `today-` prefix and the animation bodies are the
+ * prototype's, unchanged. `computedStyle.animationName` therefore reports a
+ * different identifier for the same animation, so both sides are un-prefixed
+ * before they are compared. Nothing else in a computed style contains these
+ * tokens, and no other value is touched.
+ */
+const KEYFRAME_RENAMES = ['spin', 'shine', 'blink', 'pen', 'pulse', 'fl', 'rg'];
+
+function unrenameKeyframes(value: string): string {
+  return value.replace(new RegExp(`\\btoday-(${KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1');
+}
+
 /** Style report for two trees that line up element for element. */
 export function compareStyles(A: StyleEntry[], B: StyleEntry[]): string[] {
   const lines: string[] = [];
@@ -678,8 +696,12 @@ export function compareStyles(A: StyleEntry[], B: StyleEntry[]): string[] {
     const shared = Object.keys(a.st).filter((k) => !k.startsWith('::'));
 
     for (const k of shared) {
-      if (a.st[k] !== b.st[k])
-        found.push(`[${k}] ${a.st[k] || '(empty)'} -> ${b.st[k] || '(empty)'}`);
+      const left = unrenameKeyframes(a.st[k]);
+      const right = unrenameKeyframes(b.st[k]);
+
+      if (left !== right) {
+        found.push(`[${k}] ${left || '(empty)'} -> ${right || '(empty)'}`);
+      }
     }
 
     if (found.length === 0) continue;

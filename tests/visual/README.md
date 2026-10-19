@@ -1,14 +1,15 @@
 # Visual fidelity harness (UI Revamp)
 
 Compares each `docs/prototype/*.html` page with the Svelte app at 1280x800 and
-390x844. Four independent specs per page and viewport:
+390x844, in the dark and the light theme. Five independent specs:
 
-| Spec               | Asserts                                                                               |
-| ------------------ | ------------------------------------------------------------------------------------- |
-| `health.spec.ts`   | the app booted: no `pageerror` / `console.error`, right route, expected first heading |
-| `fidelity.spec.ts` | **pixel diff** (full-page screenshots vs `pixelmatch`) and **computed-style diff**    |
-| `selftest.spec.ts` | the harness is deterministic: the same page rendered twice agrees                     |
-| `shell.spec.ts`    | the app shell: the `header` region, per page, per viewport, per theme                 |
+| Spec                         | Asserts                                                                               |
+| ---------------------------- | ------------------------------------------------------------------------------------- |
+| `health.spec.ts`             | the app booted: no `pageerror` / `console.error`, right route, expected first heading |
+| `fidelity.spec.ts`           | **pixel diff** (full-page screenshots vs `pixelmatch`) and **computed-style diff**    |
+| `selftest.spec.ts`           | the harness is deterministic: the same page rendered twice agrees                     |
+| `shell.spec.ts`              | the app shell: the `header` region, per page, per viewport, per theme                 |
+| `today-interactions.spec.ts` | the Today page's interactions: the same action on both sides, then the same diffs     |
 
 They are separate on purpose. Health describes whether the app works, the diffs
 describe whether it matches, the self-test describes whether the diffs can be
@@ -22,6 +23,7 @@ npm run test:visual                      # run everything
 npm run test:visual -- selftest          # harness self-test only
 npm run test:visual -- shell             # header region only
 npm run test:visual -- fidelity health   # the page diffs and health checks
+npm run test:visual -- today-interactions # the Today interactions (3 scenarios x 2 themes)
 npm run test:visual -- --grep "today"    # one page
 npm run test:visual -- --grep "@ 390"    # one viewport
 npm run test:visual -- --grep "light"    # one theme
@@ -87,25 +89,73 @@ reached its end state, so the screenshot is identical and the rule is silently
 wrong.
 
 `scripts/check-ui-css.mjs` reads `today.html`'s `<style>` block and the app's own
-CSS, pulls out the rules the shell owns from both, and compares them after
-normalising whitespace, comment removal, quote style, leading and trailing zeros
-and operator spacing. It prints what is missing and what differs, property by
-property:
+CSS, pulls the rules out of both, and compares them after normalising whitespace,
+comment removal, quote style, leading and trailing zeros and operator spacing. It
+prints what is missing and what differs, property by property:
 
 ```
-1 of 55 ported rules do not match docs\prototype\today.html:
+1 of 155 ported rules do not match docs\prototype\today.html:
 
-    header
-      - gap:28px
-      + gap:24px
+    #radar
+      - max-width:440px
+      + max-width:441px
 ```
 
-It covers the two token blocks, the base and background layers, `.panel` and its
-bracket animation, `.boot` and `.scan`, the header and its two media queries,
-and both motion opt-outs - 55 rules. Page-content rules (`main`, `.stats`, `.sep`,
-`.ranks`, the History table cells) are out of scope and are not compared; they
-belong to Issues 2-6. Keyframes are compared one step at a time, so a changed
+It covers **155 rules**: the two token blocks, the base and background layers,
+`.panel` and its bracket animation, `.boot` and `.scan`, the header and its two
+media queries and both motion opt-outs (the shell, 58), plus every page rule of
+`today.html` (97). Keyframes are compared one step at a time, so a changed
 declaration cannot hide inside a brace.
+
+### Reading through `@scope` and the keyframe renames
+
+The five prototypes are five standalone documents whose class names and
+`@keyframes` names collide with different rules. The app has one global
+stylesheet, so:
+
+- a page's rules are wrapped in `@scope (body[data-page="<route>"])`, and
+  `src/components/AppShell.svelte` keeps `document.body.dataset.page` equal to
+  the current route;
+- a page's own keyframes carry a `today-` prefix (`spin` -> `today-spin`),
+  because `@keyframes` names are global CSS. The shared ones (`brk-in`,
+  `brk-breathe`, `boot`, `scan`) are not renamed.
+
+Both are pure text changes, and the checker undoes them before comparing:
+`unscopeContext` drops the wrapper from the context chain, `unrenameKeyframes`
+strips the `today-` prefix from the `@keyframes` contexts and from the
+`animation` declarations that name them, and `harness.ts` does the same for
+`computedStyle.animationName` so the style diff does not report four renames as
+four differences. Every rename is listed in `docs/prototype/DEVIATIONS.md` under
+"Mechanical renames".
+
+## The Today interaction test
+
+`today-interactions.spec.ts` (Issue 2) applies the **identical** action to the
+prototype and to the app - same selector, same click point, same wait - and then
+runs the same two diffs as `fidelity.spec.ts`: full-page pixels first, then the
+computed-style walk. Three scenarios at 1280x800 in both themes, six tests:
+
+| Scenario                   | Selector                    | What it moves                                  |
+| -------------------------- | --------------------------- | ---------------------------------------------- |
+| complete "Baca 10 halaman" | `.qrow[data-i="2"]`         | XP, wallet, radar, INT chip, row state, toast  |
+| complete "Chat 1 teman" x2 | `.qrow[data-i="4"]`         | the 2x counter, the cleared penalty zone, copy |
+| buy "Main game 2 jam"      | `.rewards .rw` first `.btn` | wallet, the teaser, the toast                  |
+
+Two details the ordering depends on:
+
+- the wait is **1400 ms**, past the 1100 ms the ring burst and the floating
+  `+N XP` live for, so both sides are compared settled;
+- the engine assertions and the style walk run **before** the screenshots,
+  because the toast hides itself after 8 s and four full-page captures plus two
+  DOM walks take longer than that. Asserting the toast afterwards would test the
+  clock rather than the page.
+
+The app-only assertions compare against `pointsAwarded`, `level`, `xpForLevel`
+and `passesBalanceGate` imported from `src/engine/`, and against values read off
+the page before the click, so they follow the rank table and the level curve
+rather than the fixture's numbers.
+
+Output goes to `test-results/visual/today-1280-<theme>-<scenario>/`.
 
 ## What makes the two sides comparable
 

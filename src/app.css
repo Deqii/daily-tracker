@@ -59,6 +59,17 @@
 @import './styles/ui/header.css';
 @import './styles/ui/motion.css';
 
+/*
+ * Page rules (UI Revamp Issue 2 onward). Each page's own selectors live in its
+ * own stylesheet, wrapped in `@scope (body[data-page="<route>"])`: the
+ * prototypes are five separate documents whose class and keyframe names
+ * collide, and one global stylesheet is all the app has. `@scope` changes where
+ * a rule applies without changing a single character of what it says.
+ * `src/components/AppShell.svelte` keeps `document.body.dataset.page` equal to
+ * the current route.
+ */
+@import './styles/ui/today.css';
+
 /* ===== DESIGN TOKENS (extract to src/app.css) ===== */
 :root {
   --bg: #05070d;

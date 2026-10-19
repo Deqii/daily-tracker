@@ -55,6 +55,13 @@ jobs:
       # 5 pages x 2 viewports x 2 themes, dimensions and pixels and computed
       # styles all against the prototype.
       - run: npx playwright test shell
+      # The Today page is ported too (Issue 2): 2 viewports x 2 themes of the
+      # full-page pixel and computed-style diff, its health check, and the three
+      # interaction scenarios x 2 themes. The grep keeps the other four pages out
+      # of this required job; they are still reported by visual-fidelity below.
+      - run: npx playwright test fidelity --grep today
+      - run: npx playwright test health --grep today
+      - run: npx playwright test today-interactions
 
   visual-fidelity:
     name: visual-fidelity (informational)
