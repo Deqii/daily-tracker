@@ -88,7 +88,13 @@
   entranceTimer = setTimeout(() => {
     entered = true;
     morphTo(
-      { STR: $statXP.STR, VIT: $statXP.VIT, INT: $statXP.INT, DISC: $statXP.DISC, SOC: $statXP.SOC },
+      {
+        STR: $statXP.STR,
+        VIT: $statXP.VIT,
+        INT: $statXP.INT,
+        DISC: $statXP.DISC,
+        SOC: $statXP.SOC,
+      },
       ENTRANCE_MS
     );
   }, ENTRANCE_DELAY_MS);
@@ -154,9 +160,11 @@
         fill="var(--text)"
         font-family="Chakra Petch"
         font-weight="600"
-        font-size="15">{statLabel(axis.stat)} <tspan fill={resolvedToken(statColorToken(axis.stat))}
-          >{Math.round(axis.value)}</tspan
-        ></text>
+        font-size="15"
+        >{statLabel(axis.stat)}
+        <tspan fill={resolvedToken(statColorToken(axis.stat))}>{Math.round(axis.value)}</tspan
+        ></text
+      >
     {/each}
   </svg>
   <div class="legend"><span><s></s>Batas balance gate (50% rata-rata)</span></div>

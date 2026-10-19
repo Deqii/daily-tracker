@@ -140,7 +140,9 @@
     const row = event.currentTarget;
 
     const box =
-      row instanceof Element ? row.getBoundingClientRect() : { left: event.clientX, top: event.clientY };
+      row instanceof Element
+        ? row.getBoundingClientRect()
+        : { left: event.clientX, top: event.clientY };
 
     const x = event.clientX || box.left + 30;
     const y = event.clientY || box.top;
@@ -216,9 +218,7 @@
         aria-checked={done}
         onclick={(event) => complete(row, done, event)}
       >
-        <span class="box"
-          ><svg viewBox="0 0 14 14"><path d="M2 7.5l3.2 3L12 3.500" /></svg></span
-        >
+        <span class="box"><svg viewBox="0 0 14 14"><path d="M2 7.5l3.2 3L12 3.500" /></svg></span>
         <span class="nm">{row.name}<small>{statLabel(row.stat)}</small></span>
         {#if row.required > 1}
           <span class="need">{row.completed}/{row.required}</span>
