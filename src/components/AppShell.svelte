@@ -3,6 +3,8 @@
   import { get } from 'svelte/store';
   import { currentRoute, type Route } from '../lib/router';
   import { app } from '../stores/app';
+  import { walletDisplay } from '../stores/wallet-display';
+  import { motionIsReduced } from '../lib/tween';
 
   interface NavItem {
     readonly route: Route;
@@ -60,14 +62,6 @@
     r: number;
     v: number;
     a: number;
-  }
-
-  /** The prototype's single `reduce` test: the media query, or motion switched off in Settings. */
-  function motionIsReduced(): boolean {
-    return (
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-      document.documentElement.dataset.motion === 'off'
-    );
   }
 
   onMount(() => {
@@ -163,6 +157,6 @@
   <div class="chips">
     <div class="chip"><span>Rank</span><b>{$rank}</b></div>
     <div class="chip"><span>Streak</span><b>{$streak}</b></div>
-    <div class="chip"><span>Wallet</span><i class="coin"></i><b>{$app.userState.wallet}</b></div>
+    <div class="chip"><span>Wallet</span><i class="coin"></i><b>{$walletDisplay}</b></div>
   </div>
 </header>

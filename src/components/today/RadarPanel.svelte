@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy, untrack } from 'svelte';
   import {
     RADAR_CENTER_X,
     RADAR_CENTER_Y,
@@ -12,6 +13,8 @@
     statColorToken,
     statLabel,
   } from '../../lib/today-page';
+  import { resolvedToken } from '../../lib/tokens';
+  import { tween } from '../../lib/tween';
   import { app } from '../../stores/app';
   import { STATS, type Stat } from '../../lib/types';
 
@@ -23,29 +26,81 @@
    * string; the app builds the same elements, in the same order, from the same
    * geometry helpers. The threshold is the engine's
    * `ceil(sum / (2 x count))`, not a literal.
+   *
+   * The radar morph is the prototype's UI mechanic (line 249): on load the shape
+   * grows from zero over 1100 ms after a 500 ms beat, and on a completion it
+   * tweens to the new values over 600 ms. Under reduced motion both jump to the
+   * end state, which is what the visual tests capture.
    */
 
   const statXP = app.statXP;
   const rankGate = app.rankGate;
 
+  /** The four grid rings, brightest on the outside, as `today.html` draws them. */
   const RING_OPACITY = ['0.14', '0.14', '0.14', '0.35'];
+  /** Axis labels sit at 1.2 x the outer radius. */
   const LABEL_SCALE = 1.2;
+  /** The entrance morph: a beat, then 1100 ms (line 291). */
+  const ENTRANCE_DELAY_MS = 500;
+  const ENTRANCE_MS = 1100;
+  /** A completion morph (line 249). */
+  const MORPH_MS = 600;
 
-  /**
-   * The resolved colour of a stat token, read from the document root exactly as
-   * `today.html` does with `getComputedStyle`. Reading the token rather than a
-   * literal is what makes the light theme's own palette reach the SVG.
-   */
-  function resolvedToken(token: string): string {
-    if (typeof document === 'undefined') return '';
+  type StatValues = Record<Stat, number>;
 
-    return getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+  const zero: StatValues = { STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 };
+
+  /** The values currently drawn, which lag the engine's while a morph runs. */
+  let display = $state<StatValues>({ ...zero });
+
+  /** The entrance morph owns the first paint; later changes morph from it. */
+  let entered = $state(false);
+  let entranceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  function morphTo(target: StatValues, ms: number): void {
+    const from = { ...untrack(() => display) };
+
+    tween((progress) => {
+      display = {
+        STR: from.STR + (target.STR - from.STR) * progress,
+        VIT: from.VIT + (target.VIT - from.VIT) * progress,
+        INT: from.INT + (target.INT - from.INT) * progress,
+        DISC: from.DISC + (target.DISC - from.DISC) * progress,
+        SOC: from.SOC + (target.SOC - from.SOC) * progress,
+      };
+    }, ms);
   }
 
-  let values = $derived(STATS.map((stat) => $statXP[stat]));
+  $effect(() => {
+    const target: StatValues = {
+      STR: $statXP.STR,
+      VIT: $statXP.VIT,
+      INT: $statXP.INT,
+      DISC: $statXP.DISC,
+      SOC: $statXP.SOC,
+    };
+
+    if (!entered) return;
+
+    morphTo(target, MORPH_MS);
+  });
+
+  entranceTimer = setTimeout(() => {
+    entered = true;
+    morphTo(
+      { STR: $statXP.STR, VIT: $statXP.VIT, INT: $statXP.INT, DISC: $statXP.DISC, SOC: $statXP.SOC },
+      ENTRANCE_MS
+    );
+  }, ENTRANCE_DELAY_MS);
+
+  onDestroy(() => {
+    if (entranceTimer !== null) clearTimeout(entranceTimer);
+  });
+
+  let values = $derived(STATS.map((stat) => display[stat]));
   let gate = $derived($rankGate.threshold);
 
-  /** Each axis with the value on it, so no index lookup happens in the markup. */
+  /** Each axis with the value drawn on it, so no index lookup happens in the markup. */
   let axes = $derived(STATS.map((stat, index) => ({ stat, index, value: values[index] ?? 0 })));
 </script>
 
@@ -99,11 +154,9 @@
         fill="var(--text)"
         font-family="Chakra Petch"
         font-weight="600"
-        font-size="15"
-        >{statLabel(axis.stat)}
-        <tspan fill={resolvedToken(statColorToken(axis.stat))}>{Math.round(axis.value)}</tspan
-        ></text
-      >
+        font-size="15">{statLabel(axis.stat)} <tspan fill={resolvedToken(statColorToken(axis.stat))}
+          >{Math.round(axis.value)}</tspan
+        ></text>
     {/each}
   </svg>
   <div class="legend"><span><s></s>Batas balance gate (50% rata-rata)</span></div>
@@ -111,7 +164,7 @@
     {#each STATS as stat (stat)}
       <div class="stat" style={`--c: var(${statColorToken(stat)})`}>
         <small>{statLabel(stat)}</small>
-        <b>{$statXP[stat as Stat]}</b>
+        <b>{$statXP[stat]}</b>
         <div class="bar">
           <i style={`width: ${Math.min(100, ($statXP[stat] / RADAR_SCALE) * 100)}%`}></i>
         </div>

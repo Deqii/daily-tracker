@@ -1,25 +1,24 @@
 <script lang="ts">
+  import { toastText, toastVisible } from '../../stores/toast';
+
   /**
    * The completion toast (UI Revamp Issue 2).
    *
    * `today.html` puts this element after `</main>`, as a child of `<body>`, so it
-   * is rendered here rather than inside the Today page: `position: fixed` would
-   * look the same nested, but the DOM walk the fidelity test compares would not.
+   * is rendered by `App.svelte` rather than inside the Today page:
+   * `position: fixed` would look the same nested, but the DOM walk the fidelity
+   * test compares would not.
    *
-   * The toast shows `<task> selesai` for a few seconds after a completion. The
-   * "Batalkan" (undo) button is the prototype's; whether it can act on it is
-   * open question Q9 in `docs/prototype/DEVIATIONS.md`, because the engine has
-   * no way to revert a completion and adding one would be new game behaviour.
+   * The toast names what just happened (`<task> selesai`, or `<reward> dibeli
+   * (-60)` for a purchase). The "Batalkan" (undo) button is the prototype's and
+   * is rendered verbatim; whether it can act on anything is open question Q9 in
+   * `docs/prototype/DEVIATIONS.md`, because the engine has no way to revert a
+   * completion and adding one would be new game behaviour. The button is
+   * therefore inert, which is the smallest difference from the prototype.
    */
-
-  interface ToastProps {
-    readonly text?: string;
-  }
-
-  let { text = '' }: ToastProps = $props();
 </script>
 
-<div class="toast" class:show={text !== ''} role="status" aria-live="polite">
-  <span>{text}</span>
-  <button type="button">Batalkan</button>
+<div class="toast" class:show={$toastVisible} role="status" aria-live="polite">
+  <span>{$toastText}</span>
+  <button>Batalkan</button>
 </div>

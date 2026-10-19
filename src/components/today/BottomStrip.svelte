@@ -1,6 +1,13 @@
 <script lang="ts">
-  import { heatCells, rewardProgressPercent, rewardShortfall } from '../../lib/today-page';
+  import {
+    heatCells,
+    rewardProgressPercent,
+    rewardShortfall,
+    type HeatCell,
+  } from '../../lib/today-page';
   import { app } from '../../stores/app';
+  import { walletDisplay } from '../../stores/wallet-display';
+  import { showToast } from '../../stores/toast';
   import type { Reward } from '../../lib/types';
 
   /**
@@ -11,16 +18,41 @@
    * stored reward list, in stored order. See DEVIATIONS.md open question Q8: the
    * prototype lists every reward, where `selectRewardPreview` (design §5,
    * decisions D20) would list at most two.
+   *
+   * The wallet number the teaser shows is the tweened one the header chip shows,
+   * so the two can never disagree; the affordability test itself uses the
+   * engine's value outright, as the prototype does with `S.wallet`.
    */
 
-  let cells = $derived(heatCells($app.dailyQuestLog, $app.userState.lastRolloverDate));
+  /**
+   * The strip is read when the page mounts and again when the open day rolls
+   * over, and not on every completion: `today.html` paints `#heat` once, at load,
+   * and never redraws it, so today's cell does not brighten mid-session there
+   * either (line 280). Recomputing per completion is a difference the prototype
+   * does not have and no doc asks for. `stripDay` is the guard that makes it so:
+   * the store emits on every completion, and only a change of the open day
+   * re-reads the log.
+   */
+  let stripDay = $state<string | null>(null);
+  let cells = $state<HeatCell[]>([]);
+
+  $effect(() => {
+    const openDay = $app.userState.lastRolloverDate;
+
+    if (stripDay === openDay) return;
+
+    stripDay = openDay;
+    cells = heatCells($app.dailyQuestLog, openDay);
+  });
 
   let wallet = $derived($app.userState.wallet);
 
   function buy(reward: Reward): void {
-    if (wallet < reward.cost) return;
+    const result = app.purchaseReward(reward.id);
 
-    app.purchaseReward(reward.id);
+    if (result.ok) {
+      showToast(`${reward.title} dibeli (−${reward.cost})`);
+    }
   }
 </script>
 
@@ -38,7 +70,7 @@
     <div class="row">
       <h2>Rewards</h2>
       <span class="sub price"
-        >Wallet <span style="color:var(--text)">{wallet}</span><i class="coin"></i></span
+        >Wallet <span style="color:var(--text)">{$walletDisplay}</span><i class="coin"></i></span
       >
     </div>
     <div class="rewards">
@@ -50,9 +82,7 @@
             <span class="pts price">{reward.cost}<i class="coin"></i></span>
           </div>
           {#if canAfford}
-            <button type="button" class="btn" data-r={index} onclick={() => buy(reward)}
-              >Beli</button
-            >
+            <button class="btn" data-r={index} onclick={() => buy(reward)}>Beli</button>
           {:else}
             <div
               class="prog"
