@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -141,7 +141,9 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 64px;display:flex;flex-dir
 .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);opacity:0;z-index:60;background:var(--panel-solid);border:1px solid var(--line-strong);padding:10px 14px;display:flex;gap:16px;align-items:center;transition:all var(--t-base) var(--ease);box-shadow:var(--glow)}
 .toast.show{transform:translate(-50%,0);opacity:1}.toast button{all:unset;cursor:pointer;color:var(--cyan);font-weight:700}.toast button:hover{text-decoration:underline}
 @media(max-width:1000px){.groups{grid-template-columns:1fr}.head{flex-direction:column;align-items:flex-start}}
-@media(max-width:700px){header{padding:12px 16px;gap:12px}nav{display:none}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{padding:16px}.sep{display:none}}
+@media(max-width:1023px){header{flex-wrap:wrap;padding:12px 16px 0;gap:8px 12px}.chips{margin-left:auto}nav{order:3;flex:0 0 100%;margin:0 -16px;padding:0;gap:0;border-top:1px solid var(--line)}nav a{flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 4px}nav a[aria-current]::after{bottom:0}}
+.confirm{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--danger)}.confirm span:last-child{display:flex;gap:6px}.btn.dng{background:none;color:var(--danger);border:1px solid var(--danger);padding:5px 14px}.btn.dng:hover{box-shadow:0 0 14px var(--danger)}
+@media(max-width:700px){header{padding:12px 16px 0;gap:8px 12px}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{padding:16px}.sep{display:none}}
 @media(max-width:380px){.chips .chip:first-child{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}}
 [data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
@@ -152,18 +154,18 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 64px;display:flex;flex-dir
 <canvas id="fx" aria-hidden="true"></canvas><div class="scan" aria-hidden="true"></div>
 <header>
   <div class="logo">Daily Tracker</div>
-  <nav aria-label="Navigasi utama"><a href="today.html">Today</a><a href="#" aria-current="page">Tasks</a><a href="#">Rewards</a><a href="#">History</a><a href="#">Settings</a></nav>
+  <nav aria-label="Primary"><a href="today.html">Today</a><a href="#" aria-current="page">Tasks</a><a href="#">Rewards</a><a href="#">History</a><a href="#">Settings</a></nav>
   <div class="chips"><div class="chip"><span>Rank</span><b>E</b></div><div class="chip"><span>Streak</span><b>5</b></div><div class="chip"><span>Wallet</span><i class="coin"></i><b>65</b></div></div>
 </header>
 <main>
   <div class="head boot" style="--i:0">
     <div><h1>Task library</h1><p class="sub" id="summary"></p></div>
-    <button class="btn" id="add"><svg width="14" height="14" viewBox="0 0 14 14" stroke="currentColor" stroke-width="2.4"><path d="M7 1v12M1 7h12"/></svg>Tambah task</button>
+    <button class="btn" id="add"><svg width="14" height="14" viewBox="0 0 14 14" stroke="currentColor" stroke-width="2.4"><path d="M7 1v12M1 7h12"/></svg>Add task</button>
   </div>
   <div class="tools boot" style="--i:1">
-    <input class="search" id="q" type="search" placeholder="Cari task…" aria-label="Cari task">
-    <div class="fc" id="statF" role="group" aria-label="Filter stat"></div><div class="sep"></div>
-    <div class="fc" id="typeF" role="group" aria-label="Filter tipe"></div>
+    <input class="search" id="q" type="search" placeholder="Search tasks…" aria-label="Search tasks">
+    <div class="fc" id="statF" role="group" aria-label="Filter by stat"></div><div class="sep"></div>
+    <div class="fc" id="typeF" role="group" aria-label="Filter by type"></div>
   </div>
   <div class="warn boot" id="warn" style="--i:2" hidden></div>
   <div class="groups" id="groups"></div>
@@ -171,24 +173,24 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 64px;display:flex;flex-dir
 
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dt">
-  <div class="row"><h2 id="dt">Tambah task</h2><button class="ib" id="x" aria-label="Tutup"><svg viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13"/></svg></button></div>
-  <label class="lab" for="fname">Nama task</label><input class="in" id="fname" maxlength="40" placeholder="Contoh: Push up routine"><div class="err" id="eName"></div>
+  <div class="row"><h2 id="dt">Add task</h2><button class="ib" id="x" aria-label="Close"><svg viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13"/></svg></button></div>
+  <label class="lab" for="fname">Task name</label><input class="in" id="fname" maxlength="40" placeholder="Example: Push up routine"><div class="err" id="eName"></div>
   <span class="lab">Stat</span><div class="seg" id="seg" role="radiogroup" aria-label="Stat"></div>
-  <span class="lab">Tipe</span>
-  <button class="tg" id="anchor" role="switch" aria-checked="false"><span>Anchor task<span class="hint" style="display:block">Selalu muncul setiap hari, tidak dirotasi.</span></span><span class="sw"></span></button>
-  <div class="row"><span class="lab">Varian usaha</span><span class="hint" style="margin-top:16px">Maks 15 pts di Rank E</span></div>
+  <span class="lab">Type</span>
+  <button class="tg" id="anchor" role="switch" aria-checked="false"><span>Anchor task<span class="hint" style="display:block">Always appears daily, never rotates.</span></span><span class="sw"></span></button>
+  <div class="row"><span class="lab">Effort variants</span><span class="hint" style="margin-top:16px">Up to 3 tiers · Max 15 pts at Rank E</span></div>
   <div id="tiers"></div><div class="err" id="eTier"></div>
   <p class="hint">Satu varian saja = task single-tier, tanpa nama tier.</p>
-  <div class="dfoot"><button class="btn" id="save">Simpan task</button><button class="btn ghost" id="cancel">Batal</button></div>
+  <div class="dfoot"><button class="btn" id="save">Save task</button><button class="btn ghost" id="cancel">Cancel</button></div>
 </aside>
-<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span><button id="undo">Batalkan</button></div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span><button id="undo">Undo</button></div>
 
 <script>
 const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CAP=15,MULT=.5,xp=p=>Math.ceil(Math.min(p,CAP)*MULT),reduce=(matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.motion==='off');
 const STATS=[{k:'STR',n:'Strength',s:'Str',c:'--stat-str'},{k:'VIT',n:'Vitality',s:'Vit',c:'--stat-vit'},{k:'INT',n:'Intellect',s:'Int',c:'--stat-int'},{k:'DISC',n:'Discipline',s:'Disc',c:'--stat-disc'},{k:'SOC',n:'Social',s:'Soc',c:'--stat-soc'}];
-const TIERS=[{k:'r',n:'Ringan',c:'--tier-r'},{k:'s',n:'Sedang',c:'--tier-s'},{k:'b',n:'Berat',c:'--tier-b'}];
+const TIERS=[{k:'r',n:'Easy',c:'--tier-r'},{k:'s',n:'Medium',c:'--tier-s'},{k:'b',n:'Hard',c:'--tier-b'}];
 let T=[
  {id:1,name:'Push up routine',stat:'STR',anchor:false,pick:false,v:{r:['10x2 set',5],s:['20x3 set',12],b:['30x4 set atau jogging 2km',25]}},
  {id:2,name:'Squat 15x2 set',stat:'STR',anchor:false,pick:true,v:{r:['15x2 set',5]}},
@@ -201,26 +203,26 @@ let T=[
  {id:9,name:'Fokus tanpa HP',stat:'DISC',anchor:false,pick:true,v:{r:['30 menit',6],s:['60 menit',14],b:['90 menit',26]}},
  {id:10,name:'Chat 1 teman',stat:'SOC',anchor:true,pick:false,v:{r:['1 orang',5]}},
  {id:11,name:'Telepon keluarga',stat:'SOC',anchor:false,pick:true,v:{r:['10 menit',3]}}];
-const F={q:'',stat:'ALL',type:'ALL'};let edit=null,formStat='STR',formAnchor=false,undoFn=null,tt,opener=null,nid=12;
+const F={q:'',stat:'ALL',type:'ALL'};let edit=null,formStat='STR',formAnchor=false,undoFn=null,tt,opener=null,nid=12,confirmId=null;
 const ico={e:'<svg viewBox="0 0 16 16"><path d="M11 2l3 3-8 8H3v-3z"/></svg>',d:'<svg viewBox="0 0 16 16"><path d="M3 4h10M6 4V2h4v2M5 4l.6 9h4.800L11 4"/></svg>'};
 const vs=t=>TIERS.filter(x=>t.v[x.k]).map(x=>({...x,d:t.v[x.k][0],p:t.v[x.k][1]}));
 
 function filters(){
-  $('statF').innerHTML=[{k:'ALL',n:'Semua stat'},...STATS.map(s=>({k:s.k,n:s.s,c:s.c}))].map(s=>`<button class="f" data-s="${s.k}" aria-pressed="${F.stat===s.k}" ${s.c?`style="--c:var(${s.c})"`:''}>${s.c?'<i></i>':''}${s.n}</button>`).join('');
-  $('typeF').innerHTML=[['ALL','Semua tipe'],['A','Anchor'],['R','Rotating']].map(([k,n])=>`<button class="f" data-t="${k}" aria-pressed="${F.type===k}">${n}</button>`).join('');
+  $('statF').innerHTML=[{k:'ALL',n:'All stats'},...STATS.map(s=>({k:s.k,n:s.s,c:s.c}))].map(s=>`<button class="f" data-s="${s.k}" aria-pressed="${F.stat===s.k}" ${s.c?`style="--c:var(${s.c})"`:''}>${s.c?'<i></i>':''}${s.n}</button>`).join('');
+  $('typeF').innerHTML=[['ALL','All types'],['A','Anchor'],['R','Rotating']].map(([k,n])=>`<button class="f" data-t="${k}" aria-pressed="${F.type===k}">${n}</button>`).join('');
 }
 function render(flashId){
   const list=T.filter(t=>(F.stat==='ALL'||t.stat===F.stat)&&(F.type==='ALL'||(F.type==='A')===t.anchor)&&t.name.toLowerCase().includes(F.q.toLowerCase()));
   const over=T.reduce((n,t)=>n+vs(t).filter(v=>v.p>CAP).length,0);
-  $('summary').textContent=`${T.length} task · ${T.filter(t=>t.anchor).length} anchor · ${T.filter(t=>!t.anchor).length} rotating`;
-  const w=$('warn');w.hidden=!over;w.innerHTML=`<b>${over} varian melebihi batas</b><span>Rank E maksimal ${CAP} pts per task. Poin yang diberikan memakai batas ini.</span>`;
+  $('summary').textContent=`${T.length} tasks · ${T.filter(t=>t.anchor).length} anchor · ${T.filter(t=>!t.anchor).length} rotating`;
+  const w=$('warn');w.hidden=!over;w.innerHTML=`<b>${over} variant${over>1?'s':''} over the cap</b><span>Max ${CAP} points at Rank E. Over-cap variants count as ${CAP}.</span>`;
   let h='';STATS.forEach((s,gi)=>{const g=list.filter(t=>t.stat===s.k);if(!g.length)return;
-    h+=`<section class="panel group" style="--c:var(${s.c});--i:${gi+3}"><header><h2><i></i>${s.n}</h2><span class="sub">${g.length} task</span></header>`+
+    h+=`<section class="panel group" style="--c:var(${s.c});--i:${gi+3}"><header><h2><i></i>${s.n} (${s.s})</h2><span class="sub">${g.length} task</span></header>`+
     g.map(t=>{const v=vs(t),multi=v.length>1;
-      return `<article class="task${t.id===flashId?' flash':''}" data-id="${t.id}"><div class="row"><div><div class="nm">${esc(t.name)}</div><div class="badges"><span class="bd ${t.anchor?'a':''}">${t.anchor?'Anchor':'Rotating'}</span>${t.pick?'<span class="bd t">Quest hari ini</span>':''}${!multi&&v[0].p>CAP?'<span class="bd o">Over cap</span>':''}</div></div>
-      <div class="row">${multi?'':`<div class="pt">${v[0].p} pts<small>+${xp(v[0].p)} XP</small></div>`}<div class="acts"><button class="ib" data-e="${t.id}" aria-label="Edit ${esc(t.name)}">${ico.e}</button><button class="ib del" data-d="${t.id}" aria-label="Hapus ${esc(t.name)}">${ico.d}</button></div></div></div>
-      ${multi?`<div class="vs">${v.map(x=>`<div class="v ${x.p>CAP?'over':''}" style="--tc:var(${x.c})"><em>${x.n}</em><span>${esc(x.d)}</span><div class="pt">${x.p>CAP?'<span class="bd o" style="margin-right:6px">Over cap</span>':''}${x.p} pts<small>+${xp(x.p)} XP</small></div></div>`).join('')}</div>`:''}</article>`}).join('')+`</section>`});
-  $('groups').innerHTML=h||'<div class="empty" style="grid-column:1/-1">Tidak ada task yang cocok. Ubah filter atau tambah task baru.</div>';
+      return `<article class="task${t.id===flashId?' flash':''}" data-id="${t.id}"><div class="row"><div><div class="nm">${esc(t.name)}</div><div class="badges"><span class="bd ${t.anchor?'a':''}">${t.anchor?'Anchor':'Rotating'}</span>${t.pick?'<span class="bd t">Today’s quest</span>':''}${!multi&&v[0].p>CAP?'<span class="bd o">Over cap: counts as ${CAP}</span>':''}</div></div>
+      <div class="row">${multi?'':`<div class="pt">${v[0].p} pts<small>+${xp(v[0].p)} XP</small></div>`}<div class="acts"><button class="ib" data-e="${t.id}" aria-label="Edit ${esc(t.name)}">${ico.e}</button><button class="ib del" data-d="${t.id}" aria-label="Delete ${esc(t.name)}">${ico.d}</button></div></div></div>
+      ${multi?`<div class="vs">${v.map(x=>`<div class="v ${x.p>CAP?'over':''}" style="--tc:var(${x.c})"><em>${x.n}</em><span>${esc(x.d)}</span><div class="pt">${x.p>CAP?'<span class="bd o" style="margin-right:6px">Over cap: counts as ${CAP}</span>':''}${x.p} pts<small>+${xp(x.p)} XP</small></div></div>`).join('')}</div>`:''}${confirmId===t.id?`<div class="confirm" role="alertdialog" aria-label="Delete ${esc(t.name)}?"><span>Delete ${esc(t.name)}?</span><span><button class="btn dng" data-cd="${t.id}">Delete</button><button class="btn ghost" data-cc="1">Cancel</button></span></div>`:''}</article>`}).join('')+`</section>`});
+  $('groups').innerHTML=h||(T.length?'<div class="empty" style="grid-column:1/-1">No tasks match your filters.</div>':'<div class="empty" style="grid-column:1/-1"><h2>No tasks yet</h2><p>Add your first task to start your daily quest.</p><button class="btn" data-add="1">Add task</button></div>');
 }
 /* filters */
 $('q').oninput=e=>{F.q=e.target.value;render()};
@@ -228,7 +230,7 @@ $('statF').onclick=e=>{const b=e.target.closest('[data-s]');if(b){F.stat=b.datas
 $('typeF').onclick=e=>{const b=e.target.closest('[data-t]');if(b){F.type=b.dataset.t;filters();render()}};
 /* drawer */
 function tiers(v){$('tiers').innerHTML=TIERS.map(x=>{const on=!!v[x.k],d=v[x.k]||['',x.k==='r'?5:x.k==='s'?12:25];
-  return `<div class="tier ${on?'':'off'}" style="--tc:var(${x.c})" data-k="${x.k}"><label class="h"><input type="checkbox" ${on?'checked':''}>${x.n}</label><div class="tg2"><div><input class="in d" maxlength="40" placeholder="Apa yang dikerjakan" value="${esc(d[0])}" ${on?'':'disabled'} aria-label="Deskripsi ${x.n}"></div><div><input class="in p" type="number" min="1" step="1" value="${d[1]}" ${on?'':'disabled'} aria-label="Poin ${x.n}"><div class="hint pv"></div></div></div><div class="err"></div></div>`}).join('');preview()}
+  return `<div class="tier ${on?'':'off'}" style="--tc:var(${x.c})" data-k="${x.k}"><label class="h"><input type="checkbox" ${on?'checked':''}>${x.n}</label><div class="tg2"><div><input class="in d" maxlength="40" placeholder="What to do" value="${esc(d[0])}" ${on?'':'disabled'} aria-label="Description ${x.n}"></div><div><input class="in p" type="number" min="1" step="1" value="${d[1]}" ${on?'':'disabled'} aria-label="Points ${x.n}"><div class="hint pv"></div></div></div><div class="err"></div></div>`}).join('');preview()}
 function preview(){document.querySelectorAll('.tier').forEach(el=>{const p=+el.querySelector('.p').value;el.querySelector('.pv').textContent=p>0?`+${xp(p)} XP`:''})}
 $('tiers').addEventListener('input',preview);
 $('tiers').addEventListener('change',e=>{if(e.target.type!=='checkbox')return;const el=e.target.closest('.tier');el.classList.toggle('off',!e.target.checked);el.querySelectorAll('.in').forEach(i=>i.disabled=!e.target.checked)});
@@ -236,33 +238,37 @@ function seg(){$('seg').innerHTML=STATS.map(s=>`<button class="f" role="radio" d
 $('seg').onclick=e=>{const b=e.target.closest('[data-st]');if(b){formStat=b.dataset.st;seg()}};
 $('anchor').onclick=()=>{formAnchor=!formAnchor;$('anchor').setAttribute('aria-checked',formAnchor)};
 function open(t){opener=document.activeElement;edit=t||null;formStat=t?t.stat:'STR';formAnchor=t?t.anchor:false;
-  $('dt').textContent=t?'Edit task':'Tambah task';$('fname').value=t?t.name:'';$('anchor').setAttribute('aria-checked',formAnchor);
+  $('dt').textContent=t?'Edit task':'Add task';$('fname').value=t?t.name:'';$('anchor').setAttribute('aria-checked',formAnchor);
   seg();tiers(t?t.v:{r:['',5]});['eName','eTier'].forEach(i=>$(i).textContent='');$('fname').classList.remove('bad');
   $('scrim').classList.add('on');$('drawer').classList.add('on');setTimeout(()=>$('fname').focus(),150)}
 function close(){$('scrim').classList.remove('on');$('drawer').classList.remove('on');opener&&opener.focus?.()}
 $('add').onclick=()=>open();$('x').onclick=$('cancel').onclick=$('scrim').onclick=close;
-addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+addEventListener('keydown',e=>{if(e.key==='Escape'){close();if(confirmId){confirmId=null;render()}}});
 $('save').onclick=()=>{
   let ok=true;const name=$('fname').value.trim(),v={};
   $('eName').textContent='';$('fname').classList.remove('bad');$('eTier').textContent='';
-  if(!name){ok=false;$('eName').textContent='Nama task wajib diisi.';$('fname').classList.add('bad')}
+  if(!name){ok=false;$('eName').textContent='Task name is required.';$('fname').classList.add('bad')}
   document.querySelectorAll('.tier').forEach(el=>{const err=el.querySelector('.err');err.textContent='';if(!el.querySelector('[type=checkbox]').checked)return;
     const d=el.querySelector('.d').value.trim(),p=+el.querySelector('.p').value;
-    if(!d){err.textContent='Isi deskripsi singkat.';ok=false}
-    else if(!Number.isInteger(p)||p<1){err.textContent='Poin harus bilangan bulat minimal 1.';ok=false}
-    else if(p>CAP){err.textContent=`Maksimal ${CAP} pts di Rank E.`;ok=false}
+    if(!d){err.textContent='Describe what to do.';ok=false}
+    else if(el.querySelector('.p').value===''){err.textContent='Enter points.';ok=false}
+    else if(!Number.isInteger(p)||p<1){err.textContent='Enter a whole number of 1 or more.';ok=false}
+    else if(p>CAP){err.textContent=`Max ${CAP} points at Rank E.`;ok=false}
     else v[el.dataset.k]=[d,p]});
-  if(!Object.keys(v).length&&ok){$('eTier').textContent='Aktifkan minimal satu varian.';ok=false}
+  if(!Object.keys(v).length&&ok){$('eTier').textContent='Add at least one effort variant.';ok=false}
   if(!ok)return;
   let id;if(edit){Object.assign(edit,{name,stat:formStat,anchor:formAnchor,v});if(formAnchor)edit.pick=false;id=edit.id}
   else{id=nid++;T.push({id,name,stat:formStat,anchor:formAnchor,pick:false,v})}
-  close();F.q='';$('q').value='';F.stat='ALL';F.type='ALL';filters();render(id);toast(edit?'Task diperbarui':'Task ditambahkan');
+  close();F.q='';$('q').value='';F.stat='ALL';F.type='ALL';filters();render(id);toast(edit?'Task updated':'Task added');
   setTimeout(()=>document.querySelector(`[data-id="${id}"]`)?.scrollIntoView({block:'center',behavior:reduce?'auto':'smooth'}),60)};
 /* edit / delete */
 $('groups').onclick=e=>{
-  const eb=e.target.closest('[data-e]');if(eb){open(T.find(t=>t.id==eb.dataset.e));return}
-  const db=e.target.closest('[data-d]');if(!db)return;const id=+db.dataset.d,i=T.findIndex(t=>t.id===id),t=T[i],card=db.closest('.task');
-  card.classList.add('out');setTimeout(()=>{T.splice(i,1);render();undoFn=()=>{T.splice(i,0,t);render(t.id)};toast(`"${t.name}" dihapus`,true)},reduce?0:280)};
+const ab=e.target.closest('[data-add]');if(ab){open();return}
+const eb=e.target.closest('[data-e]');if(eb){open(T.find(t=>t.id==eb.dataset.e));return}
+const db=e.target.closest('[data-d]');if(db){confirmId=+db.dataset.d;render();setTimeout(()=>document.querySelector('[data-cc]')?.focus(),0);return}
+const cc=e.target.closest('[data-cc]');if(cc){confirmId=null;render();return}
+const cd=e.target.closest('[data-cd]');if(!cd)return;const id=+cd.dataset.cd,i=T.findIndex(t=>t.id===id),t=T[i],card=cd.closest('.task');
+confirmId=null;card.classList.add('out');setTimeout(()=>{T.splice(i,1);render();toast(`"${t.name}" deleted`)},reduce?0:280)};
 $('undo').onclick=()=>{undoFn&&undoFn();undoFn=null;hide()};
 function toast(t,u){$('toastTxt').textContent=t;$('undo').hidden=!u;$('toast').classList.add('show');clearTimeout(tt);tt=setTimeout(hide,6000)}
 function hide(){$('toast').classList.remove('show')}

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -142,7 +142,9 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 64px;display:flex;flex-dir
 .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);opacity:0;z-index:60;background:var(--panel-solid);border:1px solid var(--line-strong);padding:10px 14px;display:flex;gap:16px;align-items:center;transition:all var(--t-base) var(--ease);box-shadow:var(--glow)}
 .toast.show{transform:translate(-50%,0);opacity:1}.toast button{all:unset;cursor:pointer;color:var(--cyan);font-weight:700}.toast button:hover{text-decoration:underline}
 @media(max-width:1000px){.layout{grid-template-columns:1fr}.side{position:static;order:-1}.head{flex-direction:column;align-items:flex-start}}
-@media(max-width:700px){header{padding:12px 16px;gap:12px}nav{display:none}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{padding:16px}.sep{display:none}}
+@media(max-width:1023px){header{flex-wrap:wrap;padding:12px 16px 0;gap:8px 12px}.chips{margin-left:auto}nav{order:3;flex:0 0 100%;margin:0 -16px;padding:0;gap:0;border-top:1px solid var(--line)}nav a{flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 4px}nav a[aria-current]::after{bottom:0}}
+.confirm{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--danger)}.confirm span:last-child{display:flex;gap:6px}.btn.dng{background:none;color:var(--danger);border:1px solid var(--danger);padding:5px 14px}.btn.dng:hover{box-shadow:0 0 14px var(--danger)}
+@media(max-width:700px){header{padding:12px 16px 0;gap:8px 12px}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{padding:16px}.sep{display:none}}
 @media(max-width:380px){.chips .chip:first-child{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan,.cn{display:none}}
 [data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
@@ -153,18 +155,18 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 64px;display:flex;flex-dir
 <canvas id="fx" aria-hidden="true"></canvas><div class="scan" aria-hidden="true"></div>
 <header>
   <div class="logo">Daily Tracker</div>
-  <nav aria-label="Navigasi utama"><a href="today.html">Today</a><a href="tasks.html">Tasks</a><a href="#" aria-current="page">Rewards</a><a href="#">History</a><a href="#">Settings</a></nav>
+  <nav aria-label="Primary"><a href="today.html">Today</a><a href="tasks.html">Tasks</a><a href="#" aria-current="page">Rewards</a><a href="#">History</a><a href="#">Settings</a></nav>
   <div class="chips"><div class="chip"><span>Rank</span><b>E</b></div><div class="chip"><span>Streak</span><b>5</b></div><div class="chip"><span>Wallet</span><i class="coin"></i><b id="chipW">65</b></div></div>
 </header>
 <main>
   <div class="head boot" style="--i:0">
     <div><h1>Rewards</h1><p class="sub" id="summary"></p></div>
-    <button class="btn" id="add"><svg width="14" height="14" viewBox="0 0 14 14" stroke="currentColor" stroke-width="2.4"><path d="M7 1v12M1 7h12"/></svg>Tambah reward</button>
+    <button class="btn" id="add"><svg width="14" height="14" viewBox="0 0 14 14" stroke="currentColor" stroke-width="2.4"><path d="M7 1v12M1 7h12"/></svg>Add reward</button>
   </div>
   <div class="layout">
     <div>
       <div class="tools boot" style="--i:1">
-        <button class="f" id="onlyCan" aria-pressed="false">Bisa dibeli sekarang</button><div class="sep"></div>
+        <button class="f" id="onlyCan" aria-pressed="false">Affordable now</button><div class="sep"></div>
         <div style="display:flex;gap:6px" role="group" aria-label="Urutkan" id="sorts"></div>
       </div>
       <div class="grid" id="grid"></div>
@@ -173,33 +175,33 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 64px;display:flex;flex-dir
       <section class="panel wallet boot" style="--i:2" aria-label="Wallet">
         <span class="sub">Wallet</span>
         <div class="big"><span id="bigW">65</span><i class="coin xl"></i></div>
-        <div class="kv"><span>Bisa dibeli sekarang</span><b id="kvCan"></b></div>
-        <div class="kv"><span>Rata-rata pemasukan</span><b>+13 / hari</b></div>
-        <div class="kv"><span>Total dibelanjakan</span><b id="kvSpent"></b></div>
+        <div class="kv"><span>Affordable now</span><b id="kvCan"></b></div>
+        <div class="kv"><span>Average income</span><b>+13 / day</b></div>
+        <div class="kv"><span>Total spent</span><b id="kvSpent"></b></div>
       </section>
-      <section class="panel hist boot" style="--i:3" aria-label="Riwayat pembelian"><h2>Riwayat pembelian</h2><ul class="log" id="log"></ul></section>
+      <section class="panel hist boot" style="--i:3" aria-label="Purchase history"><h2>Purchase history</h2><ul class="log" id="log"></ul></section>
     </aside>
   </div>
 </main>
 
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dt">
-  <div class="row"><h2 id="dt">Tambah reward</h2><button class="ib" id="x" aria-label="Tutup"><svg viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13"/></svg></button></div>
-  <label class="lab" for="fT">Nama reward</label><input class="in" id="fT" maxlength="40" placeholder="Contoh: Main game 2 jam"><div class="err" id="eT"></div>
-  <label class="lab" for="fC">Harga (koin)</label><input class="in" id="fC" type="number" min="1" step="1" placeholder="60"><div class="hint" id="hC"></div><div class="err" id="eC"></div>
-  <p class="hint" style="margin-top:16px">Reward bisa dibeli berulang. Pembelian hanya mengurangi Wallet, tidak mengurangi XP atau stat.</p>
-  <div class="dfoot"><button class="btn" id="save">Simpan reward</button><button class="btn ghost" id="cancel">Batal</button></div>
+  <div class="row"><h2 id="dt">Add reward</h2><button class="ib" id="x" aria-label="Close"><svg viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13"/></svg></button></div>
+  <label class="lab" for="fT">Reward name</label><input class="in" id="fT" maxlength="40" placeholder="Example: Main game 2 jam"><div class="err" id="eT"></div>
+  <label class="lab" for="fC">Cost</label><input class="in" id="fC" type="number" min="1" step="1" placeholder="60"><div class="hint" id="hC"></div><div class="err" id="eC"></div>
+  <p class="hint" style="margin-top:16px">Rewards can be bought repeatedly. Buying only lowers your Wallet, not XP or stats.</p>
+  <div class="dfoot"><button class="btn" id="save">Save reward</button><button class="btn ghost" id="cancel">Cancel</button></div>
 </aside>
-<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span><button id="undo">Batalkan</button></div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span><button id="undo">Undo</button></div>
 
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const reduce=(matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.motion==='off'),AVG=13,C=2*Math.PI*26;
-let wallet=65,shownW=65,sort='afford',only=false,edit=null,undoFn=null,tt,opener=null,nid=6;
+let wallet=65,shownW=65,sort='afford',only=false,edit=null,undoFn=null,tt,opener=null,nid=6,confirmId=null;
 let R=[{id:1,t:'Main game 2 jam',c:60,b:4},{id:2,t:'Kopi susu santai',c:35,b:8},{id:3,t:'Beli buku baru',c:150,b:0},{id:4,t:'Jajan favorit',c:250,b:1},{id:5,t:'Nonton bioskop',c:800,b:2}];
-let L=[{t:'Main game 2 jam',c:60,w:'Kemarin'},{t:'Kopi susu santai',c:35,w:'2 hari lalu'},{t:'Kopi susu santai',c:35,w:'4 hari lalu'},{t:'Nonton bioskop',c:800,w:'5 hari lalu'},{t:'Kopi susu santai',c:35,w:'6 hari lalu'},{t:'Main game 2 jam',c:60,w:'8 hari lalu'},{t:'Jajan favorit',c:250,w:'9 hari lalu'},{t:'Kopi susu santai',c:35,w:'11 hari lalu'},{t:'Kopi susu santai',c:35,w:'13 hari lalu'},{t:'Main game 2 jam',c:60,w:'15 hari lalu'},{t:'Kopi susu santai',c:35,w:'17 hari lalu'},{t:'Nonton bioskop',c:800,w:'19 hari lalu'},{t:'Kopi susu santai',c:35,w:'21 hari lalu'},{t:'Main game 2 jam',c:60,w:'24 hari lalu'},{t:'Kopi susu santai',c:35,w:'27 hari lalu'}];
-const SORTS=[['afford','Terjangkau dulu'],['cheap','Termurah'],['most','Paling sering dibeli']];
+let L=[{t:'Main game 2 jam',c:60,w:'Yesterday'},{t:'Kopi susu santai',c:35,w:'2 days ago'},{t:'Kopi susu santai',c:35,w:'4 days ago'},{t:'Nonton bioskop',c:800,w:'5 days ago'},{t:'Kopi susu santai',c:35,w:'6 days ago'},{t:'Main game 2 jam',c:60,w:'8 days ago'},{t:'Jajan favorit',c:250,w:'9 days ago'},{t:'Kopi susu santai',c:35,w:'11 days ago'},{t:'Kopi susu santai',c:35,w:'13 days ago'},{t:'Main game 2 jam',c:60,w:'15 days ago'},{t:'Kopi susu santai',c:35,w:'17 days ago'},{t:'Nonton bioskop',c:800,w:'19 days ago'},{t:'Kopi susu santai',c:35,w:'21 days ago'},{t:'Main game 2 jam',c:60,w:'24 days ago'},{t:'Kopi susu santai',c:35,w:'27 days ago'}];
+const SORTS=[['afford','Affordable first'],['cheap','Cheapest'],['most','Most bought']];
 const ico={e:'<svg viewBox="0 0 16 16"><path d="M11 2l3 3-8 8H3v-3z"/></svg>',d:'<svg viewBox="0 0 16 16"><path d="M3 4h10M6 4V2h4v2M5 4l.6 9h4.800L11 4"/></svg>',k:'<svg width="13" height="14" viewBox="0 0 13 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.500" y="6" width="10" height="7" rx="1"/><path d="M4 6V4a2.500 2.500 0 015 0v2"/></svg>'};
 
 function tween(from,to,fn,ms=600){if(reduce){fn(to);return}const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/ms);fn(from+(to-from)*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(t0)}
@@ -208,21 +210,21 @@ function sorted(){let l=[...R];if(only)l=l.filter(r=>wallet>=r.c);
   const k={afford:(a,b)=>(wallet>=b.c)-(wallet>=a.c)||a.c-b.c,cheap:(a,b)=>a.c-b.c,most:(a,b)=>b.b-a.b};return l.sort(k[sort])}
 function render(opt={}){
   const can=R.filter(r=>wallet>=r.c).length;
-  $('summary').textContent=`${R.length} reward · ${can} bisa dibeli sekarang`;$('kvCan').textContent=`${can} dari ${R.length}`;
-  $('kvSpent').textContent=L.reduce((s,x)=>s+x.c,0).toLocaleString('id-ID');
+  $('summary').textContent=`${R.length} items · ${can} affordable now`;$('kvCan').textContent=`${can} of ${R.length}`;
+  $('kvSpent').textContent=L.reduce((s,x)=>s+x.c,0).toLocaleString('en-US');
   $('sorts').innerHTML=SORTS.map(([k,n])=>`<button class="f" data-so="${k}" aria-pressed="${sort===k}">${n}</button>`).join('');
   $('onlyCan').setAttribute('aria-pressed',only);
   const l=sorted();
   $('grid').innerHTML=l.length?l.map((r,i)=>{const ok=wallet>=r.c,pct=Math.min(1,wallet/r.c),days=Math.ceil((r.c-wallet)/AVG);
     return `<article class="panel card ${ok?'can':'lock'}${opt.flash===r.id?' flash':''}${opt.fresh===r.id?' new':''}" data-id="${r.id}" style="--i:${i+2}">
-    <div class="row" style="align-items:flex-start"><div class="ttl">${esc(r.t)}</div><div class="acts"><button class="ib" data-e="${r.id}" aria-label="Edit ${esc(r.t)}">${ico.e}</button><button class="ib del" data-d="${r.id}" aria-label="Hapus ${esc(r.t)}">${ico.d}</button></div></div>
-    <div class="row"><span class="cost">${r.c.toLocaleString('id-ID')}<i class="coin l"></i></span><span class="bought">Dibeli <b ${opt.pop===r.id?'class="pop"':''}>${r.b}</b>×</span></div>
-    <div class="foot">${ok?`<button class="btn gold" data-b="${r.id}" style="flex:1">Beli</button>`:
+    <div class="row" style="align-items:flex-start"><div class="ttl">${esc(r.t)}</div><div class="acts"><button class="ib" data-e="${r.id}" aria-label="Edit ${esc(r.t)}">${ico.e}</button><button class="ib del" data-d="${r.id}" aria-label="Delete ${esc(r.t)}">${ico.d}</button></div></div>
+    <div class="row"><span class="cost">${r.c.toLocaleString('en-US')}<i class="coin l"></i></span><span class="bought">Bought <b ${opt.pop===r.id?'class="pop"':''}>${r.b}</b> ${r.b===1?'time':'times'}</span></div>
+    <div class="foot">${ok?`<button class="btn gold" data-b="${r.id}" style="flex:1">Buy</button>`:
       `<div class="ring" role="progressbar" aria-valuemin="0" aria-valuemax="${r.c}" aria-valuenow="${wallet}"><svg viewBox="0 0 62 62"><circle class="bg" cx="31" cy="31" r="26"/><circle class="fg" cx="31" cy="31" r="26" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-off="${C*(1-pct)}"/></svg><span>${Math.floor(pct*100)}%</span></div>
-      <div class="need"><span class="lk">${ico.k}Terkunci</span><br>Kurang <b>${(r.c-wallet).toLocaleString('id-ID')}</b> koin<br>≈ ${days} hari lagi</div>`}</div></article>`}).join(''):
-    '<div class="empty">Belum ada reward yang bisa dibeli. Selesaikan quest untuk mengumpulkan koin.</div>';
+      <div class="need"><span class="lk">${ico.k}Locked</span><br><b>${(r.c-wallet).toLocaleString('en-US')}</b> more coins<br>≈ ${days} days to go</div>`}</div>${confirmId===r.id?`<div class="confirm" role="alertdialog" aria-label="Delete ${esc(r.t)}?"><span>Delete ${esc(r.t)}?</span><span><button class="btn dng" data-cd="${r.id}">Delete</button><button class="btn ghost" data-cc="1">Cancel</button></span></div>`:''}</article>`}).join(''):
+    (R.length?'<div class="empty">Nothing affordable yet. Complete quests to earn coins.</div>':'<div class="empty"><h2>No rewards yet</h2><p>Add a reward to spend your wallet on.</p><button class="btn" data-add="1">Add reward</button></div>');
   requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('.fg').forEach(c=>c.style.strokeDashoffset=c.dataset.off)));
-  $('log').innerHTML=L.length?L.map((x,i)=>`<li class="${opt.log&&i===0?'fresh':''}"><span>${esc(x.t)}<small>${x.w}</small></span><b>−${x.c.toLocaleString('id-ID')}</b></li>`).join(''):'<li class="sub">Belum ada pembelian.</li>';
+  $('log').innerHTML=L.length?L.map((x,i)=>`<li class="${opt.log&&i===0?'fresh':''}"><span>${esc(x.t)}<small>${x.w}</small></span><b>−${x.c.toLocaleString('en-US')}</b></li>`).join(''):'<li class="sub">No purchases yet.</li>';
 }
 /* controls */
 $('sorts').onclick=e=>{const b=e.target.closest('[data-so]');if(b){sort=b.dataset.so;render()}};
@@ -233,31 +235,34 @@ function burst(el){if(reduce)return;const r=el.getBoundingClientRect(),x=r.left+
     c.style.cssText=`left:${x}px;top:${y}px;--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d-30}px;animation-delay:${i*12}ms`;document.body.append(c);setTimeout(()=>c.remove(),1100)}}
 function buy(id,btn){const r=R.find(x=>x.id===id);if(wallet<r.c){btn.closest('.card').classList.add('shake');return}
   burst(btn);const rc=btn.getBoundingClientRect(),f=document.createElement('div');f.className='float';f.textContent='−'+r.c;f.style.cssText=`left:${rc.left+rc.width/2-14}px;top:${rc.top-6}px`;document.body.append(f);setTimeout(()=>f.remove(),1200);
-  r.b++;L.unshift({t:r.t,c:r.c,w:'Baru saja'});setWallet(wallet-r.c);render({flash:id,pop:id,log:true});
-  undoFn=()=>{r.b--;L.shift();setWallet(wallet+r.c);render()};toast(`${r.t} dibeli (−${r.c})`,true)}
+  r.b++;L.unshift({t:r.t,c:r.c,w:'Just now'});setWallet(wallet-r.c);render({flash:id,pop:id,log:true});
+  toast(`${r.t} bought (−${r.c})`)}
 $('grid').onclick=e=>{
-  const b=e.target.closest('[data-b]');if(b){buy(+b.dataset.b,b);return}
-  const eb=e.target.closest('[data-e]');if(eb){open(R.find(r=>r.id==eb.dataset.e));return}
-  const db=e.target.closest('[data-d]');if(!db)return;const id=+db.dataset.d,i=R.findIndex(r=>r.id===id),r=R[i];
-  db.closest('.card').classList.add('out');setTimeout(()=>{R.splice(i,1);render();undoFn=()=>{R.splice(i,0,r);render({flash:r.id})};toast(`"${r.t}" dihapus. Riwayat pembelian tetap tersimpan.`,true)},reduce?0:280)};
+const ab=e.target.closest('[data-add]');if(ab){open();return}
+const b=e.target.closest('[data-b]');if(b){buy(+b.dataset.b,b);return}
+const eb=e.target.closest('[data-e]');if(eb){open(R.find(r=>r.id==eb.dataset.e));return}
+const db=e.target.closest('[data-d]');if(db){confirmId=+db.dataset.d;render();setTimeout(()=>document.querySelector('[data-cc]')?.focus(),0);return}
+const cc=e.target.closest('[data-cc]');if(cc){confirmId=null;render();return}
+const cd=e.target.closest('[data-cd]');if(!cd)return;const id=+cd.dataset.cd,i=R.findIndex(r=>r.id===id),r=R[i];
+confirmId=null;cd.closest('.card').classList.add('out');setTimeout(()=>{R.splice(i,1);render();toast(`"${r.t}" deleted. Purchase history is kept.`)},reduce?0:280)};
 $('undo').onclick=()=>{undoFn&&undoFn();undoFn=null;hide()};
 function toast(t,u){$('toastTxt').textContent=t;$('undo').hidden=!u;$('toast').classList.add('show');clearTimeout(tt);tt=setTimeout(hide,7000)}
 function hide(){$('toast').classList.remove('show')}
 /* drawer */
-function open(r){opener=document.activeElement;edit=r||null;$('dt').textContent=r?'Edit reward':'Tambah reward';$('fT').value=r?r.t:'';$('fC').value=r?r.c:'';
+function open(r){opener=document.activeElement;edit=r||null;$('dt').textContent=r?'Edit reward':'Add reward';$('fT').value=r?r.t:'';$('fC').value=r?r.c:'';
   ['eT','eC'].forEach(i=>$(i).textContent='');['fT','fC'].forEach(i=>$(i).classList.remove('bad'));hint();
   $('scrim').classList.add('on');$('drawer').classList.add('on');setTimeout(()=>$('fT').focus(),150)}
 function close(){$('scrim').classList.remove('on');$('drawer').classList.remove('on');opener&&opener.focus?.()}
-function hint(){const c=+$('fC').value;$('hC').textContent=c>0?(c<=wallet?'Bisa dibeli sekarang.':`Butuh sekitar ${Math.ceil((c-wallet)/AVG)} hari pada laju rata-rata ${AVG} koin/hari.`):''}
+function hint(){const c=+$('fC').value;$('hC').textContent=c>0?(c<=wallet?'You can buy this now.':`About ${Math.ceil((c-wallet)/AVG)} days at an average of ${AVG} coins a day.`):''}
 $('fC').oninput=hint;$('add').onclick=()=>open();$('x').onclick=$('cancel').onclick=$('scrim').onclick=close;
-addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+addEventListener('keydown',e=>{if(e.key==='Escape'){close();if(confirmId){confirmId=null;render()}}});
 $('save').onclick=()=>{const t=$('fT').value.trim(),c=+$('fC').value;let ok=true;
   ['eT','eC'].forEach(i=>$(i).textContent='');['fT','fC'].forEach(i=>$(i).classList.remove('bad'));
-  if(!t){$('eT').textContent='Nama reward wajib diisi.';$('fT').classList.add('bad');ok=false}
-  if(!Number.isInteger(c)||c<1){$('eC').textContent='Harga harus bilangan bulat minimal 1.';$('fC').classList.add('bad');ok=false}
+  if(!t){$('eT').textContent='Reward name is required.';$('fT').classList.add('bad');ok=false}
+  if(!Number.isInteger(c)||c<1){$('eC').textContent='Enter a whole number of 1 or more.';$('fC').classList.add('bad');ok=false}
   if(!ok)return;let id;
   if(edit){edit.t=t;edit.c=c;id=edit.id}else{id=nid++;R.push({id,t,c,b:0})}
-  close();only=false;render({flash:edit?id:null,fresh:edit?null:id});toast(edit?'Reward diperbarui':'Reward ditambahkan');
+  close();only=false;render({flash:edit?id:null,fresh:edit?null:id});toast(edit?'Reward updated':'Reward added');
   setTimeout(()=>document.querySelector(`[data-id="${id}"]`)?.scrollIntoView({block:'center',behavior:reduce?'auto':'smooth'}),60)};
 /* particles */
 const cv=$('fx'),cx=cv.getContext('2d');let P=[],raf;const size=()=>{cv.width=innerWidth;cv.height=innerHeight};

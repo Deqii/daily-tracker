@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -151,7 +151,8 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
 .toast.show{transform:translate(-50%,0);opacity:1}
 .toast button{all:unset;cursor:pointer;color:var(--cyan);font-weight:700}.toast button:hover{text-decoration:underline}
 @media(max-width:1100px){main{grid-template-columns:1fr 1fr}.quest{grid-column:1/-1;order:-1}.bottom{grid-template-columns:1fr}}
-@media(max-width:700px){header{padding:12px 16px;gap:12px}nav{display:none}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{grid-template-columns:1fr;padding:16px}.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:1023px){header{flex-wrap:wrap;padding:12px 16px 0;gap:8px 12px}.chips{margin-left:auto}nav{order:3;flex:0 0 100%;margin:0 -16px;padding:0;gap:0;border-top:1px solid var(--line)}nav a{flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 4px}nav a[aria-current]::after{bottom:0}}
+@media(max-width:700px){header{padding:12px 16px 0;gap:8px 12px}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{grid-template-columns:1fr;padding:16px}.stats{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:380px){.chips .chip:first-child{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}}
 [data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
@@ -163,7 +164,7 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
 <div class="scan" aria-hidden="true"></div>
 <header>
   <div class="logo">Daily Tracker</div>
-  <nav aria-label="Navigasi utama"><a href="#" aria-current="page">Today</a><a href="#">Tasks</a><a href="#">Rewards</a><a href="#">History</a><a href="#">Settings</a></nav>
+  <nav aria-label="Primary"><a href="#" aria-current="page">Today</a><a href="#">Tasks</a><a href="#">Rewards</a><a href="#">History</a><a href="#">Settings</a></nav>
   <div class="chips"><div class="chip"><span>Rank</span><b>E</b></div><div class="chip"><span>Streak</span><b id="streakChip">5</b></div><div class="chip"><span>Wallet</span><i class="coin"></i><b id="walletChip">65</b></div></div>
 </header>
 
@@ -175,37 +176,37 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
     </div>
     <div class="lv"><span class="sub">Level</span><b id="lvl">3</b></div>
     <div class="title">Hadiah pertama</div>
-    <div><div class="row sub" style="margin-bottom:6px"><span id="xpTxt">9 / 70 XP</span><span id="xpNext">ke Level 4</span></div><div class="xpbar"><i id="xpFill" style="width:0"></i></div></div>
-    <div><div class="row sub" style="margin-bottom:6px"><span>Streak</span><span class="shield"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1l5.5 2v5c0 3.5-2.4 6-5.5 7C3.9 14 1.5 11.500 1.500 8V3z"/></svg>Freeze 1 tersisa</span></div>
-      <div class="pips" aria-label="Streak 5 hari"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on today"></i><i></i><i></i></div></div>
+    <div><div class="row sub" style="margin-bottom:6px"><span id="xpTxt">9 / 70 XP</span><span id="xpNext">to Level 4</span></div><div class="xpbar"><i id="xpFill" style="width:0"></i></div></div>
+    <div><div class="row sub" style="margin-bottom:6px"><span>Streak</span><span class="shield"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1l5.5 2v5c0 3.5-2.4 6-5.5 7C3.9 14 1.5 11.500 1.500 8V3z"/></svg>1 freeze left this week</span></div>
+      <div class="pips" aria-label="Streak 5 days"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on today"></i><i></i><i></i></div></div>
   </section>
 
   <section class="panel radar-wrap boot" style="--i:1" aria-label="Stat">
     <div class="row" style="width:100%"><h2>Stat</h2><span class="sub" id="gateTxt"></span></div>
-    <svg id="radar" viewBox="-60 -30 440 380" role="img" aria-label="Radar lima stat"></svg>
-    <div class="legend"><span><s></s>Batas balance gate (50% rata-rata)</span></div>
+    <svg id="radar" viewBox="-60 -30 440 380" role="img" aria-label="Radar chart"></svg>
+    <div class="legend"><span><s></s>Balance gate limit (50% of average)</span></div>
     <div class="stats" id="stats"></div>
   </section>
 
   <section class="quest boot" style="--i:2" aria-label="Daily quest">
-    <div class="sys panel" style="padding:12px 14px"><small>Pesan sistem</small><p><span id="typed"></span><span class="caret"></span></p></div>
-    <div class="penalty" id="penalty"><div><strong id="penTitle">Penalty zone aktif</strong><div class="sub" id="penSub">Soc butuh 2 penyelesaian hari ini.</div></div><div class="timer"><span id="timer">--:--:--</span><small>sampai rollover</small></div></div>
-    <div class="row"><h2>Daily quest</h2><span class="sub" id="qCount">3/5 stat terpenuhi</span></div>
+    <div class="sys panel" style="padding:12px 14px"><small>System message</small><p><span id="typed"></span><span class="caret"></span></p></div>
+    <div class="penalty" id="penalty"><div><strong id="penTitle">Penalty active</strong><div class="sub" id="penSub">Soc needs 2 completions today.</div></div><div class="timer"><span id="timer">--:--:--</span><small>until rollover</small></div></div>
+    <div class="row"><h2>Daily quest</h2><span class="sub" id="qCount">3/5</span></div>
     <div id="quests" style="display:flex;flex-direction:column;gap:8px"></div>
   </section>
 
   <div class="bottom">
-    <section class="panel boot" style="--i:3"><h2>14 hari terakhir</h2><div class="heat" id="heat"></div><p class="sub" style="margin-top:10px">Merah = hari dengan stat terlewat.</p></section>
+    <section class="panel boot" style="--i:3"><h2>Last 14 days</h2><div class="heat" id="heat"></div><p class="sub" style="margin-top:10px">Red = days with missed stats.</p></section>
     <section class="panel boot" style="--i:4"><div class="row"><h2>Rewards</h2><span class="sub price">Wallet <span id="wal2" style="color:var(--text)">65</span><i class="coin"></i></span></div><div class="rewards" id="rewards"></div></section>
   </div>
 </main>
-<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span><button id="undo">Batalkan</button></div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span><button id="undo">Undo</button></div>
 
 <script>
 const STATS=[{k:'STR',n:'Str',c:'--stat-str'},{k:'VIT',n:'Vit',c:'--stat-vit'},{k:'INT',n:'Int',c:'--stat-int'},{k:'DISC',n:'Disc',c:'--stat-disc'},{k:'SOC',n:'Soc',c:'--stat-soc'}];
 const S={xp:65,wallet:65,stat:{STR:16,VIT:12,INT:20,DISC:10,SOC:7},mult:.5};
 const Q=[{s:'STR',n:'Squat 15x2 set',nom:5,need:1,done:1},{s:'VIT',n:'Minum air 2L',nom:5,need:1,done:1},{s:'INT',n:'Baca 10 halaman',nom:5,need:1,done:0},{s:'DISC',n:'Ibadah',nom:5,need:1,done:1},{s:'SOC',n:'Chat 1 teman',nom:5,need:2,done:0}];
-const R=[{n:'Main game 2 jam',cost:60},{n:'Kopi susu santai',cost:35},{n:'Nonton bioskop',cost:800}];
+const R=[{n:'Main game 2 jam',cost:60},{n:'Kopi susu santai',cost:35},{n:'Beli buku baru',cost:150},{n:'Jajan favorit',cost:250},{n:'Nonton bioskop',cost:800}];
 const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const award=n=>Math.ceil(n*S.mult), lvOf=x=>Math.floor(Math.sqrt(x/14))+1;
 const reduce=(matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.motion==='off');
@@ -215,11 +216,11 @@ let disp={...S.stat},dispW=S.wallet,last=null,tt;
 function tween(from,to,fn,ms=600){if(reduce){fn(to);return}const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-p,3);fn(from+(to-from)*e);if(p<1)requestAnimationFrame(f)})(t0)}
 
 /* radar */
-const CX=160,CY=160,RR=118,MAX=30;
+let MAX=20;const CX=160,CY=160,RR=118;const scaleMax=()=>Math.max(20,Math.ceil(Math.max(...Object.values(S.stat))/10)*10);
 const ang=i=>-Math.PI/2+i*2*Math.PI/5, pt=(i,v)=>[CX+Math.cos(ang(i))*RR*v/MAX,CY+Math.sin(ang(i))*RR*v/MAX];
 const gate=()=>{const v=Object.values(S.stat);return Math.ceil(v.reduce((a,b)=>a+b,0)/(2*v.length))};
 function drawRadar(vals){
-  let h='';
+  MAX=scaleMax();let h='';
   [.25,.5,.75,1].forEach(r=>h+=`<polygon points="${STATS.map((_,i)=>pt(i,MAX*r).join(',')).join(' ')}" fill="none" stroke="var(--blue)" stroke-opacity="${r==1?.35:.14}"/>`);
   STATS.forEach((s,i)=>{const[x,y]=pt(i,MAX);h+=`<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" stroke="var(--blue)" stroke-opacity=".14"/>`});
   h+=`<polygon points="${STATS.map((_,i)=>pt(i,gate()).join(',')).join(' ')}" fill="rgba(139,108,255,.06)" stroke="var(--monarch)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
@@ -228,19 +229,19 @@ function drawRadar(vals){
     const[lx,ly]=pt(i,MAX*1.2);h+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" fill="var(--text)" font-family="Chakra Petch" font-weight="600" font-size="15">${s.n} <tspan fill="${css(s.c)}">${Math.round(vals[s.k])}</tspan></text>`});
   $('radar').innerHTML=h;
 }
-function stats(){$('stats').innerHTML=STATS.map(s=>`<div class="stat" style="--c:var(${s.c})"><small>${s.n}</small><b>${S.stat[s.k]}</b><div class="bar"><i style="width:${Math.min(100,S.stat[s.k]/MAX*100)}%"></i></div></div>`).join('');
-  $('gateTxt').textContent=`Ambang gate: ${gate()} XP`}
+function stats(){MAX=scaleMax();$('radar').setAttribute('aria-label','Radar chart: '+STATS.map(x=>x.n+' '+S.stat[x.k]).join(', '));$('stats').innerHTML=STATS.map(s=>`<div class="stat" style="--c:var(${s.c})"><small>${s.n}</small><b>${S.stat[s.k]}</b><div class="bar"><i style="width:${Math.min(100,S.stat[s.k]/MAX*100)}%"></i></div></div>`).join('');
+  $('gateTxt').textContent=`Gate threshold: ${gate()} XP`}
 
 /* quests */
 const sat=k=>{const q=Q.find(x=>x.s===k);return q.done>=q.need};
 function quests(){
   $('quests').innerHTML=Q.map((q,i)=>{const st=STATS.find(s=>s.k===q.s);const d=q.done>=q.need;
    return `<button class="qrow${d?' done':''}" style="--c:var(${st.c})" data-i="${i}" role="checkbox" aria-checked="${d}"><span class="box"><svg viewBox="0 0 14 14"><path d="M2 7.5l3.2 3L12 3.500"/></svg></span><span class="nm">${q.n}<small>${st.n}</small></span>${q.need>1?`<span class="need">${q.done}/${q.need}</span>`:''}<span class="pts">+${award(q.nom)}</span></button>`}).join('');
-  const n=STATS.filter(s=>sat(s.k)).length;$('qCount').textContent=`${n}/5 stat terpenuhi`;
+  const n=STATS.filter(s=>sat(s.k)).length;$('qCount').textContent=`${n}/5`;
   const p=$('penalty'),ok=sat('SOC');p.classList.toggle('clear',ok);
-  $('penTitle').textContent=ok?'Penalty dibersihkan':'Penalty zone aktif';$('penSub').textContent=ok?'Soc memenuhi 2 penyelesaian.':'Soc butuh 2 penyelesaian hari ini.';
+  $('penTitle').textContent=ok?'Penalty cleared':'Penalty active';$('penSub').textContent=ok?'Soc has 2 completions.':'Soc needs 2 completions today.';
   $('timer').style.color=ok?'var(--ok)':'';
-  msg(n===5?'Semua stat terpenuhi. Daily quest selesai.':ok?'Penalty hilang. Selesaikan stat yang tersisa.':'Selesaikan minimal 1 task di setiap stat hari ini.');
+  msg(n===5?'All stats completed. Daily quest done.':ok?'Penalty cleared. Finish the remaining stats.':'Complete at least 1 task in every stat today.');
 }
 function apply(i,dir,ev){
   const q=Q[i];const pts=award(q.nom)*dir;
@@ -249,7 +250,7 @@ function apply(i,dir,ev){
   tween(0,1,p=>{STATS.forEach(s=>disp[s.k]=from[s.k]+(S.stat[s.k]-from[s.k])*p);drawRadar(disp)});
   tween(fw,S.wallet,v=>{dispW=v;$('walletChip').textContent=$('wal2').textContent=Math.round(v)},500);
   quests();stats();xp();rewards();
-  if(dir>0&&ev){fx(ev,q.s,pts);last=i;toast(`${q.n} selesai`)}
+  if(dir>0&&ev){fx(ev,q.s,pts);last=i;toast(`${q.n} completed`)}
 }
 $('quests').addEventListener('click',e=>{const b=e.target.closest('.qrow');if(!b)return;const i=+b.dataset.i;if(Q[i].done<Q[i].need)apply(i,1,e)});
 $('undo').onclick=()=>{if(last!=null&&Q[last].done>0){apply(last,-1);last=null}hide()};
@@ -262,10 +263,11 @@ function toast(t){$('toastTxt').textContent=t;$('toast').classList.add('show');c
 function hide(){$('toast').classList.remove('show')}
 
 /* xp / level */
-function xp(){const L=lvOf(S.xp),a=14*(L-1)**2,b=14*L*L;$('lvl').textContent=L;$('xpTxt').textContent=`${S.xp-a} / ${b-a} XP`;$('xpNext').textContent=`ke Level ${L+1}`;$('xpFill').style.width=((S.xp-a)/(b-a)*100)+'%'}
+function xp(){const L=lvOf(S.xp),a=14*(L-1)**2,b=14*L*L;$('lvl').textContent=L;$('xpTxt').textContent=`${S.xp-a} / ${b-a} XP`;$('xpNext').textContent=`to Level ${L+1}`;$('xpFill').style.width=((S.xp-a)/(b-a)*100)+'%'}
 
 /* rewards */
-function rewards(){$('rewards').innerHTML=R.map((r,i)=>{const can=S.wallet>=r.cost;return `<div class="rw"><div class="row"><b>${r.n}</b><span class="pts price">${r.cost}<i class="coin"></i></span></div>${can?`<button class="btn" data-r="${i}">Beli</button>`:`<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${r.cost}" aria-valuenow="${S.wallet}"><i style="width:${S.wallet/r.cost*100}%"></i></div><span class="sub">Kurang ${r.cost-S.wallet} koin</span>`}</div>`}).join('')}
+function teaser(){const x=R.map((r,i)=>({r,i})),by=(a,b)=>b.r.cost-a.r.cost,af=x.filter(o=>S.wallet>=o.r.cost).sort(by)[0],lk=x.filter(o=>S.wallet<o.r.cost).sort(by)[0];return [af,lk].filter(Boolean)}
+function rewards(){$('rewards').innerHTML=teaser().map(({r,i})=>{const can=S.wallet>=r.cost;return `<div class="rw"><div class="row"><b>${r.n}</b><span class="pts price">${r.cost}<i class="coin"></i></span></div>${can?`<button class="btn" data-r="${i}">Buy</button>`:`<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${r.cost}" aria-valuenow="${S.wallet}"><i style="width:${S.wallet/r.cost*100}%"></i></div><span class="sub">${r.cost-S.wallet} more coins</span>`}</div>`}).join('')}
 $('rewards').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b)return;const r=R[+b.dataset.r];if(S.wallet<r.cost)return;
   const fw=S.wallet;S.wallet-=r.cost;tween(fw,S.wallet,v=>{$('walletChip').textContent=$('wal2').textContent=Math.round(v)},500);last=null;rewards();toast(`${r.n} dibeli (−${r.cost})`)});
 
@@ -277,7 +279,7 @@ function tick(){const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);let s=Math
 setInterval(tick,1000);tick();
 
 /* heat strip */
-$('heat').innerHTML=[3,2,3,1,'x',3,3,2,'x',3,2,2,3,1].map((l,i)=>`<i data-l="${l}" title="${i===13?'Hari ini':(13-i)+' hari lalu'}"></i>`).join('');
+$('heat').innerHTML=[3,2,3,1,'x',3,3,2,'x',3,2,2,3,1].map((l,i)=>`<i data-l="${l}" title="${i===13?'Today':(13-i)+' days ago'}"></i>`).join('');
 
 /* particles (cheap, paused when hidden) */
 const cv=$('fx'),cx=cv.getContext('2d');let P=[],raf;
