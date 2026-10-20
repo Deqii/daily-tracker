@@ -258,8 +258,15 @@ const RULES = [
   { context: '', selector: '.chip' },
   { context: '', selector: '.chip span' },
   { context: '', selector: '.coin' },
+  // The two-row header from 1023px down. `nav` is never hidden; the 700px
+  // block only compacts the first row, so it is compared for header, logo and
+  // chips, not for nav.
+  { context: '@media(max-width:1023px)', selector: 'header' },
+  { context: '@media(max-width:1023px)', selector: '.chips' },
+  { context: '@media(max-width:1023px)', selector: 'nav' },
+  { context: '@media(max-width:1023px)', selector: 'nav a' },
+  { context: '@media(max-width:1023px)', selector: 'nav a[aria-current]::after' },
   { context: '@media(max-width:700px)', selector: 'header' },
-  { context: '@media(max-width:700px)', selector: 'nav' },
   { context: '@media(max-width:700px)', selector: '.logo' },
   { context: '@media(max-width:700px)', selector: '.chips' },
   { context: '@media(max-width:700px)', selector: '.chip' },

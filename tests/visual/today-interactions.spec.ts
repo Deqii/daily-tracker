@@ -80,6 +80,8 @@ interface Snapshot {
   readonly level: number;
   /** XP already earned inside that level. */
   readonly xpIntoLevel: number;
+  /** The cost of the first reward row, the affordable one, read before the action. */
+  readonly rewardCost: number;
 }
 
 async function text(page: Page, selector: string): Promise<string> {
@@ -105,6 +107,7 @@ async function snapshot(page: Page): Promise<Snapshot> {
     wallet: await number(page, WALLET),
     level: await number(page, LEVEL),
     xpIntoLevel,
+    rewardCost: Number((await text(page, '.rewards .rw .pts')).replace(/[^\d]/g, '')),
   };
 }
 
@@ -151,10 +154,10 @@ const scenarios: readonly Scenario[] = [
       expect(total).toBe(xpForLevel(level + 1) - floor);
       await expect(page.locator(LEVEL)).toHaveText(String(level));
       await expect(page.locator('.radar-wrap .row .sub')).toHaveText(
-        `Ambang gate: ${passesBalanceGate(await readStatXp(page)).threshold} XP`
+        `Gate threshold: ${passesBalanceGate(await readStatXp(page)).threshold} XP`
       );
       await expect(page.locator('.toast')).toHaveClass(/show/);
-      await expect(page.locator('.toast span')).toHaveText('Baca 10 halaman selesai');
+      await expect(page.locator('.toast span')).toHaveText('Baca 10 halaman completed');
     },
   },
   {
@@ -182,17 +185,17 @@ const scenarios: readonly Scenario[] = [
       const penalty = page.locator('.penalty');
 
       await expect(penalty).toHaveClass(/clear/);
-      await expect(penalty.locator('strong')).toHaveText('Penalty dibersihkan');
-      await expect(penalty.locator('.sub').first()).toHaveText('Soc memenuhi 2 penyelesaian.');
+      await expect(penalty.locator('strong')).toHaveText('Penalty cleared');
+      await expect(penalty.locator('.sub').first()).toHaveText('Soc has 2 completions.');
       // The timer turns to the success colour, which is `--ok` and therefore a
       // different rgb per theme; it is compared with the title, which is styled
       // from the same token, instead of with a literal.
       expect(
         await penalty.locator('.timer span').evaluate((el) => getComputedStyle(el).color)
       ).toBe(await penalty.locator('strong').evaluate((el) => getComputedStyle(el).color));
-      await expect(page.locator('.quest .row .sub')).toHaveText('4/5 stat terpenuhi');
+      await expect(page.locator('.quest .row .sub')).toHaveText('4/5');
       await expect(page.locator('.sys p span').first()).toHaveText(
-        'Penalty hilang. Selesaikan stat yang tersisa.'
+        'Penalty cleared. Finish the remaining stats.'
       );
     },
   },
@@ -203,17 +206,23 @@ const scenarios: readonly Scenario[] = [
       await page.locator('.rewards .rw').first().locator('.btn').click();
     },
     async assertEngine(page, before) {
-      const cost = Number((await text(page, '.rewards .rw .pts')).replace(/[^\d]/g, ''));
+      const cost = before.rewardCost;
       const wallet = before.wallet - cost;
 
       expect(await number(page, WALLET)).toBe(wallet);
 
-      // Under the price now, so the teaser shows what is still missing instead of a
-      // Buy button, and the panel's wallet line agrees with the header chip.
-      await expect(page.locator('.rewards .rw').first().locator('.btn')).toHaveCount(0);
-      await expect(page.locator('.rewards .rw').first().locator('.sub')).toHaveText(
-        `Kurang ${cost - wallet} koin`
-      );
+      // Buying the only affordable reward leaves a single locked row - the
+      // dearest locked one, which the prototype's `teaser()` also keeps - with
+      // what is still missing instead of a Buy button, and the panel's wallet
+      // line agrees with the header chip.
+      const rows = page.locator('.rewards .rw');
+
+      await expect(rows).toHaveCount(1);
+      await expect(rows.locator('.btn')).toHaveCount(0);
+
+      const lockedCost = Number((await text(page, '.rewards .rw .pts')).replace(/[^\d]/g, ''));
+
+      await expect(rows.locator('.sub')).toHaveText(`${lockedCost - wallet} more coins`);
       await expect(page.locator('.bottom .row .sub span')).toHaveText(String(wallet));
       await expect(page.locator('.toast')).toHaveClass(/show/);
       await expect(page.locator('.toast span')).toHaveText(`Main game 2 jam dibeli (−${cost})`);

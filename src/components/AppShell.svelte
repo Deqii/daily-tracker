@@ -147,7 +147,7 @@
 
 <header>
   <div class="logo">Daily Tracker</div>
-  <nav aria-label="Navigasi utama">
+  <nav aria-label="Primary">
     {#each navItems as item (item.route)}
       <a href={`#/${item.route}`} aria-current={$currentRoute === item.route ? 'page' : undefined}
         >{item.label}</a

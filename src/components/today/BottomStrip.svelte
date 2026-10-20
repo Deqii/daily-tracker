@@ -10,14 +10,16 @@
   import { showToast } from '../../stores/toast';
   import type { Reward } from '../../lib/types';
 
+  const rewardPreview = app.rewardPreview;
+
   /**
    * The bottom strip (UI Revamp Issue 2): the fourteen-day heat strip and the
    * rewards teaser.
    *
-   * Every cell comes from the engine's own `dailyQuestLog`; every reward from the
-   * stored reward list, in stored order. See DEVIATIONS.md open question Q8: the
-   * prototype lists every reward, where `selectRewardPreview` (design §5,
-   * decisions D20) would list at most two.
+   * Every cell comes from the engine's own `dailyQuestLog`; the rewards teaser
+   * is the store's `rewardPreview`, which is `selectRewardPreview` (design §5,
+   * decisions D20): the dearest affordable reward and the dearest locked one, up
+   * to two rows, exactly what `today.html`'s `teaser()` picks.
    *
    * The wallet number the teaser shows is the tweened one the header chip shows,
    * so the two can never disagree; the affordability test itself uses the
@@ -58,13 +60,13 @@
 
 <div class="bottom">
   <section class="panel boot" style="--i:3">
-    <h2>14 hari terakhir</h2>
+    <h2>Last 14 days</h2>
     <div class="heat">
       {#each cells as cell (cell.date)}
         <i data-l={cell.level} title={cell.title}></i>
       {/each}
     </div>
-    <p class="sub" style="margin-top:10px">Merah = hari dengan stat terlewat.</p>
+    <p class="sub" style="margin-top:10px">Red = days with missed stats.</p>
   </section>
   <section class="panel boot" style="--i:4">
     <div class="row">
@@ -74,15 +76,15 @@
       >
     </div>
     <div class="rewards">
-      {#each $app.rewards as reward, index (reward.id)}
-        {@const canAfford = wallet >= reward.cost}
+      {#each $rewardPreview as row, index (row.reward.id)}
+        {@const reward = row.reward}
         <div class="rw">
           <div class="row">
             <b>{reward.title}</b>
             <span class="pts price">{reward.cost}<i class="coin"></i></span>
           </div>
-          {#if canAfford}
-            <button class="btn" data-r={index} onclick={() => buy(reward)}>Beli</button>
+          {#if !row.locked}
+            <button class="btn" data-r={index} onclick={() => buy(reward)}>Buy</button>
           {:else}
             <div
               class="prog"
@@ -93,7 +95,7 @@
             >
               <i style={`width: ${rewardProgressPercent(wallet, reward.cost)}%`}></i>
             </div>
-            <span class="sub">Kurang {rewardShortfall(wallet, reward.cost)} koin</span>
+            <span class="sub">{rewardShortfall(wallet, reward.cost)} more coins</span>
           {/if}
         </div>
       {/each}

@@ -115,11 +115,11 @@ describe('heat strip', () => {
     expect(satisfiedCount(met)).toBe(2);
   });
 
-  it('labels the newest cell "Hari ini" and counts the rest back from it', () => {
-    expect(heatTitle(13, 14)).toBe('Hari ini');
-    expect(heatTitle(12, 14)).toBe('1 hari lalu');
-    expect(heatTitle(0, 14)).toBe('13 hari lalu');
-    expect(heatTitle(0, 1)).toBe('Hari ini');
+  it('labels the newest cell "Today" and counts the rest back from it', () => {
+    expect(heatTitle(13, 14)).toBe('Today');
+    expect(heatTitle(12, 14)).toBe('1 days ago');
+    expect(heatTitle(0, 14)).toBe('13 days ago');
+    expect(heatTitle(0, 1)).toBe('Today');
   });
 
   it('reads the fourteen days up to the open day, oldest first', () => {
@@ -132,7 +132,7 @@ describe('heat strip', () => {
     expect(cells.map((cell) => cell.daysAgo)).toEqual(
       Array.from({ length: HEAT_DAYS }, (_, index) => HEAT_DAYS - 1 - index)
     );
-    expect(cells[HEAT_DAYS - 1]?.title).toBe('Hari ini');
+    expect(cells[HEAT_DAYS - 1]?.title).toBe('Today');
     expect(cells[0]?.level).toBe(3);
   });
 
@@ -169,18 +169,18 @@ describe('the open day', () => {
 
 describe('copy', () => {
   it('names the freezes left', () => {
-    expect(freezesRemainingText(1)).toBe('Freeze 1 tersisa');
-    expect(freezesRemainingText(0)).toBe('Freeze 0 tersisa');
-    expect(freezesRemainingText(2)).toBe('Freeze 2 tersisa');
+    expect(freezesRemainingText(1)).toBe('1 freeze left this week');
+    expect(freezesRemainingText(0)).toBe('No freezes left this week');
+    expect(freezesRemainingText(2)).toBe('2 freezes left this week');
   });
 
   it('picks the system message from the engine state, not from a flag', () => {
-    expect(systemMessage(5, false)).toBe('Semua stat terpenuhi. Daily quest selesai.');
-    expect(systemMessage(4, true)).toBe('Penalty hilang. Selesaikan stat yang tersisa.');
-    expect(systemMessage(3, false)).toBe('Selesaikan minimal 1 task di setiap stat hari ini.');
+    expect(systemMessage(5, false)).toBe('All stats completed. Daily quest done.');
+    expect(systemMessage(4, true)).toBe('Penalty cleared. Finish the remaining stats.');
+    expect(systemMessage(3, false)).toBe('Complete at least 1 task in every stat today.');
 
     // Every stat done wins over a cleared penalty zone.
-    expect(systemMessage(5, true)).toBe('Semua stat terpenuhi. Daily quest selesai.');
+    expect(systemMessage(5, true)).toBe('All stats completed. Daily quest done.');
   });
 });
 
@@ -237,8 +237,8 @@ describe('radar geometry', () => {
   });
 
   it('labels the gate threshold', () => {
-    expect(gateLabel(7)).toBe('Ambang gate: 7 XP');
-    expect(gateLabel(0)).toBe('Ambang gate: 0 XP');
+    expect(gateLabel(7)).toBe('Gate threshold: 7 XP');
+    expect(gateLabel(0)).toBe('Gate threshold: 0 XP');
   });
 
   it('maps a stat to its own colour token', () => {

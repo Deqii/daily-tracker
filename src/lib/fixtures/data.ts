@@ -534,12 +534,12 @@ const REWARDS_SNAPSHOT = rewardsSnapshot as unknown as RewardsSnapshot;
 
 /**
  * The prototype's relative day label -> whole days before the fixed clock.
- * "Kemarin" is the only label that is not written as a number.
+ * "Yesterday" is the only label that is not written as a number.
  */
 function daysAgoFor(label: string): number {
-  if (label === 'Kemarin') return 1;
+  if (label === 'Yesterday') return 1;
 
-  const match = /^(\d+) hari lalu$/.exec(label);
+  const match = /^(\d+) days ago$/.exec(label);
 
   if (match === null) {
     throw new Error(`rewards-snapshot.json: unknown relative label "${label}"`);
