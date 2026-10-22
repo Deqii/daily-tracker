@@ -92,7 +92,7 @@
           stroke="currentColor"
           stroke-width="1.5"
           ><path d="M7 1l5.5 2v5c0 3.5-2.4 6-5.5 7C3.9 14 1.5 11.500 1.500 8V3z" /></svg
-        >{freezesRemainingText($freezesLeft)}</span
+        ><span id="frz">{freezesRemainingText($freezesLeft)}</span></span
       >
     </div>
     <div class="pips" aria-label={`Streak ${$streak} days`}>

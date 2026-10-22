@@ -282,6 +282,34 @@ const RULES = [
   { context: '@media(max-width:700px)', selector: '.chip' },
   { context: '@media(max-width:380px)', selector: '.chips .chip:first-child' },
 
+  // overlays.css (shared notices and overlays).
+  { context: '', selector: '.ov' },
+  { context: '', selector: '.ovp' },
+  { context: '', selector: '.ovp small' },
+  { context: '', selector: '.ovp p' },
+  { context: '', selector: '.ovp .big' },
+  { context: '', selector: '.ovp dl' },
+  { context: '', selector: '.ovp dt' },
+  { context: '', selector: '.ovp dd' },
+  { context: '@keyframes ov-fade', selector: 'from' },
+  { context: '@keyframes ov-in', selector: 'from' },
+  { context: '@keyframes ov-pulse', selector: '50%' },
+  { context: '', selector: '.banner' },
+  { context: '', selector: '.banner.recovery' },
+  { context: '', selector: '.banner span:last-child' },
+  { context: '', selector: '.notice' },
+  { context: '', selector: '.obtn' },
+  { context: '', selector: '.obtn:hover' },
+  { context: '', selector: '.obtn:active' },
+  { context: '', selector: '.obtn:focus-visible' },
+  { context: '', selector: '.lnk' },
+  { context: '', selector: '.lnk:focus-visible' },
+  { context: '@media(prefers-reduced-motion:reduce)', selector: '.ovp' },
+  { context: '@media(prefers-reduced-motion:reduce)', selector: '.ovp .big' },
+  { context: '', selector: '[data-motion=off] .ovp' },
+  { context: '', selector: '[data-motion=off] .ovp .big' },
+  { context: '@media(max-width:700px)', selector: '.banner' },
+
   // motion.css
   { context: '@media(prefers-reduced-motion:reduce)', selector: '*' },
   { context: '@media(prefers-reduced-motion:reduce)', selector: '*::before' },
@@ -429,9 +457,6 @@ const RULES = [
   { context: '@keyframes fl', selector: 'to' },
   { context: '@keyframes rg', selector: 'from' },
   { context: '@keyframes rg', selector: 'to' },
-  { context: '@keyframes ov-fade', selector: 'from' },
-  { context: '@keyframes ov-in', selector: 'from' },
-  { context: '@keyframes ov-pulse', selector: '50%' },
 ];
 
 /* ------------------------------------------------------------------ indexing */

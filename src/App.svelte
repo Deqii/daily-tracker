@@ -1,7 +1,5 @@
 <script lang="ts">
-  import StorageNotices from './components/StorageNotices.svelte';
-  import LevelUpReveal from './components/LevelUpReveal.svelte';
-  import RankUpReveal from './components/RankUpReveal.svelte';
+  import MilestoneOverlays from './components/MilestoneOverlays.svelte';
   import AppShell from './components/AppShell.svelte';
   import CompletionToast from './components/today/CompletionToast.svelte';
   import Today from './pages/Today.svelte';
@@ -26,9 +24,6 @@
   toast last, as in `docs/prototype/today.html`.
 -->
 <AppShell />
-<StorageNotices />
-<LevelUpReveal />
-<RankUpReveal />
 
 <main>
   <svelte:component this={routes[$currentRoute]} />
@@ -37,3 +32,5 @@
 {#if $currentRoute === 'today'}
   <CompletionToast />
 {/if}
+
+<MilestoneOverlays />

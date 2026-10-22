@@ -665,10 +665,12 @@
 }
 
 @media (max-width: 640px) {
-  .qrow,
-  .tier,
-  .btn,
-  .obtn {
-    min-height: 44px;
+  @scope (body[data-page='today']) {
+    .qrow,
+    .tier,
+    .btn,
+    .obtn {
+      min-height: 44px;
+    }
   }
 }

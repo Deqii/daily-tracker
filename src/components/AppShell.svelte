@@ -1,4 +1,5 @@
 <script lang="ts">
+  import StorageNotices from './StorageNotices.svelte';
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
   import { currentRoute, type Route } from '../lib/router';
@@ -144,6 +145,8 @@
 -->
 <canvas id="fx" aria-hidden="true"></canvas>
 <div class="scan" aria-hidden="true"></div>
+
+<StorageNotices />
 
 <header>
   <div class="logo">Daily Tracker</div>

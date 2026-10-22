@@ -263,34 +263,32 @@
     <small>System message</small>
     <p><span>{typed}</span><span class="caret"></span></p>
   </div>
-  {#if rows.length > 0}
-    <div class="penalty" class:clear={cleared}>
-      <div>
-        <strong>{cleared ? 'Penalty cleared' : 'Penalty active'}</strong>
-        <div class="sub">
-          {cleared
-            ? `${penaltyStatLabel} has 2 completions.`
-            : `${penaltyStatLabel} needs 2 completions today.`}
-        </div>
-      </div>
-      <div class="timer">
-        <span style={cleared ? 'color: var(--ok)' : undefined}>{countdown}</span>
-        <small>until rollover</small>
+  <div class="penalty" class:clear={cleared} style={rows.length === 0 ? 'display:none' : undefined}>
+    <div>
+      <strong>{cleared ? 'Penalty cleared' : 'Penalty active'}</strong>
+      <div class="sub">
+        {cleared
+          ? `${penaltyStatLabel} has 2 completions.`
+          : `${penaltyStatLabel} needs 2 completions today.`}
       </div>
     </div>
-  {/if}
+    <div class="timer">
+      <span style={cleared ? 'color: var(--ok)' : undefined}>{countdown}</span>
+      <small>until rollover</small>
+    </div>
+  </div>
   <div class="row">
     <h2>Daily quest</h2>
     <span class="sub">{rows.length === 0 ? '' : `${satisfied}/${STATS.length}`}</span>
   </div>
-  {#if rows.length === 0}
-    <div class="empty">
-      <h2>No tasks yet</h2>
-      <p>Add your first task to start your daily quest.</p>
-      <a class="btn" href="#/tasks">Add task</a>
-    </div>
-  {:else}
-    <div style="display:flex;flex-direction:column;gap:8px">
+  <div style="display:flex;flex-direction:column;gap:8px">
+    {#if rows.length === 0}
+      <div class="empty">
+        <h2>No tasks yet</h2>
+        <p>Add your first task to start your daily quest.</p>
+        <a class="btn" href="#/tasks">Add task</a>
+      </div>
+    {:else}
       {#each rows as row (row.taskId)}
         {@const done = row.completed >= row.required}
         {#if row.options.length > 1}
@@ -364,6 +362,6 @@
           </button>
         {/if}
       {/each}
-    </div>
-  {/if}
+    {/if}
+  </div>
 </section>
