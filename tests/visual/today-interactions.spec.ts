@@ -225,7 +225,7 @@ const scenarios: readonly Scenario[] = [
       await expect(rows.locator('.sub')).toHaveText(`${lockedCost - wallet} more coins`);
       await expect(page.locator('.bottom .row .sub span')).toHaveText(String(wallet));
       await expect(page.locator('.toast')).toHaveClass(/show/);
-      await expect(page.locator('.toast span')).toHaveText(`Main game 2 jam dibeli (−${cost})`);
+      await expect(page.locator('.toast span')).toHaveText(`Main game 2 jam bought (−${cost})`);
     },
   },
 ];
