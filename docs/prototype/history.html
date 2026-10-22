@@ -22,6 +22,7 @@
   --ease:cubic-bezier(.2,.8,.2,1); --t-fast:.15s; --t-base:.35s; --t-slow:.7s; --stagger:70ms;
   --ins2:rgba(5,7,13,.6); --scan:rgba(61,169,255,.12); --track:rgba(255,255,255,.08); --lock-text:#c3d0e4; --monarch-soft:#b7a4ff;
   --tier-r:#4ade9a; --tier-s:#3da9ff; --tier-b:#ff8a9a;
+  --accent:var(--rk-e);
   color-scheme:dark;
 }
 [data-theme=light]{
@@ -37,6 +38,7 @@
   --tier-r:#12804a; --tier-s:#1673c9; --tier-b:#c8365a;
   color-scheme:light;
 }
+[data-rank=E]{--accent:var(--rk-e)}[data-rank=D]{--accent:var(--rk-d)}[data-rank=C]{--accent:var(--rk-c)}[data-rank=B]{--accent:var(--rk-b)}[data-rank=A]{--accent:var(--rk-a)}[data-rank=S]{--accent:var(--rk-s)}
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);color:var(--text);font:400 15px/1.5 var(--font-body);min-height:100vh;overflow-x:hidden;transition:background var(--t-base),color var(--t-base)}
 body::before{content:"";position:fixed;inset:0;z-index:-2;
@@ -52,11 +54,12 @@ nav{display:flex;gap:6px;flex:1}nav a{color:var(--muted);text-decoration:none;pa
 nav a[aria-current]::after{content:"";position:absolute;left:12px;right:12px;bottom:-15px;height:2px;background:var(--blue);box-shadow:0 0 12px var(--blue)}
 .chips{display:flex;gap:8px}.chip{border:1px solid var(--line);border-radius:var(--r-chip);padding:4px 12px;font:500 13px var(--font-mono);background:var(--panel);display:flex;gap:8px;align-items:center}
 .chip span{color:var(--muted);font-family:var(--font-body)}
+.chip.rk{border-color:var(--accent);color:var(--accent)}.chip.rk b{color:var(--accent)}
 .coin{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 30%,#fff3b8,var(--gold) 55%,#b8860b)}
 @property --arm{syntax:'<length>';inherits:false;initial-value:14px}
 .panel,.drawer{position:relative;background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:var(--r-panel);box-shadow:var(--glow)}
 .panel{padding:22px}
-.panel::before,.drawer::before,.penalty::before,.stat::before,.rw::before{content:"";position:absolute;inset:-1px;pointer-events:none;--k:var(--bc,var(--blue));--a0:14px;--a1:26px;--w:2px;
+.panel::before,.drawer::before,.penalty::before,.stat::before,.rw::before{content:"";position:absolute;inset:-1px;pointer-events:none;--k:var(--bc,var(--accent));--a0:14px;--a1:26px;--w:2px;
   background:linear-gradient(var(--k),var(--k)) 0 0/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 0 0/var(--w) var(--arm) no-repeat,
   linear-gradient(var(--k),var(--k)) 100% 0/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 100% 0/var(--w) var(--arm) no-repeat,
   linear-gradient(var(--k),var(--k)) 0 100%/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 0 100%/var(--w) var(--arm) no-repeat,
@@ -125,9 +128,13 @@ td svg{width:15px;stroke:var(--cyan);stroke-width:2.4;fill:none;vertical-align:m
 tr.e td{background:color-mix(in srgb,var(--ec) 10%,transparent);color:var(--ec);font-weight:600;text-align:left;border-bottom:1px solid color-mix(in srgb,var(--ec) 35%,transparent)}
 tr.e td:last-child{text-align:right}
 @media(max-width:1100px){.g1,.g2{grid-template-columns:1fr}.sum{grid-template-columns:1fr 1fr}.head{flex-direction:column;align-items:flex-start}}
+.frz{font-size:12px;color:var(--cyan);border:1px solid var(--line);padding:0 6px;margin-left:6px;white-space:nowrap}
+.pend{display:inline-block;width:12px;height:12px;border:1.5px solid var(--muted);border-radius:50%;vertical-align:middle}
 @media(max-width:1023px){header{flex-wrap:wrap;padding:12px 16px 0;gap:8px 12px}.chips{margin-left:auto}nav{order:3;flex:0 0 100%;margin:0 -16px;padding:0;gap:0;border-top:1px solid var(--line)}nav a{flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 4px}nav a[aria-current]::after{bottom:0}}
 @media(max-width:700px){header{padding:12px 16px 0;gap:8px 12px}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{padding:16px}td:nth-child(n+2):nth-child(-n+6),th:nth-child(n+2):nth-child(-n+6){padding:8px 2px}}
 @media(max-width:380px){.chips .chip:first-child{display:none}}
+@media(max-width:640px){.panel::before,.drawer::before{--a0:10px;--a1:16px}}
+@media(max-width:640px){.f{min-height:44px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}.ln{stroke-dashoffset:0}.ar,.mk{opacity:1}}
 [data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
 [data-motion=off] #fx,[data-motion=off] .scan{display:none}
@@ -138,7 +145,7 @@ tr.e td:last-child{text-align:right}
 <header>
   <div class="logo">Daily Tracker</div>
   <nav aria-label="Primary"><a href="today.html">Today</a><a href="tasks.html">Tasks</a><a href="rewards.html">Rewards</a><a href="#" aria-current="page">History</a><a href="#">Settings</a></nav>
-  <div class="chips"><div class="chip"><span>Rank</span><b id="cRank"></b></div><div class="chip"><span>Streak</span><b id="cStreak"></b></div><div class="chip"><span>Wallet</span><i class="coin"></i><b>65</b></div></div>
+  <div class="chips"><div class="chip rk"><span>Rank</span><b id="cRank"></b></div><div class="chip"><span>Streak</span><b id="cStreak"></b></div><div class="chip"><span>Wallet</span><i class="coin"></i><b>65</b></div></div>
 </header>
 <main>
   <div class="head boot" style="--i:0">
@@ -156,43 +163,49 @@ tr.e td:last-child{text-align:right}
   </div>
   <div class="g2">
     <section class="panel boot" style="--i:5" aria-label="Calendar"><div class="row"><h2>Calendar</h2><span class="sub">Red = many missed stats</span></div><div class="cal" id="cal"></div></section>
-    <section class="panel boot" style="--i:6" aria-label="Daily log"><h2>Daily log</h2><div class="lw"><table id="log"><thead><tr><th>Date</th><th>Str</th><th>Vit</th><th>Int</th><th>Disc</th><th>Soc</th><th>Net points</th></tr></thead><tbody></tbody></table></div></section>
+    <section class="panel boot" style="--i:6" aria-label="Daily log"><h2>Daily log</h2><div class="lw"><table id="log"><thead><tr><th>Date</th><th>Str</th><th>Vit</th><th>Int</th><th>Disc</th><th>Soc</th><th>Net points</th></tr></thead><tbody></tbody></table></div><div id="moreWrap" style="margin-top:12px"></div></section>
   </div>
 </main>
 
 <script>
 const $=id=>document.getElementById(id),reduce=(matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.motion==='off');
 /* ===== Simulasi kecil dari aturan PRD (data demo; di app semua ini berasal dari engine) ===== */
-const MASKS='11111 11011 11111 11110 11111 11111 11111 10101 11111 11111 11011 11111 11111 00100 00000 00000 00000 11111 11111 11101 11111 11111 11111 01111 11111 11111 11110 11111 11111 11111'.split(' ');
+let MASKS='11111 11011 11111 11110 11111 11111 11111 10101 11111 11111 11011 11111 11111 00100 00000 00000 00000 11111 11111 11101 11111 11111 11111 01111 11111 11111 11110 11111 11111 11111'.split(' ');
+const HSTATE=new URLSearchParams(location.search).get('state')||'';
+if(HSTATE==='long'){const B=[...MASKS];MASKS=Array.from({length:150},(_,i)=>B[i%B.length])}
+if(HSTATE==='open')MASKS=[...MASKS.slice(0,-1),'11010'];
+const FRZ={E:1,D:1,C:2,B:2,A:3,S:3},wk=d=>{const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x.toDateString()};let frzWeek=null,frzUsed=0;
 const MULT={E:.5,D:.7,C:.85,B:1,A:1.15,S:1.3},PEN={E:5,D:8,C:13,B:20,A:30,S:45},ORD='EDCBAS';
 const lvl=x=>x<=0?1:Math.floor(Math.sqrt(x/14))+1,rk=l=>l>=51?'S':l>=36?'A':l>=21?'B':l>=11?'C':l>=6?'D':'E';
 const SK=['Str','Vit','Int','Disc','Soc'],today=new Date();today.setHours(0,0,0,0);
-const D=[],EV=[];let xp=300,rank=rk(lvl(xp)),streak=0,tot=0,got7=false,got100=false;
+const D=[],EV=[];let xp=HSTATE==='long'?0:300,rank=rk(lvl(xp)),streak=0,tot=0,got7=false,got100=false;
 MASKS.forEach((m,i)=>{
   const c=[...m].filter(x=>x==='1').length,r0=rank,L0=lvl(xp),pre=xp,date=new Date(today);date.setDate(today.getDate()-(MASKS.length-1-i));
-  xp=Math.max(0,xp+c*Math.ceil(5*MULT[r0])-(5-c)*PEN[r0]);const L=lvl(xp);let nr=rk(L);
+  const open=HSTATE==='open'&&i===MASKS.length-1;
+  xp=Math.max(0,xp+c*Math.ceil(5*MULT[r0])-(open?0:(5-c)*PEN[r0]));const L=lvl(xp);let nr=rk(L);
   if(ORD.indexOf(nr)>ORD.indexOf(r0)+1)nr=ORD[ORD.indexOf(r0)+1];rank=nr;
-  streak=c>0?streak+1:0;tot+=c;
-  const d={i,date,m,c,net:xp-pre,xp,rank,L,streak,ev:[]};D.push(d);
+  let freeze=false;if(c>0)streak+=1;else if(!open){const w=wk(date);if(w!==frzWeek){frzWeek=w;frzUsed=0}if(frzUsed<FRZ[r0]){frzUsed++;freeze=true}else streak=0}
+  tot+=c;
+  const d={i,date,m,c,net:xp-pre,xp,rank,L,streak,freeze,open,ev:[]};D.push(d);
   if(nr!==r0){d.ev.push({k:ORD.indexOf(nr)>ORD.indexOf(r0)?'up':'down',t:`${ORD.indexOf(nr)>ORD.indexOf(r0)?'Rank up':'Rank down'}: ${r0} to ${nr}`,s:`Level ${L} · ${xp} XP`})}
   else if(L>L0)d.ev.push({k:'lv',t:`Level up: ${L0} to ${L}`,s:`${xp} XP`});
   if(streak>=7&&!got7){got7=true;d.ev.push({k:'ms',t:'New title: Konsisten 7 hari',s:'Streak reached 7'})}
   if(tot>=100&&!got100){got100=true;d.ev.push({k:'ms',t:'New title: 100 tugas selesai',s:'100 tasks completed'})}
   d.ev.forEach(e=>EV.push({...e,d}));
 });
-$('cRank').textContent=rank;$('cStreak').textContent=streak;
+document.documentElement.dataset.rank=rank;$('cRank').textContent=rank;$('cStreak').textContent=streak;
 const fmt=(d,o={day:'numeric',month:'short'})=>d.toLocaleDateString('en-GB',o);
 const EC={up:'--blue',down:'--danger',lv:'--cyan',ms:'--monarch'},EG={up:'▲',down:'▼',lv:'◆',ms:'★'};
-let range=30,sel=D.length-1,lay=null;
-const view=()=>D.slice(-range);
+let range=7,shown=60,sel=D.length-1,lay=null;
+const view=()=>range==='All'?D.slice(-shown):D.slice(-range);
 
 /* summary */
 function summary(){const v=view(),start=v[0].xp-v[0].net,delta=v[v.length-1].xp-start,perfect=v.filter(d=>d.c===5).length;
   const miss=SK.map((s,i)=>({s,n:v.filter(d=>d.m[i]==='0').length})).sort((a,b)=>b.n-a.n)[0];
-  const cards=[['Lifetime XP',v[v.length-1].xp.toLocaleString('en-GB'),`<span class="${delta>=0?'up':'dn'}">${delta>=0?'+':''}${delta}</span> in ${range} days`],
+  const cards=[['Lifetime XP',v[v.length-1].xp.toLocaleString('en-GB'),`<span class="${delta>=0?'up':'dn'}">${delta>=0?'+':''}${delta}</span> in ${v.length} days`],
    ['Current streak',`${streak} days`,'Consecutive days with a completion'],
    ['Perfect days',`${perfect} / ${v.length}`,'All stats completed'],
-   ['Most often missed',miss.n?miss.s:'—',miss.n?`${miss.n} times in ${range} days`:'None']];
+   ['Most often missed',miss.n?miss.s:'—',miss.n?`${miss.n} times in ${v.length} days`:'None']];
   $('sum').innerHTML=cards.map((c,i)=>`<div class="panel boot" style="--i:${i+1}"><small>${c[0]}</small><b>${c[1]}</b><em>${c[2]}</em></div>`).join('');
   $('rangeTxt').textContent=`${fmt(v[0].date)} – ${fmt(v[v.length-1].date,{day:'numeric',month:'short',year:'numeric'})}`}
 
@@ -214,10 +227,10 @@ function chart(){const v=view(),n=v.length;
     else h+=`<rect class="mk" style="--d:${i}" x="${cx-5}" y="${cy-5}" width="10" height="10" transform="rotate(45 ${cx} ${cy})" fill="var(--bg)" stroke="${c}" stroke-width="2"/>`}));
   h+=`<g id="cur" style="display:none"><line id="cl" y1="${PT}" y2="${H-PB}" stroke="var(--cyan)" stroke-opacity=".55" stroke-dasharray="3 4"/><circle id="cc" r="5" fill="var(--cyan)" style="filter:drop-shadow(0 0 8px var(--blue))"/></g>`;
   $('chart').innerHTML=h;lay.y=y;
-  $('chart').setAttribute('aria-label',`Lifetime XP chart, ${range} days: from ${v[0].xp-v[0].net} to ${v[n-1].xp} XP, ${v.reduce((a,d)=>a+d.ev.length,0)} key events`)}
+  $('chart').setAttribute('aria-label',`Lifetime XP chart, ${n} days: from ${v[0].xp-v[0].net} to ${v[n-1].xp} XP, ${v.reduce((a,d)=>a+d.ev.length,0)} key events`)}
 function cursor(i){const v=lay.v;if(i<0||i>=v.length)return;const d=v[i],cx=lay.x(i),cy=lay.y(d.xp);
   $('cur').style.display='';$('cl').setAttribute('x1',cx);$('cl').setAttribute('x2',cx);$('cc').setAttribute('cx',cx);$('cc').setAttribute('cy',cy);
-  const t=$('tip');t.innerHTML=`<b>${fmt(d.date,{weekday:'short',day:'numeric',month:'short'})}</b><div><span>Lifetime XP</span><span>${d.xp}</span></div><div><span>Net points</span><span class="${d.net>=0?'up':'dn'}">${d.net>=0?'+':''}${d.net}</span></div><div><span>Stats completed</span><span>${d.c}/5</span></div>${d.ev.map(e=>`<div style="color:var(${EC[e.k]})"><span>${EG[e.k]} ${e.t}</span><span></span></div>`).join('')}`;
+  const t=$('tip');t.innerHTML=`<b>${fmt(d.date,{weekday:'short',day:'numeric',month:'short'})}</b><div><span>Lifetime XP</span><span>${d.xp}</span></div><div><span>Net points</span><span class="${d.net>=0?'up':'dn'}">${d.net>=0?'+':''}${d.net}</span></div><div><span>Stats completed</span><span>${d.c}/5</span></div>${d.freeze?'<div><span>Freeze used</span><span></span></div>':''}${d.open?'<div><span>Day still open</span><span></span></div>':''}${d.ev.map(e=>`<div style="color:var(${EC[e.k]})"><span>${EG[e.k]} ${e.t}</span><span></span></div>`).join('')}`;
   t.style.left=(cx/W*100)+'%';t.style.top=(cy/H*100)+'%';t.classList.add('on');
   const idx=D.indexOf(d);mark(idx)}
 function mark(idx){sel=idx;document.querySelectorAll('tr.d').forEach(r=>r.classList.toggle('sel',+r.dataset.i===idx));document.querySelectorAll('.cal button').forEach(b=>b.classList.toggle('sel',+b.dataset.i===idx))}
@@ -231,12 +244,12 @@ ch.addEventListener('focus',()=>cursor(Math.max(0,lay.v.indexOf(D[sel]))));
 function events(){const v=new Set(view()),l=EV.filter(e=>v.has(e.d)).reverse();
   $('evs').innerHTML=l.length?l.map(e=>`<li><button class="ev ${e.k==='up'||e.k==='down'?'big':''}" style="--ec:var(${EC[e.k]})" data-i="${e.d.i}"><span class="g">${EG[e.k]}</span><span><b>${e.t}</b><small>${fmt(e.d.date,{weekday:'short',day:'numeric',month:'short'})} · ${e.s}</small></span></button></li>`).join(''):'<li class="sub">No events in this range.</li>'}
 function calendar(){const v=view(),off=(v[0].date.getDay()+6)%7;
-  $('cal').innerHTML=['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map(s=>`<span>${s}</span>`).join('')+'<i></i>'.repeat(off)+
-   v.map(d=>`<button data-i="${d.i}" data-l="${d.c>=5?3:d.c===4?2:d.c===3?1:'x'}" aria-label="${fmt(d.date)}: ${d.c} of 5 stats completed">${d.date.getDate()}</button>`).join('')}
+  $('cal').innerHTML=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(s=>`<span>${s}</span>`).join('')+'<i></i>'.repeat(off)+
+   v.map(d=>`<button data-i="${d.i}" data-l="${d.c>=5?3:d.c===4?2:d.c===3?1:'x'}" aria-label="${fmt(d.date)}: ${d.c} of 5 stats completed${d.freeze?', freeze used':''}">${d.date.getDate()}</button>`).join('')}
 const chk='<svg viewBox="0 0 14 14"><path d="M2 7.500l3.200 3L12 3.500"/></svg>';
 function log(){let h='';[...view()].reverse().forEach(d=>{
   d.ev.forEach(e=>h+=`<tr class="e" style="--ec:var(${EC[e.k]})"><td colspan="6">${EG[e.k]} ${e.t}</td><td></td></tr>`);
-  h+=`<tr class="d" tabindex="0" data-i="${d.i}"><td>${fmt(d.date)}</td>${[...d.m].map(x=>`<td>${x==='1'?chk:'<span class="no" aria-label="missed">—</span>'}</td>`).join('')}<td class="net ${d.net>=0?'up':'dn'}">${d.net>=0?'+':''}${d.net}</td></tr>`});
+  h+=`<tr class="d" tabindex="0" data-i="${d.i}"><td>${fmt(d.date)}${d.freeze?' <span class="frz">Freeze used</span>':''}</td>${[...d.m].map(x=>`<td>${x==='1'?chk:(d.open?'<span class="pend" aria-label="pending"></span>':'<span class="no" aria-label="missed">—</span>')}</td>`).join('')}<td class="net ${d.net>=0?'up':'dn'}">${d.net>=0?'+':''}${d.net}</td></tr>`});
   document.querySelector('#log tbody').innerHTML=h}
 function pick(i){const k=lay.v.indexOf(D[i]);if(k>=0){cursor(k);document.querySelector(`tr.d[data-i="${i}"]`)?.scrollIntoView({block:'nearest',behavior:reduce?'auto':'smooth'})}}
 $('evs').onclick=e=>{const b=e.target.closest('[data-i]');b&&pick(+b.dataset.i)};
@@ -244,10 +257,11 @@ $('cal').onclick=e=>{const b=e.target.closest('[data-i]');b&&pick(+b.dataset.i)}
 $('log').addEventListener('click',e=>{const r=e.target.closest('tr.d');r&&pick(+r.dataset.i)});
 $('log').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const r=e.target.closest('tr.d');if(r){e.preventDefault();pick(+r.dataset.i)}}});
 
-function render(){summary();chart();events();calendar();log();if(!lay.v.includes(D[sel]))sel=D.length-1;mark(sel);$('tip').classList.remove('on');$('cur').style.display='none'}
-$('ranges').innerHTML=[7,14,30].map(n=>`<button class="f" data-r="${n}" aria-pressed="${n===range}">${n} days</button>`).join('');
-$('ranges').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;range=+b.dataset.r;document.querySelectorAll('#ranges .f').forEach(x=>x.setAttribute('aria-pressed',x===b));
+function render(){summary();chart();events();calendar();log();$('moreWrap').innerHTML=range==='All'&&D.length>shown?'<button class="f" id="more">Show more</button>':'';if(!lay.v.includes(D[sel]))sel=D.length-1;mark(sel);$('tip').classList.remove('on');$('cur').style.display='none'}
+$('ranges').innerHTML=[7,30,'All'].map(n=>`<button class="f" data-r="${n}" aria-pressed="${n===range}">${n==='All'?'All':n+' days'}</button>`).join('');
+$('ranges').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;range=b.dataset.r==='All'?'All':+b.dataset.r;document.querySelectorAll('#ranges .f').forEach(x=>x.setAttribute('aria-pressed',x===b));
   document.querySelectorAll('.sum .panel').forEach(p=>p.style.animation='none');render()};
+$('moreWrap').onclick=e=>{if(e.target.id==='more'){shown+=60;render()}};
 /* particles */
 const cv=$('fx'),cx=cv.getContext('2d');let P=[],raf;const size=()=>{cv.width=innerWidth;cv.height=innerHeight};
 function loop(){cx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.y-=p.v;if(p.y<-5){p.y=cv.height+5;p.x=Math.random()*cv.width}cx.fillStyle=`rgba(${document.documentElement.dataset.theme==='light'?'22,115,201':'138,219,255'},${p.a})`;cx.fillRect(p.x,p.y,p.r,p.r)});raf=requestAnimationFrame(loop)}

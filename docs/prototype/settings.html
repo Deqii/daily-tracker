@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" data-rank="E">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,6 +21,7 @@
   --ease:cubic-bezier(.2,.8,.2,1); --t-fast:.15s; --t-base:.35s; --t-slow:.7s; --stagger:70ms;
   --ins2:rgba(5,7,13,.6); --scan:rgba(61,169,255,.12); --track:rgba(255,255,255,.08); --lock-text:#c3d0e4; --monarch-soft:#b7a4ff;
   --tier-r:#4ade9a; --tier-s:#3da9ff; --tier-b:#ff8a9a;
+  --accent:var(--rk-e);
   color-scheme:dark;
 }
 [data-theme=light]{
@@ -36,6 +37,7 @@
   --tier-r:#12804a; --tier-s:#1673c9; --tier-b:#c8365a;
   color-scheme:light;
 }
+[data-rank=E]{--accent:var(--rk-e)}[data-rank=D]{--accent:var(--rk-d)}[data-rank=C]{--accent:var(--rk-c)}[data-rank=B]{--accent:var(--rk-b)}[data-rank=A]{--accent:var(--rk-a)}[data-rank=S]{--accent:var(--rk-s)}
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);color:var(--text);font:400 15px/1.5 var(--font-body);min-height:100vh;overflow-x:hidden;transition:background var(--t-base),color var(--t-base)}
 body::before{content:"";position:fixed;inset:0;z-index:-2;
@@ -51,11 +53,12 @@ nav{display:flex;gap:6px;flex:1}nav a{color:var(--muted);text-decoration:none;pa
 nav a[aria-current]::after{content:"";position:absolute;left:12px;right:12px;bottom:-15px;height:2px;background:var(--blue);box-shadow:0 0 12px var(--blue)}
 .chips{display:flex;gap:8px}.chip{border:1px solid var(--line);border-radius:var(--r-chip);padding:4px 12px;font:500 13px var(--font-mono);background:var(--panel);display:flex;gap:8px;align-items:center}
 .chip span{color:var(--muted);font-family:var(--font-body)}
+.chip.rk{border-color:var(--accent);color:var(--accent)}.chip.rk b{color:var(--accent)}
 .coin{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 30%,#fff3b8,var(--gold) 55%,#b8860b)}
 @property --arm{syntax:'<length>';inherits:false;initial-value:14px}
 .panel,.drawer{position:relative;background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:var(--r-panel);box-shadow:var(--glow)}
 .panel{padding:22px}
-.panel::before,.drawer::before,.penalty::before,.stat::before,.rw::before{content:"";position:absolute;inset:-1px;pointer-events:none;--k:var(--bc,var(--blue));--a0:14px;--a1:26px;--w:2px;
+.panel::before,.drawer::before,.penalty::before,.stat::before,.rw::before{content:"";position:absolute;inset:-1px;pointer-events:none;--k:var(--bc,var(--accent));--a0:14px;--a1:26px;--w:2px;
   background:linear-gradient(var(--k),var(--k)) 0 0/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 0 0/var(--w) var(--arm) no-repeat,
   linear-gradient(var(--k),var(--k)) 100% 0/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 100% 0/var(--w) var(--arm) no-repeat,
   linear-gradient(var(--k),var(--k)) 0 100%/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 0 100%/var(--w) var(--arm) no-repeat,
@@ -138,6 +141,8 @@ span.ok{color:var(--ok)}span.bad{color:var(--danger)}
 @media(max-width:1023px){header{flex-wrap:wrap;padding:12px 16px 0;gap:8px 12px}.chips{margin-left:auto}nav{order:3;flex:0 0 100%;margin:0 -16px;padding:0;gap:0;border-top:1px solid var(--line)}nav a{flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 4px}nav a[aria-current]::after{bottom:0}}
 @media(max-width:700px){header{padding:12px 16px 0;gap:8px 12px}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{padding:16px}.ranks{grid-template-columns:1fr 1fr}}
 @media(max-width:380px){.chips .chip:first-child{display:none}}
+@media(max-width:640px){.panel::before,.drawer::before{--a0:10px;--a1:16px}}
+@media(max-width:640px){.btn,.seg button,.f{min-height:44px}.set{min-height:56px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}}
 [data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
 [data-motion=off] #fx,[data-motion=off] .scan{display:none}
@@ -148,7 +153,7 @@ span.ok{color:var(--ok)}span.bad{color:var(--danger)}
 <header>
   <div class="logo">Daily Tracker</div>
   <nav aria-label="Primary"><a href="today.html">Today</a><a href="tasks.html">Tasks</a><a href="rewards.html">Rewards</a><a href="history.html">History</a><a href="#" aria-current="page">Settings</a></nav>
-  <div class="chips"><div class="chip"><span>Rank</span><b>E</b></div><div class="chip"><span>Streak</span><b>5</b></div><div class="chip"><span>Wallet</span><i class="coin"></i><b>65</b></div></div>
+  <div class="chips"><div class="chip rk"><span>Rank</span><b>E</b></div><div class="chip"><span>Streak</span><b>5</b></div><div class="chip"><span>Wallet</span><i class="coin"></i><b>65</b></div></div>
 </header>
 <main>
   <div class="boot" style="--i:0"><h1>Settings</h1><p class="sub">Appearance, rank rules, titles and data backup.</p></div>
