@@ -45,8 +45,8 @@ export const PAGES = [
 
 export type PageSpec = (typeof PAGES)[number];
 
-export function protoUrl(p: PageSpec): string {
-  return `${PROTO}/${p.proto}`;
+export function protoUrl(p: PageSpec, state: string | null = null): string {
+  return `${PROTO}/${p.proto}${state === null ? '' : `?state=${state}`}`;
 }
 
 /**
@@ -63,8 +63,8 @@ export type Theme = (typeof THEMES)[number];
  * parameter lands inside the fragment, the router never matches the route and
  * falls back to the default page.
  */
-export function appUrl(p: PageSpec): string {
-  return `${APP}/?fixture=${p.name}#/${p.route}`;
+export function appUrl(p: PageSpec, state: string | null = null): string {
+  return `${APP}/?fixture=${p.name}${state === null ? '' : `&state=${state}`}#/${p.route}`;
 }
 
 export function slug(p: PageSpec, vp: Viewport): string {
@@ -151,7 +151,33 @@ export async function open(page: Page, url: string): Promise<void> {
   // it is hidden on both sides rather than diffed.
   await page.addStyleTag({ content: '#fx,.scan,#demo{display:none!important}' });
   await page.waitForTimeout(SETTLE_MS);
+  await settleFiniteAnimations(page);
   await settleFrames(page);
+}
+
+/**
+ * Waits for every finite CSS animation and transition to reach its end state.
+ *
+ * The settle window is long enough for all of them on a warm page, but the app
+ * mounts from a dynamic import, so on a cold or slow run the XP bar's width
+ * transition can still be in flight at the end of it. The prototype and the app
+ * would then be read at different points of the same transition. Infinite
+ * animations (the caret, the bracket breathe) never finish, so they are skipped;
+ * a timeout keeps a broken animation from hanging the harness.
+ */
+async function settleFiniteAnimations(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    const finite = document.getAnimations().filter((animation) => {
+      const timing = animation.effect?.getTiming();
+
+      return timing !== undefined && timing.iterations !== Infinity;
+    });
+
+    await Promise.race([
+      Promise.all(finite.map((animation) => animation.finished.catch(() => undefined))),
+      new Promise((resolve) => setTimeout(resolve, 1000)),
+    ]);
+  });
 }
 
 /** Two committed frames: a style change is only guaranteed painted after one. */
@@ -200,12 +226,13 @@ export async function openPrototype(
   browser: Browser,
   p: PageSpec,
   vp: Viewport,
-  theme: Theme = 'dark'
+  theme: Theme = 'dark',
+  state: string | null = null
 ): Promise<Page> {
   const context = await newIsolatedContext(browser, vp, theme);
   const page = await context.newPage();
 
-  await open(page, protoUrl(p));
+  await open(page, protoUrl(p, state));
 
   return page;
 }
@@ -214,12 +241,13 @@ export async function openApp(
   browser: Browser,
   p: PageSpec,
   vp: Viewport,
-  theme: Theme = 'dark'
+  theme: Theme = 'dark',
+  state: string | null = null
 ): Promise<Page> {
   const context = await newIsolatedContext(browser, vp, theme);
   const page = await context.newPage();
 
-  await open(page, appUrl(p));
+  await open(page, appUrl(p, state));
 
   return page;
 }

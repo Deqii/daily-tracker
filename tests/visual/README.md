@@ -1,15 +1,17 @@
 # Visual fidelity harness (UI Revamp)
 
 Compares each `docs/prototype/*.html` page with the Svelte app at 1280x800 and
-390x844, in the dark and the light theme. Five independent specs:
+390x844, in the dark and the light theme. Six independent specs:
 
-| Spec                         | Asserts                                                                               |
-| ---------------------------- | ------------------------------------------------------------------------------------- |
-| `health.spec.ts`             | the app booted: no `pageerror` / `console.error`, right route, expected first heading |
-| `fidelity.spec.ts`           | **pixel diff** (full-page screenshots vs `pixelmatch`) and **computed-style diff**    |
-| `selftest.spec.ts`           | the harness is deterministic: the same page rendered twice agrees                     |
-| `shell.spec.ts`              | the app shell: the `header` region, per page, per viewport, per theme                 |
-| `today-interactions.spec.ts` | the Today page's interactions: the same action on both sides, then the same diffs     |
+| Spec                                | Asserts                                                                               |
+| ----------------------------------- | ------------------------------------------------------------------------------------- |
+| `health.spec.ts`                    | the app booted: no `pageerror` / `console.error`, right route, expected first heading |
+| `fidelity.spec.ts`                  | **pixel diff** (full-page screenshots vs `pixelmatch`) and **computed-style diff**    |
+| `selftest.spec.ts`                  | the harness is deterministic: the same page rendered twice agrees                     |
+| `shell.spec.ts`                     | the app shell: the `header` region, per page, per viewport, per theme                 |
+| `today-interactions.spec.ts`        | the Today page's interactions: the same action on both sides, then the same diffs     |
+| `today-states.spec.ts`              | every reusable Today state (`?state=`) at 1280x800 dark, 390x844 dark, 1280x800 light |
+| `today-states-interactions.spec.ts` | the states' mechanics and keyboard/ARIA paths                                         |
 
 They are separate on purpose. Health describes whether the app works, the diffs
 describe whether it matches, the self-test describes whether the diffs can be
@@ -24,6 +26,7 @@ npm run test:visual -- selftest          # harness self-test only
 npm run test:visual -- shell             # header region only
 npm run test:visual -- fidelity health   # the page diffs and health checks
 npm run test:visual -- today-interactions # the Today interactions (3 scenarios x 2 themes)
+npm run test:visual -- today-states   # the Today state diffs + interactions
 npm run test:visual -- --grep "today"    # one page
 npm run test:visual -- --grep "@ 390"    # one viewport
 npm run test:visual -- --grep "light"    # one theme
@@ -157,6 +160,22 @@ rather than the fixture's numbers.
 
 Output goes to `test-results/visual/today-1280-<theme>-<scenario>/`.
 
+## The Today state tests
+
+`today.html?state=<name>` and `/?fixture=today&state=<name>#/today` render the
+same page for every state the app can reproduce. `today-states.spec.ts` runs the
+full-page pixel and computed-style diffs for each of them at **1280x800 dark,
+390x844 dark and 1280x800 light**; `today-states-interactions.spec.ts` then
+exercises the behaviour through the app's own code (tier picker, Escape and focus
+return, engine-derived blocked/freeze lines, title/empty state, overlay focus and
+Escape, rank-down dismissal, both banners, reduced motion).
+
+Supported states: `tiers`, `freeze0`, `blocked`, `notitle`, `empty`, `levelup`,
+`rankup`, `rankdown`, `storage`, `recovery`. `freeze2` is intentionally absent:
+Rank E allows one freeze per week, so the engine cannot produce the prototype's
+two-freeze page without changing the rank. It is recorded in
+`docs/prototype/DEVIATIONS.md` (Q10) and reported in the PR rather than faked.
+
 ## What makes the two sides comparable
 
 |                   |                                                                                                                            |
@@ -278,7 +297,8 @@ The visual build goes to `dist-visual/`, which the script is expected to _fail_
 on; that is what proves the marker is real rather than a check that can never
 fire.
 
-The fixture parameter goes **before** the hash: `/?fixture=today#/today`. After
+The fixture parameter goes **before** the hash: `/?fixture=today#/today`, and a
+state is another query parameter: `/?fixture=today&state=tiers#/today`. After
 the hash it lands inside the fragment, the router never matches, and the app
 falls back to the default page.
 
@@ -290,13 +310,14 @@ seed `localStorage` too late to be seen, and every page would quietly render its
 first-run defaults - Rank `E`, Streak `0`, Wallet `0` in the header - which is a
 diff that reads like a styling problem and is not one.
 
-| `?fixture=` | Source in the prototype                                           |
-| ----------- | ----------------------------------------------------------------- |
-| `today`     | `S`, `Q`, `R` and the 14 `heat` levels in `today.html`            |
-| `tasks`     | the `T` array and the `pick` flags in `tasks.html`                |
-| `rewards`   | the `R` and `L` arrays in `rewards.html`                          |
-| `history`   | `src/lib/fixtures/history-snapshot.json`, dumped from `{ D, EV }` |
-| `settings`  | `SX`, `RANKS`, `TT` and `un` in `settings.html`                   |
+| `?fixture=`       | Source in the prototype                                           |
+| ----------------- | ----------------------------------------------------------------- |
+| `today`           | `S`, `Q`, `R` and the 14 `heat` levels in `today.html`            |
+| `tasks`           | the `T` array and the `pick` flags in `tasks.html`                |
+| `rewards`         | the `R` and `L` arrays in `rewards.html`                          |
+| `history`         | `src/lib/fixtures/history-snapshot.json`, dumped from `{ D, EV }` |
+| `settings`        | `SX`, `RANKS`, `TT` and `un` in `settings.html`                   |
+| `today` + `state` | `today.html?state=`, via `today-states-snapshot.json`             |
 
 Notes on the data:
 
