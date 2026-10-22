@@ -62,6 +62,11 @@ jobs:
       - run: npx playwright test fidelity --grep today
       - run: npx playwright test health --grep today
       - run: npx playwright test today-interactions
+      # The reusable Today states from the batch-2 audit: the same pixel and
+      # computed-style diffs for each state at 1280x800 dark, 390x844 dark and
+      # 1280x800 light, plus the state mechanics, keyboard paths and ARIA roles.
+      - run: npx playwright test today-states
+      - run: npx playwright test today-states-interactions
 
   visual-fidelity:
     name: visual-fidelity (informational)
