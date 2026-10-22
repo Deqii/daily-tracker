@@ -67,6 +67,8 @@ export async function buildHistory(page) {
         levelEnd: d.L,
         rankEnd: d.rank,
         streakEnd: d.streak,
+        freeze: d.freeze,
+        open: d.open,
         events: d.ev.map((e) => ({ kind: e.k, title: e.t, subtitle: e.s })),
       })),
       events: EV.map((e) => ({
@@ -130,6 +132,99 @@ export async function buildToday(page) {
   };
 }
 
+/**
+ * The deterministic Today states in `today.html?state=...`. The page is reloaded
+ * once per state and the state's rendered values are read back, so the app can
+ * seed the same state from data instead of copying the prototype's demo logic.
+ */
+export async function buildTodayStates(page) {
+  const base = page.url().split('?')[0];
+  const names = [
+    'default',
+    'tiers',
+    'freeze2',
+    'freeze0',
+    'blocked',
+    'notitle',
+    'empty',
+    'levelup',
+    'rankup',
+    'rankdown',
+    'storage',
+    'recovery',
+  ];
+
+  const states = {};
+
+  for (const name of names) {
+    const query = name === 'default' ? '' : `?state=${name}`;
+
+    await page.goto(`${base}${query}`);
+    await page.waitForTimeout(200);
+
+    /* eslint-disable no-undef */
+    states[name] = await page.evaluate(() => {
+      const text = (selector) => document.querySelector(selector)?.textContent ?? null;
+      const overlay = document.querySelector('.ov');
+      const banner = document.querySelector('.banner');
+
+      return {
+        rank: text('.chip.rk b'),
+        level: Number(text('#lvl')),
+        xp: S.xp,
+        wallet: S.wallet,
+        stats: { ...S.stat },
+        multiplier: S.mult,
+        title: TITLE,
+        freezes: FREEZES,
+        quests: Q.map((q) => ({
+          stat: q.s,
+          name: q.n,
+          nominal: q.nom ?? null,
+          need: q.need,
+          done: q.done,
+          tiers: q.tiers?.map((t) => ({ name: t.n, description: t.d, nominal: t.nom })) ?? null,
+        })),
+        qCount: text('#qCount'),
+        blocked: text('.blocked'),
+        emptyTitle: text('.empty h2'),
+        penaltyTitle: text('#penTitle'),
+        message: text('#qMsg'),
+        overlay:
+          overlay === null
+            ? null
+            : {
+                role: overlay.getAttribute('role'),
+                label: text('.ovp small'),
+                big: text('.ovp .big'),
+                text: text('.ovp p'),
+                details: [...overlay.querySelectorAll('dt')].map((dt, i) => [
+                  dt.textContent,
+                  overlay.querySelectorAll('dd')[i]?.textContent ?? null,
+                ]),
+              },
+        notice: text('.notice'),
+        banner:
+          banner === null
+            ? null
+            : {
+                role: banner.getAttribute('role'),
+                recovery: banner.classList.contains('recovery'),
+                text: banner.innerText,
+              },
+      };
+    });
+    /* eslint-enable no-undef */
+  }
+
+  return {
+    source: 'docs/prototype/today.html',
+    note: "Prototype states from today.html?state=: rendered values, not engine output. 'default' is the unparameterised page.",
+    fixedTime: '2026-10-15T09:00:00+07:00',
+    states,
+  };
+}
+
 /* ------------------------------------------------------------------ targets */
 
 export const TARGETS = [
@@ -150,6 +245,26 @@ export const TARGETS = [
     file: 'today.html',
     out: join('src', 'lib', 'fixtures', 'today-snapshot.json'),
     build: buildToday,
+  },
+  {
+    name: 'today-states',
+    file: 'today.html',
+    out: join('src', 'lib', 'fixtures', 'today-states-snapshot.json'),
+    build: buildTodayStates,
+  },
+  {
+    name: 'history-long',
+    file: 'history.html',
+    query: '?state=long',
+    out: join('src', 'lib', 'fixtures', 'history-long-snapshot.json'),
+    build: buildHistory,
+  },
+  {
+    name: 'history-open',
+    file: 'history.html',
+    query: '?state=open',
+    out: join('src', 'lib', 'fixtures', 'history-open-snapshot.json'),
+    build: buildHistory,
   },
 ];
 
@@ -186,7 +301,9 @@ export async function withPrototypes(names, fn) {
       const page = await context.newPage();
 
       await page.clock.setFixedTime(FIXED_TIME);
-      await page.goto(pathToFileURL(join(root, 'docs', 'prototype', target.file)).href);
+      await page.goto(
+        `${pathToFileURL(join(root, 'docs', 'prototype', target.file)).href}${target.query ?? ''}`
+      );
       await page.waitForTimeout(200);
 
       pages[target.name] = page;
@@ -232,11 +349,13 @@ if (invokedDirectly) {
 
   for (const { name, path, snapshot } of written) {
     const detail =
-      'days' in snapshot
-        ? `${snapshot.days.length} days, ${snapshot.events.length} events`
-        : 'purchases' in snapshot
-          ? `${snapshot.purchases.length} purchases, total ${snapshot.totalSpent}`
-          : `${snapshot.heatLevels.length} heat cells`;
+      'states' in snapshot
+        ? `${Object.keys(snapshot.states).length} states`
+        : 'days' in snapshot
+          ? `${snapshot.days.length} days, ${snapshot.events.length} events`
+          : 'purchases' in snapshot
+            ? `${snapshot.purchases.length} purchases, total ${snapshot.totalSpent}`
+            : `${snapshot.heatLevels.length} heat cells`;
 
     console.log(`wrote ${detail} to ${path} (${name})`);
   }

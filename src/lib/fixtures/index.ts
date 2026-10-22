@@ -36,6 +36,10 @@ function readRequestedName(): FixtureName | null {
   return (FIXTURE_NAMES as string[]).includes(requested) ? (requested as FixtureName) : null;
 }
 
+function readRequestedState(): string | null {
+  return new URLSearchParams(window.location.search).get('state');
+}
+
 function clearStorage(): void {
   try {
     localStorage.clear();
@@ -78,7 +82,9 @@ export function applyFixture(): void {
   const name = readRequestedName();
   if (name === null) return;
 
-  const fixture = FIXTURES[name];
+  const base = FIXTURES[name];
+  const state = readRequestedState();
+  const fixture = (state === null ? undefined : base.states?.[state]) ?? base;
   const seededTheme = readSeededTheme();
 
   clearStorage();
@@ -96,5 +102,25 @@ export function applyFixture(): void {
 
   if (seededTheme !== null) {
     localStorage.setItem(STORAGE_KEYS.theme, JSON.stringify(seededTheme));
+  }
+
+  if (fixture.post === 'recovery') {
+    // A corrupt non-visual key: the storage layer discards it, keeps a backup
+    // and reports recovery, while the Today data stays intact.
+    localStorage.setItem(STORAGE_KEYS.milestoneEvents, 'not-json');
+  }
+
+  if (fixture.post === 'storage-failure') {
+    // Every later write fails through the app's own save path, so the banner is
+    // driven by `saveError`, not by a component override.
+    const original = Storage.prototype.setItem;
+
+    Storage.prototype.setItem = function (key: string, value: string): void {
+      if (key.startsWith('daily-tracker:')) {
+        throw new DOMException('Quota exceeded', 'QuotaExceededError');
+      }
+
+      original.call(this, key, value);
+    };
   }
 }

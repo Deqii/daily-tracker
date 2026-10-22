@@ -1,0 +1,811 @@
+{
+  "source": "docs/prototype/today.html",
+  "note": "Prototype states from today.html?state=: rendered values, not engine output. 'default' is the unparameterised page.",
+  "fixedTime": "2026-10-15T09:00:00+07:00",
+  "states": {
+    "default": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 1,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Baca 10 halaman",
+          "nominal": 5,
+          "need": 1,
+          "done": 0,
+          "tiers": null
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": null,
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": null,
+      "notice": null,
+      "banner": null
+    },
+    "tiers": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 1,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Belajar coding",
+          "nominal": null,
+          "need": 1,
+          "done": 0,
+          "tiers": [
+            {
+              "name": "Easy",
+              "description": "30 menit",
+              "nominal": 5
+            },
+            {
+              "name": "Medium",
+              "description": "1 jam",
+              "nominal": 9
+            },
+            {
+              "name": "Hard",
+              "description": "2 jam",
+              "nominal": 15
+            }
+          ]
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": null,
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": null,
+      "notice": null,
+      "banner": null
+    },
+    "freeze2": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 2,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Baca 10 halaman",
+          "nominal": 5,
+          "need": 1,
+          "done": 0,
+          "tiers": null
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": null,
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": null,
+      "notice": null,
+      "banner": null
+    },
+    "freeze0": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 0,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Baca 10 halaman",
+          "nominal": 5,
+          "need": 1,
+          "done": 0,
+          "tiers": null
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": null,
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": null,
+      "notice": null,
+      "banner": null
+    },
+    "blocked": {
+      "rank": "E",
+      "level": 6,
+      "xp": 360,
+      "wallet": 65,
+      "stats": {
+        "STR": 110,
+        "VIT": 90,
+        "INT": 100,
+        "DISC": 53,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 1,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Baca 10 halaman",
+          "nominal": 5,
+          "need": 1,
+          "done": 0,
+          "tiers": null
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": "Rank-up blocked: raise Soc to 36 xp (now 7)",
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": null,
+      "notice": null,
+      "banner": null
+    },
+    "notitle": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": null,
+      "freezes": 1,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Baca 10 halaman",
+          "nominal": 5,
+          "need": 1,
+          "done": 0,
+          "tiers": null
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": null,
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": null,
+      "notice": null,
+      "banner": null
+    },
+    "empty": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 1,
+      "quests": [],
+      "qCount": "",
+      "blocked": null,
+      "emptyTitle": "No tasks yet",
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": null,
+      "notice": null,
+      "banner": null
+    },
+    "levelup": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 1,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Baca 10 halaman",
+          "nominal": 5,
+          "need": 1,
+          "done": 0,
+          "tiers": null
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": null,
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": {
+        "role": "dialog",
+        "label": "Level up",
+        "big": "4",
+        "text": "Level 3 to 4",
+        "details": []
+      },
+      "notice": null,
+      "banner": null
+    },
+    "rankup": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 1,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Baca 10 halaman",
+          "nominal": 5,
+          "need": 1,
+          "done": 0,
+          "tiers": null
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": null,
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": {
+        "role": "dialog",
+        "label": "Rank up",
+        "big": "D",
+        "text": "Rank D",
+        "details": [
+          [
+            "Freezes per week",
+            "1"
+          ],
+          [
+            "Max points per task",
+            "25"
+          ],
+          [
+            "Multiplier",
+            "×0.7"
+          ],
+          [
+            "Penalty per missed stat",
+            "−8"
+          ]
+        ]
+      },
+      "notice": null,
+      "banner": null
+    },
+    "rankdown": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 1,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Baca 10 halaman",
+          "nominal": 5,
+          "need": 1,
+          "done": 0,
+          "tiers": null
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": null,
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": null,
+      "notice": "Rank dropped to EDismiss",
+      "banner": null
+    },
+    "storage": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 1,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Baca 10 halaman",
+          "nominal": 5,
+          "need": 1,
+          "done": 0,
+          "tiers": null
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": null,
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": null,
+      "notice": null,
+      "banner": {
+        "role": "alert",
+        "recovery": false,
+        "text": "Your data could not be saved. Export it now so you don’t lose progress.\nExport data"
+      }
+    },
+    "recovery": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 1,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Baca 10 halaman",
+          "nominal": 5,
+          "need": 1,
+          "done": 0,
+          "tiers": null
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": null,
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": null,
+      "notice": null,
+      "banner": {
+        "role": "status",
+        "recovery": true,
+        "text": "Some saved data could not be used, so it was reset. A copy was kept.\nExport data\nDismiss"
+      }
+    }
+  }
+}
