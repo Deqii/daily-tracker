@@ -1,5 +1,6 @@
 <script lang="ts">
   import { freezesRemainingText, hasCompletionToday } from '../../lib/today-page';
+  import { rankUpBlockedLine } from '../../lib/today-lines';
   import { app } from '../../stores/app';
 
   /**
@@ -16,6 +17,7 @@
   const equippedTitle = app.equippedTitle;
   const streak = app.streak;
   const freezesLeft = app.freezesLeft;
+  const rankGate = app.rankGate;
 
   /** The pips are seven wide and light up from the left; today carries the flag (DEVIATIONS note 4). */
   const PIP_COUNT = 7;
@@ -32,6 +34,14 @@
     )
   );
 
+  let blockedText = $derived(
+    $rankGate.blocked && $rankGate.weakest !== null && $rankGate.current !== null
+      ? rankUpBlockedLine($rankGate.weakest, $rankGate.threshold, $rankGate.current)
+          .map((segment) => segment.text)
+          .join('')
+      : null
+  );
+
   function pipClass(index: number): string {
     if (index >= lit) return '';
     if (todayIsLit && index === lit - 1) return 'on today';
@@ -46,13 +56,13 @@
       ><polygon
         points="75,4 140,40 140,110 75,146 10,110 10,40"
         fill="none"
-        stroke="var(--blue)"
+        stroke="var(--accent)"
         stroke-opacity=".6"
         stroke-width="1.5"
       /><polygon
         points="75,16 128,46 128,104 75,134 22,104 22,46"
         fill="none"
-        stroke="var(--cyan)"
+        stroke="var(--accent)"
         stroke-opacity=".25"
         stroke-dasharray="4 6"
       /></svg
@@ -91,4 +101,7 @@
       {/each}
     </div>
   </div>
+  {#if blockedText !== null}
+    <div class="blocked">{blockedText}</div>
+  {/if}
 </section>

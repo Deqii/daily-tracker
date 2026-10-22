@@ -45,7 +45,7 @@ const SCOPE_ROOTS = ['@scope (body[data-page=today])'];
  * bodies are the prototype's; only the name moved. Every rename is listed in
  * `docs/prototype/DEVIATIONS.md` under "Mechanical renames".
  */
-const KEYFRAME_RENAMES = ['spin', 'shine', 'blink', 'pen', 'pulse', 'fl', 'rg'];
+const KEYFRAME_RENAMES = ['spin', 'shine', 'blink', 'pen', 'pulse', 'fl', 'rg', 'tiers-in'];
 
 /** `today-spin` -> `spin`, but only for a name on the rename list. */
 function unrenameKeyframes(text) {

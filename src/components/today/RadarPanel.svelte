@@ -163,10 +163,10 @@
     />
     <polygon
       points={radarPolygonPoints(values, scale)}
-      fill="rgba(61,169,255,.22)"
-      stroke="var(--cyan)"
+      fill="color-mix(in srgb, var(--accent) 22%, transparent)"
+      stroke="var(--accent)"
       stroke-width="2"
-      style="filter:drop-shadow(0 0 8px var(--blue))"
+      style="filter:drop-shadow(0 0 8px var(--accent))"
     />
     {#each axes as axis (axis.stat)}
       {@const point = radarPoint(axis.index, axis.value, scale)}
