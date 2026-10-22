@@ -1,0 +1,33 @@
+/*
+ * The settings page's `.rk` rank-card rule, ported early because it collides
+ * with the shared header's rank chip.
+ *
+ * `settings.html` gives the header chip `class="chip rk"` and also defines a
+ * page-local `.rk` for the rank cards. In the prototype that rule therefore
+ * restyles the header chip too (padding, inset background, relative position).
+ * The shared header must keep one DOM on every page, so the rule is scoped to
+ * the settings route here; the rest of the page still lands with its own issue.
+ */
+@scope (body[data-page='settings']) {
+  .rk {
+    --bc: var(--c);
+    border: 1px solid var(--line);
+    background: var(--ins);
+    padding: 16px 14px;
+    position: relative;
+    transition:
+      transform var(--t-base) var(--ease),
+      box-shadow var(--t-base);
+  }
+  .rk:hover {
+    transform: translateY(-3px);
+  }
+  @media (max-width: 700px) {
+    .chip {
+      padding: 3px 8px;
+      gap: 5px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+  }
+}
