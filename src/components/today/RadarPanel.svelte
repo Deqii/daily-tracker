@@ -3,7 +3,6 @@
   import {
     RADAR_CENTER_X,
     RADAR_CENTER_Y,
-    RADAR_SCALE,
     RADAR_VIEW_BOX,
     gateLabel,
     radarPoint,
@@ -12,6 +11,7 @@
     radarSpokes,
     statColorToken,
     statLabel,
+    statScale,
   } from '../../lib/today-page';
   import { resolvedToken } from '../../lib/tokens';
   import { tween } from '../../lib/tween';
@@ -106,6 +106,23 @@
   let values = $derived(STATS.map((stat) => display[stat]));
   let gate = $derived($rankGate.threshold);
 
+  /**
+   * The drawing scale the prototype recomputes in `drawRadar`/`stats`: the
+   * largest engine stat rounded up to the next ten, minimum twenty. Read from
+   * the engine values, not from the tweened ones, exactly as `today.html` reads
+   * `S.stat`.
+   */
+  let scale = $derived(statScale(STATS.map((stat) => $statXP[stat])));
+
+  /**
+   * The radar's own `aria-label`, as `today.html`'s `stats()` writes it: the five
+   * labels with their engine values, so the chart stays readable to a screen
+   * reader and updates whenever a value changes.
+   */
+  let radarLabel = $derived(
+    `Radar chart: ${STATS.map((stat) => `${statLabel(stat)} ${$statXP[stat]}`).join(', ')}`
+  );
+
   /** Each axis with the value drawn on it, so no index lookup happens in the markup. */
   let axes = $derived(STATS.map((stat, index) => ({ stat, index, value: values[index] ?? 0 })));
 </script>
@@ -115,16 +132,16 @@
     <h2>Stat</h2>
     <span class="sub">{gateLabel($rankGate.threshold)}</span>
   </div>
-  <svg id="radar" viewBox={RADAR_VIEW_BOX} role="img" aria-label="Radar lima stat">
-    {#each radarRings() as ring, index (index)}
+  <svg id="radar" viewBox={RADAR_VIEW_BOX} role="img" aria-label={radarLabel}>
+    {#each radarRings(scale) as ring, index (index)}
       <polygon
-        points={radarPolygonPoints(ring)}
+        points={radarPolygonPoints(ring, scale)}
         fill="none"
         stroke="var(--blue)"
         stroke-opacity={RING_OPACITY[index]}
       />
     {/each}
-    {#each radarSpokes() as spoke, index (index)}
+    {#each radarSpokes(scale) as spoke, index (index)}
       <line
         x1={RADAR_CENTER_X}
         y1={RADAR_CENTER_Y}
@@ -135,22 +152,25 @@
       />
     {/each}
     <polygon
-      points={radarPolygonPoints(STATS.map(() => gate))}
+      points={radarPolygonPoints(
+        STATS.map(() => gate),
+        scale
+      )}
       fill="rgba(139,108,255,.06)"
       stroke="var(--monarch)"
       stroke-width="1.5"
       stroke-dasharray="5 4"
     />
     <polygon
-      points={radarPolygonPoints(values)}
+      points={radarPolygonPoints(values, scale)}
       fill="rgba(61,169,255,.22)"
       stroke="var(--cyan)"
       stroke-width="2"
       style="filter:drop-shadow(0 0 8px var(--blue))"
     />
     {#each axes as axis (axis.stat)}
-      {@const point = radarPoint(axis.index, axis.value)}
-      {@const label = radarPoint(axis.index, RADAR_SCALE * LABEL_SCALE)}
+      {@const point = radarPoint(axis.index, axis.value, scale)}
+      {@const label = radarPoint(axis.index, scale * LABEL_SCALE, scale)}
       <circle cx={point.x} cy={point.y} r="4" fill={resolvedToken(statColorToken(axis.stat))} />
       <text
         x={label.x}
@@ -167,14 +187,14 @@
       >
     {/each}
   </svg>
-  <div class="legend"><span><s></s>Batas balance gate (50% rata-rata)</span></div>
+  <div class="legend"><span><s></s>Balance gate limit (50% of average)</span></div>
   <div class="stats">
     {#each STATS as stat (stat)}
       <div class="stat" style={`--c: var(${statColorToken(stat)})`}>
         <small>{statLabel(stat)}</small>
         <b>{$statXP[stat]}</b>
         <div class="bar">
-          <i style={`width: ${Math.min(100, ($statXP[stat] / RADAR_SCALE) * 100)}%`}></i>
+          <i style={`width: ${Math.min(100, ($statXP[stat] / scale) * 100)}%`}></i>
         </div>
       </div>
     {/each}

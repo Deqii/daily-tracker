@@ -1,4 +1,4 @@
-import { statLabel } from './today-lines';
+import { freezesLine, statLabel } from './today-lines';
 import type { DailyQuestDay, Stat } from './types';
 import { STATS } from './types';
 
@@ -19,12 +19,20 @@ export const HEAT_DAYS = 14;
 /**
  * The radar's outer drawing scale (DEVIATIONS.md note 2).
  *
- * `today.html` divides every stat by `MAX = 30`. That is a drawing scale and not
- * a rule: the engine has no per-stat ceiling, and the one value the engine does
- * own on this page, the balance-gate threshold, comes from
- * `passesBalanceGate` as `ceil(sum / (2 x count))`. The value itself is taken
- * from the engine.
+ * `today.html` divides every stat by `MAX = scaleMax()`, the largest stat
+ * rounded up to the next multiple of ten with a minimum of twenty. That is a
+ * drawing scale and not a rule: the engine has no per-stat ceiling, and the one
+ * value the engine does own on this page, the balance-gate threshold, comes from
+ * `passesBalanceGate` as `ceil(sum / (2 x count))`. The values themselves are
+ * taken from the engine.
  */
+export function statScale(values: readonly number[]): number {
+  const max = Math.max(0, ...values);
+
+  return Math.max(20, Math.ceil(max / 10) * 10);
+}
+
+/** The default drawing scale, the prototype's `MAX` before it is first recomputed. */
 export const RADAR_SCALE = 30;
 
 /** The `data-l` a day with this many satisfied stats paints (see `history.html`). */
@@ -74,11 +82,11 @@ export function heatLevel(satisfied: number): HeatLevel {
 }
 
 /**
- * The `title` `today.html` puts on each cell: the last one reads "Hari ini", the
+ * The `title` `today.html` puts on each cell: the last one reads "Today", the
  * rest count back from it.
  */
 export function heatTitle(index: number, count: number): string {
-  return index === count - 1 ? 'Hari ini' : `${count - 1 - index} hari lalu`;
+  return index === count - 1 ? 'Today' : `${count - 1 - index} days ago`;
 }
 
 /**
@@ -103,9 +111,9 @@ export function hasCompletionToday(day: DailyQuestDay | undefined): boolean {
   return day !== undefined && STATS.some((stat) => day.actualCompletions[stat] > 0);
 }
 
-/** The freezes-left copy, in the prototype's wording. */
+/** The freezes-left copy, in the prototype's wording (design §7). */
 export function freezesRemainingText(freezesLeft: number): string {
-  return `Freeze ${freezesLeft} tersisa`;
+  return freezesLine(freezesLeft);
 }
 
 /**
@@ -116,10 +124,10 @@ export function freezesRemainingText(freezesLeft: number): string {
  * zone is every remaining penalty stat met, otherwise the daily reminder.
  */
 export function systemMessage(satisfied: number, penaltyCleared: boolean): string {
-  if (satisfied === STATS.length) return 'Semua stat terpenuhi. Daily quest selesai.';
-  if (penaltyCleared) return 'Penalty hilang. Selesaikan stat yang tersisa.';
+  if (satisfied === STATS.length) return 'All stats completed. Daily quest done.';
+  if (penaltyCleared) return 'Penalty cleared. Finish the remaining stats.';
 
-  return 'Selesaikan minimal 1 task di setiap stat hari ini.';
+  return 'Complete at least 1 task in every stat today.';
 }
 
 /* ------------------------------------------------------------------- radar */
@@ -140,9 +148,9 @@ export function radarAngle(index: number): number {
   return -Math.PI / 2 + (index * 2 * Math.PI) / STATS.length;
 }
 
-/** Where axis `index` sits at `value` on the `RADAR_SCALE` radius. */
-export function radarPoint(index: number, value: number): RadarPoint {
-  const radius = (RADAR_RADIUS * value) / RADAR_SCALE;
+/** Where axis `index` sits at `value` on the drawing-scale radius. */
+export function radarPoint(index: number, value: number, scale = RADAR_SCALE): RadarPoint {
+  const radius = (RADAR_RADIUS * value) / scale;
 
   return {
     x: RADAR_CENTER_X + Math.cos(radarAngle(index)) * radius,
@@ -151,10 +159,10 @@ export function radarPoint(index: number, value: number): RadarPoint {
 }
 
 /** A polygon's `points` attribute, in the fixed stat order. */
-export function radarPolygonPoints(values: readonly number[]): string {
+export function radarPolygonPoints(values: readonly number[], scale = RADAR_SCALE): string {
   return values
     .map((value, index) => {
-      const point = radarPoint(index, value);
+      const point = radarPoint(index, value, scale);
 
       return `${point.x},${point.y}`;
     })
@@ -162,20 +170,20 @@ export function radarPolygonPoints(values: readonly number[]): string {
 }
 
 /** The four grid rings, drawn at a quarter, a half, three quarters and full scale. */
-export function radarRings(): number[][] {
+export function radarRings(scale = RADAR_SCALE): number[][] {
   return [0.25, 0.5, 0.75, 1].map((ratio) =>
-    Array.from({ length: STATS.length }, () => RADAR_SCALE * ratio)
+    Array.from({ length: STATS.length }, () => scale * ratio)
   );
 }
 
 /** The five spokes, from the centre out to the outer ring. */
-export function radarSpokes(): RadarPoint[] {
-  return STATS.map((_, index) => radarPoint(index, RADAR_SCALE));
+export function radarSpokes(scale = RADAR_SCALE): RadarPoint[] {
+  return STATS.map((_, index) => radarPoint(index, scale, scale));
 }
 
 /** The text `title` the threshold line carries, as the legend describes it. */
 export function gateLabel(threshold: number): string {
-  return `Ambang gate: ${threshold} XP`;
+  return `Gate threshold: ${threshold} XP`;
 }
 
 /* ------------------------------------------------------------------ rewards */

@@ -66,7 +66,7 @@
   <div>
     <div class="row sub" style="margin-bottom:6px">
       <span>{$progress.xpIntoLevel} / {$progress.xpForThisLevel} XP</span><span
-        >ke Level {$progress.level + 1}</span
+        >to Level {$progress.level + 1}</span
       >
     </div>
     <div class="xpbar"><i style="width: {$progress.ratio * 100}%"></i></div>
@@ -85,7 +85,7 @@
         >{freezesRemainingText($freezesLeft)}</span
       >
     </div>
-    <div class="pips" aria-label={`Streak ${$streak} hari`}>
+    <div class="pips" aria-label={`Streak ${$streak} days`}>
       {#each Array.from({ length: PIP_COUNT }, (_, index) => index) as index (index)}
         <i class={pipClass(index)}></i>
       {/each}

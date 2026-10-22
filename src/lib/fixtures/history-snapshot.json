@@ -68,7 +68,7 @@
       "events": [
         {
           "kind": "up",
-          "title": "Rank naik: E ke D",
+          "title": "Rank up: E to D",
           "subtitle": "Level 6 · 359 XP"
         }
       ]
@@ -98,8 +98,8 @@
       "events": [
         {
           "kind": "ms",
-          "title": "Title baru: Konsisten 7 hari",
-          "subtitle": "Streak mencapai 7"
+          "title": "New title: Konsisten 7 hari",
+          "subtitle": "Streak reached 7"
         }
       ]
     },
@@ -224,7 +224,7 @@
       "events": [
         {
           "kind": "down",
-          "title": "Rank turun: D ke E",
+          "title": "Rank down: D to E",
           "subtitle": "Level 5 · 335 XP"
         }
       ]
@@ -242,7 +242,7 @@
       "events": [
         {
           "kind": "up",
-          "title": "Rank naik: E ke D",
+          "title": "Rank up: E to D",
           "subtitle": "Level 6 · 350 XP"
         }
       ]
@@ -344,8 +344,8 @@
       "events": [
         {
           "kind": "ms",
-          "title": "Title baru: 100 tugas selesai",
-          "subtitle": "Total 100 penyelesaian"
+          "title": "New title: 100 tugas selesai",
+          "subtitle": "100 tasks completed"
         }
       ]
     },
@@ -374,7 +374,7 @@
       "events": [
         {
           "kind": "lv",
-          "title": "Level naik: 6 ke 7",
+          "title": "Level up: 6 to 7",
           "subtitle": "514 XP"
         }
       ]
@@ -407,42 +407,42 @@
   "events": [
     {
       "kind": "up",
-      "title": "Rank naik: E ke D",
+      "title": "Rank up: E to D",
       "subtitle": "Level 6 · 359 XP",
       "dayIndex": 4,
       "date": "2026-09-20"
     },
     {
       "kind": "ms",
-      "title": "Title baru: Konsisten 7 hari",
-      "subtitle": "Streak mencapai 7",
+      "title": "New title: Konsisten 7 hari",
+      "subtitle": "Streak reached 7",
       "dayIndex": 6,
       "date": "2026-09-22"
     },
     {
       "kind": "down",
-      "title": "Rank turun: D ke E",
+      "title": "Rank down: D to E",
       "subtitle": "Level 5 · 335 XP",
       "dayIndex": 16,
       "date": "2026-10-02"
     },
     {
       "kind": "up",
-      "title": "Rank naik: E ke D",
+      "title": "Rank up: E to D",
       "subtitle": "Level 6 · 350 XP",
       "dayIndex": 17,
       "date": "2026-10-03"
     },
     {
       "kind": "ms",
-      "title": "Title baru: 100 tugas selesai",
-      "subtitle": "Total 100 penyelesaian",
+      "title": "New title: 100 tugas selesai",
+      "subtitle": "100 tasks completed",
       "dayIndex": 25,
       "date": "2026-10-11"
     },
     {
       "kind": "lv",
-      "title": "Level naik: 6 ke 7",
+      "title": "Level up: 6 to 7",
       "subtitle": "514 XP",
       "dayIndex": 27,
       "date": "2026-10-13"

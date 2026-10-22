@@ -179,32 +179,32 @@
     if (!result.ok) return;
 
     burst(event, row.stat, result.value.completion.pointsAwarded);
-    showToast(`${row.name} selesai`);
+    showToast(`${row.name} completed`);
   }
 </script>
 
 <section class="quest boot" style="--i:2" aria-label="Daily quest">
   <div class="sys panel" style="padding:12px 14px">
-    <small>Pesan sistem</small>
+    <small>System message</small>
     <p><span>{typed}</span><span class="caret"></span></p>
   </div>
   <div class="penalty" class:clear={cleared}>
     <div>
-      <strong>{cleared ? 'Penalty dibersihkan' : 'Penalty zone aktif'}</strong>
+      <strong>{cleared ? 'Penalty cleared' : 'Penalty active'}</strong>
       <div class="sub">
         {cleared
-          ? `${penaltyStatLabel} memenuhi 2 penyelesaian.`
-          : `${penaltyStatLabel} butuh 2 penyelesaian hari ini.`}
+          ? `${penaltyStatLabel} has 2 completions.`
+          : `${penaltyStatLabel} needs 2 completions today.`}
       </div>
     </div>
     <div class="timer">
       <span style={cleared ? 'color: var(--ok)' : undefined}>{countdown}</span>
-      <small>sampai rollover</small>
+      <small>until rollover</small>
     </div>
   </div>
   <div class="row">
     <h2>Daily quest</h2>
-    <span class="sub">{satisfied}/{STATS.length} stat terpenuhi</span>
+    <span class="sub">{satisfied}/{STATS.length}</span>
   </div>
   <div style="display:flex;flex-direction:column;gap:8px">
     {#each rows as row (row.index)}

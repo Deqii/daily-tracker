@@ -9,8 +9,8 @@
    * `position: fixed` would look the same nested, but the DOM walk the fidelity
    * test compares would not.
    *
-   * The toast names what just happened (`<task> selesai`, or `<reward> dibeli
-   * (-60)` for a purchase). The "Batalkan" (undo) button is the prototype's and
+   * The toast names what just happened (`<task> completed`, or `<reward> dibeli
+   * (-60)` for a purchase). The "Undo" button is the prototype's and
    * is rendered verbatim; whether it can act on anything is open question Q9 in
    * `docs/prototype/DEVIATIONS.md`, because the engine has no way to revert a
    * completion and adding one would be new game behaviour. The button is
@@ -20,5 +20,5 @@
 
 <div class="toast" class:show={$toastVisible} role="status" aria-live="polite">
   <span>{$toastText}</span>
-  <button>Batalkan</button>
+  <button>Undo</button>
 </div>

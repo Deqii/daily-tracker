@@ -182,8 +182,16 @@ const RULES = [
   { context: '', selector: '.chip' },
   { context: '', selector: '.chip span' },
   { context: '', selector: '.coin' },
+
+  // The two-row header from 1023px down. `nav` is never hidden; the 700px
+  // block only compacts the first row, so it is compared for header, logo and
+  // chips, not for nav.
+  { context: '@media(max-width:1023px)', selector: 'header' },
+  { context: '@media(max-width:1023px)', selector: '.chips' },
+  { context: '@media(max-width:1023px)', selector: 'nav' },
+  { context: '@media(max-width:1023px)', selector: 'nav a' },
+  { context: '@media(max-width:1023px)', selector: 'nav a[aria-current]::after' },
   { context: '@media(max-width:700px)', selector: 'header' },
-  { context: '@media(max-width:700px)', selector: 'nav' },
   { context: '@media(max-width:700px)', selector: '.logo' },
   { context: '@media(max-width:700px)', selector: '.chips' },
   { context: '@media(max-width:700px)', selector: '.chip' },
@@ -310,6 +318,35 @@ for (const rule of RULES) {
         `${label(rule)}\n      ${page}.html differs from ${REFERENCE}.html\n${lines.join('\n')}`
       );
     }
+  }
+}
+
+/**
+ * The inline delete confirmation is shared by the two pages that delete
+ * something. It is not part of the shell, so it is compared across `tasks.html`
+ * and `rewards.html` only.
+ */
+const CONFIRM_RULES = ['.confirm', '.confirm span:last-child', '.btn.dng', '.btn.dng:hover'];
+
+for (const selector of CONFIRM_RULES) {
+  const expected = block(pages.tasks, `|${selector}`, 1);
+
+  if (expected === undefined) {
+    failures.push(`${selector}\n      not found in tasks.html; the check itself is out of date`);
+    continue;
+  }
+
+  const actual = block(pages.rewards, `|${selector}`, 1);
+
+  if (actual === undefined) {
+    failures.push(`${selector}\n      missing from rewards.html`);
+    continue;
+  }
+
+  const lines = diff(expected, actual);
+
+  if (lines.length > 0) {
+    failures.push(`${selector}\n      rewards.html differs from tasks.html\n${lines.join('\n')}`);
   }
 }
 

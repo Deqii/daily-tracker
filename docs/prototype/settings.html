@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -135,7 +135,8 @@ span.ok{color:var(--ok)}span.bad{color:var(--danger)}
 .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);opacity:0;z-index:60;background:var(--panel-solid);border:1px solid var(--line-strong);padding:10px 16px;transition:all var(--t-base) var(--ease);box-shadow:var(--glow)}
 .toast.show{transform:translate(-50%,0);opacity:1}
 @media(max-width:1100px){.g2,.go{grid-template-columns:1fr}.ranks{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:700px){header{padding:12px 16px;gap:12px}nav{display:none}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{padding:16px}.ranks{grid-template-columns:1fr 1fr}}
+@media(max-width:1023px){header{flex-wrap:wrap;padding:12px 16px 0;gap:8px 12px}.chips{margin-left:auto}nav{order:3;flex:0 0 100%;margin:0 -16px;padding:0;gap:0;border-top:1px solid var(--line)}nav a{flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 4px}nav a[aria-current]::after{bottom:0}}
+@media(max-width:700px){header{padding:12px 16px 0;gap:8px 12px}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{padding:16px}.ranks{grid-template-columns:1fr 1fr}}
 @media(max-width:380px){.chips .chip:first-child{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}}
 [data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
@@ -146,24 +147,24 @@ span.ok{color:var(--ok)}span.bad{color:var(--danger)}
 <canvas id="fx" aria-hidden="true"></canvas><div class="scan" aria-hidden="true"></div>
 <header>
   <div class="logo">Daily Tracker</div>
-  <nav aria-label="Navigasi utama"><a href="today.html">Today</a><a href="tasks.html">Tasks</a><a href="rewards.html">Rewards</a><a href="history.html">History</a><a href="#" aria-current="page">Settings</a></nav>
+  <nav aria-label="Primary"><a href="today.html">Today</a><a href="tasks.html">Tasks</a><a href="rewards.html">Rewards</a><a href="history.html">History</a><a href="#" aria-current="page">Settings</a></nav>
   <div class="chips"><div class="chip"><span>Rank</span><b>E</b></div><div class="chip"><span>Streak</span><b>5</b></div><div class="chip"><span>Wallet</span><i class="coin"></i><b>65</b></div></div>
 </header>
 <main>
-  <div class="boot" style="--i:0"><h1>Settings</h1><p class="sub">Tampilan, aturan rank, title, dan cadangan data.</p></div>
+  <div class="boot" style="--i:0"><h1>Settings</h1><p class="sub">Appearance, rank rules, titles and data backup.</p></div>
 
   <div class="g2">
     <section class="panel boot" style="--i:1" aria-labelledby="h-look">
-      <h2 id="h-look">Tampilan</h2>
-      <div class="set"><div><b>Tema</b><span class="sub">Mode tampilan antarmuka</span></div>
-        <div class="seg" role="radiogroup" aria-label="Tema" id="theme"><button role="radio" data-v="light" aria-checked="false">Light</button><button role="radio" data-v="dark" aria-checked="true">Dark</button></div></div>
-      <div class="set"><div><b>Animasi</b><span class="sub">Partikel, efek sudut, dan transisi</span></div><button class="tg" id="motion" role="switch" aria-checked="true" aria-label="Animasi"></button></div>
-      <div class="set"><div><b>Efek suara</b><span class="sub">Bunyi singkat saat memasang title</span></div><button class="tg" id="sound" role="switch" aria-checked="false" aria-label="Efek suara"></button></div>
+      <h2 id="h-look">Appearance</h2>
+      <div class="set"><div><b>Theme</b><span class="sub">Interface display mode</span></div>
+        <div class="seg" role="radiogroup" aria-label="Theme" id="theme"><button role="radio" data-v="light" aria-checked="false">Light</button><button role="radio" data-v="dark" aria-checked="true">Dark</button></div></div>
+      <div class="set"><div><b>Animation</b><span class="sub">Particles, corner effects and transitions</span></div><button class="tg" id="motion" role="switch" aria-checked="true" aria-label="Animation"></button></div>
+      <div class="set"><div><b>Sound effects</b><span class="sub">A short sound when equipping a title</span></div><button class="tg" id="sound" role="switch" aria-checked="false" aria-label="Sound effects"></button></div>
     </section>
 
     <section class="panel boot" style="--i:2" aria-labelledby="h-data">
       <h2 id="h-data">Data</h2>
-      <p class="sub" style="margin-top:4px">Semua data hanya tersimpan di browser ini. Menghapus data situs menghapus seluruh progres, dan tidak ada sinkronisasi. Export adalah satu-satunya cadangan.</p>
+      <p class="sub" style="margin-top:4px">All data is stored in this browser only. Clearing site data deletes all progress, and there is no sync. Export is the only backup.</p>
       <div class="bk" id="bk" role="status"><span class="dot"></span><div><b id="bkT"></b><span class="sub" id="bkS"></span></div></div>
       <div class="btns"><button class="btn" id="exp">Export data</button><button class="btn line" id="imp">Import data</button><input type="file" id="file" accept="application/json,.json" hidden></div>
       <div id="impMsg" aria-live="polite"></div>
@@ -171,11 +172,11 @@ span.ok{color:var(--ok)}span.bad{color:var(--danger)}
   </div>
 
   <section class="panel boot" style="--i:3" aria-labelledby="h-rank">
-    <div class="row"><div><h2 id="h-rank">Rank reference</h2><p class="sub">Semua nilai di bawah berlaku sebelum memengaruhi Anda. Tidak ada mekanik tersembunyi.</p></div><span class="chip" style="border-color:var(--rk-e);color:var(--rk-e)">Saat ini: Rank E · Level 3</span></div>
+    <div class="row"><div><h2 id="h-rank">Rank reference</h2><p class="sub">Every value below applies before it affects you. There are no hidden mechanics.</p></div><span class="chip" style="border-color:var(--rk-e);color:var(--rk-e)">Current: Rank E · Level 3</span></div>
     <div class="go">
-      <div class="box"><h3><span>Menuju Rank D</span><span class="sub">Level 6</span></h3>
-        <div class="bar"><i id="lvBar"></i></div><p class="sub" style="margin-top:8px"><b style="color:var(--text)">65</b> / 350 XP · kurang <b style="color:var(--text)">285 XP</b> lagi</p></div>
-      <div class="box"><h3><span>Balance gate</span><span id="gateS" class="ok">Lulus</span></h3>
+      <div class="box"><h3><span>Toward Rank D</span><span class="sub">Level 6</span></h3>
+        <div class="bar"><i id="lvBar"></i></div><p class="sub" style="margin-top:8px"><b style="color:var(--text)">65</b> / 350 XP · <b style="color:var(--text)">285 XP</b> to go</p></div>
+      <div class="box"><h3><span>Balance gate</span><span id="gateS" class="ok">Passed</span></h3>
         <div class="gate" id="gate"></div><p class="sub" style="margin-top:10px" id="gateT"></p></div>
     </div>
     <div class="ranks" id="ranks"></div>
@@ -183,7 +184,7 @@ span.ok{color:var(--ok)}span.bad{color:var(--danger)}
 
   <section class="panel boot" style="--i:4" aria-labelledby="h-title">
     <div class="row"><div><h2 id="h-title">Titles</h2><p class="sub">Murni kosmetik. Satu title bisa dipasang pada satu waktu dan tampil di halaman Today.</p></div><button class="btn ghost" id="demo" title="Hanya untuk prototype">Demo: buka title berikutnya</button></div>
-    <div class="pv"><span class="sub">Pratinjau di Today</span><span class="tchip" id="pv"></span></div>
+    <div class="pv"><span class="sub">Preview on Today</span><span class="tchip" id="pv"></span></div>
     <div class="tg3" id="titles"></div>
   </section>
 </main>
@@ -205,57 +206,57 @@ $('sound').onclick=()=>{soundOn=!soundOn;$('sound').setAttribute('aria-checked',
 function blip(){if(!soundOn)return;try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(660,a.currentTime);o.frequency.exponentialRampToValueAtTime(990,a.currentTime+.12);g.gain.setValueAtTime(.08,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.25);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+.26)}catch{}}
 
 /* ===== Rank reference (nilai dari PRD) ===== */
-const RANKS=[['E','1–5',1,'15','×0.5',5,'--rk-e'],['D','6–10',1,'25','×0.7',8,'--rk-d'],['C','11–20',2,'40','×0.85',13,'--rk-c'],['B','21–35',2,'60','×1.0',20,'--rk-b'],['A','36–50',3,'90','×1.15',30,'--rk-a'],['S','51+',3,'Tanpa batas','×1.3',45,'--rk-s']];
+const RANKS=[['E','1–5',1,'15','×0.5',5,'--rk-e'],['D','6–10',1,'25','×0.7',8,'--rk-d'],['C','11–20',2,'40','×0.85',13,'--rk-c'],['B','21–35',2,'60','×1.0',20,'--rk-b'],['A','36–50',3,'90','×1.15',30,'--rk-a'],['S','51+',3,'No cap','×1.3',45,'--rk-s']];
 const CUR='E',NXT='D';
-$('ranks').innerHTML=RANKS.map((r,i)=>`<article class="rk ${r[0]===CUR?'cur':''} ${r[0]===NXT?'nxt':''}" style="--c:var(${r[6]});--i:${i+5}">${r[0]===CUR?'<span class="tag">Saat ini</span>':r[0]===NXT?'<span class="tag">Berikutnya</span>':''}<div class="L">${r[0]}</div><div class="rg">Level ${r[1]}</div>
- <dl><dt>Freeze / minggu</dt><dd>${r[2]}</dd><dt>Maks poin / task</dt><dd>${r[3]}</dd><dt>Multiplier XP</dt><dd>${r[4]}</dd><dt>Penalti / stat</dt><dd>−${r[5]}</dd></dl></article>`).join('');
+$('ranks').innerHTML=RANKS.map((r,i)=>`<article class="rk ${r[0]===CUR?'cur':''} ${r[0]===NXT?'nxt':''}" style="--c:var(${r[6]});--i:${i+5}">${r[0]===CUR?'<span class="tag">Current</span>':r[0]===NXT?'<span class="tag">Next</span>':''}<div class="L">${r[0]}</div><div class="rg">Level ${r[1]}</div>
+ <dl><dt>Freezes per week</dt><dd>${r[2]}</dd><dt>Max points per task</dt><dd>${r[3]}</dd><dt>Point multiplier</dt><dd>${r[4]}</dd><dt>Penalty per missed stat</dt><dd>−${r[5]}</dd></dl></article>`).join('');
 /* gate: statXP demo konsisten dengan today.html, rumus PRD: 2 × terlemah × jumlah ≥ total */
 const SX=[['Str',16,'--stat-str'],['Vit',12,'--stat-vit'],['Int',20,'--stat-int'],['Disc',10,'--stat-disc'],['Soc',7,'--stat-soc']];
 const sum=SX.reduce((a,s)=>a+s[1],0),thr=Math.ceil(sum/(2*SX.length)),weak=SX.reduce((a,s)=>s[1]<a[1]?s:a),MAXV=20,pass=2*weak[1]*SX.length>=sum;
 $('gate').innerHTML=SX.map(s=>`<div class="gr ${s===weak?'weak':''}" style="--c:var(${s[2]})"><span>${s[0]}</span><div class="bar"><i data-w="${s[1]/MAXV*100}"></i></div><b>${s[1]}</b></div>`).join('')+`<div class="thr" id="thr" style="left:calc(44px + 10px + (100% - 44px - 34px - 20px) * ${thr/MAXV})"></div>`;
-$('gateS').textContent=pass?'Lulus':'Belum lulus';$('gateS').className=pass?'ok':'bad';
-$('gateT').innerHTML=`Stat terlemah <b style="color:var(--text)">${weak[0]} ${weak[1]}</b> ${pass?'≥':'<'} ambang <b style="color:var(--text)">${thr}</b> (50% dari rata-rata). ${pass?'Margin tipis: tambah Soc agar aman.':'Naikkan stat terlemah sebelum rank-up.'}`;
+$('gateS').textContent=pass?'Passed':'Not passed';$('gateS').className=pass?'ok':'bad';
+$('gateT').innerHTML=`Weakest stat <b style="color:var(--text)">${weak[0]} ${weak[1]}</b> ${pass?'≥':'<'} threshold <b style="color:var(--text)">${thr}</b> (50% of the average). ${pass?'Thin margin: raise Soc to be safe.':'Raise the weakest stat before ranking up.'}`;
 requestAnimationFrame(()=>requestAnimationFrame(()=>{$('lvBar').style.width=(65/350*100)+'%';document.querySelectorAll('.gr i').forEach(i=>i.style.width=i.dataset.w+'%')}));
 
 /* ===== Titles (katalog PRD) ===== */
 const TT=[
- {id:'first-reward',n:'Hadiah pertama',c:'Beli reward pertama',p:[1,1]},
- {id:'streak-7',n:'Konsisten 7 hari',c:'Streak tampilan mencapai 7',p:[5,7]},
- {id:'completions-100',n:'100 tugas selesai',c:'Total 100 penyelesaian',p:[47,100]},
- {id:'rank-d',n:'Naik ke Rank D',c:'Rank efektif mencapai D (Level 6 + balance gate)',p:[3,6],u:'Level'},
- {id:'streak-30',n:'Konsisten 30 hari',c:'Streak tampilan mencapai 30',p:[5,30]},
- {id:'rank-c',n:'Naik ke Rank C',c:'Rank efektif mencapai C',p:[3,11],u:'Level'},
- {id:'rank-b',n:'Naik ke Rank B',c:'Rank efektif mencapai B',p:[3,21],u:'Level'},
- {id:'rank-a',n:'Naik ke Rank A',c:'Rank efektif mencapai A',p:[3,36],u:'Level'},
- {id:'rank-s',n:'Naik ke Rank S',c:'Rank efektif mencapai S',p:[3,51],u:'Level'}];
+ {id:'first-reward',n:'Hadiah pertama',c:'Buy your first reward',p:[1,1]},
+ {id:'streak-7',n:'Konsisten 7 hari',c:'Reach a 7-day streak',p:[5,7]},
+ {id:'completions-100',n:'100 tugas selesai',c:'Complete 100 tasks',p:[47,100]},
+ {id:'rank-d',n:'Naik ke Rank D',c:'Reach Rank D',p:[3,6],u:'Level'},
+ {id:'streak-30',n:'Konsisten 30 hari',c:'Reach a 30-day streak',p:[5,30]},
+ {id:'rank-c',n:'Naik ke Rank C',c:'Reach Rank C',p:[3,11],u:'Level'},
+ {id:'rank-b',n:'Naik ke Rank B',c:'Reach Rank B',p:[3,21],u:'Level'},
+ {id:'rank-a',n:'Naik ke Rank A',c:'Reach Rank A',p:[3,36],u:'Level'},
+ {id:'rank-s',n:'Naik ke Rank S',c:'Reach Rank S',p:[3,51],u:'Level'}];
 const un=new Set(['first-reward']);let eq='first-reward',flashId=null;
 const lock='<svg width="13" height="14" viewBox="0 0 13 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.500" y="6" width="10" height="7" rx="1"/><path d="M4 6V4a2.500 2.500 0 015 0v2"/></svg>';
 function titles(){
-  $('pv').textContent=eq?TT.find(t=>t.id===eq).n:'Tanpa title';
+  $('pv').textContent=eq?TT.find(t=>t.id===eq).n:'No title';
   $('titles').innerHTML=TT.map(t=>{const u=un.has(t.id),e=eq===t.id,pct=Math.min(100,t.p[0]/t.p[1]*100);
    return `<article class="t ${u?'un':'lk'} ${e?'eq':''} ${flashId===t.id?'flash':''}"><b>${t.n}</b><span class="c">${t.c}</span>
-   <div class="ft">${u?`<span class="sub">${e?'Sedang dipasang':'Terbuka'}</span><button class="btn ${e?'line':''}" data-t="${t.id}" aria-pressed="${e}" style="padding:5px 14px">${e?'Lepas':'Pasang'}</button>`:
-   `<span class="ic">${lock}Terkunci</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${t.p[1]}" aria-valuenow="${t.p[0]}"><i style="width:${pct}%"></i></div><span class="pp">${t.p[0]}/${t.p[1]}</span>`}</div></article>`}).join('');
+   <div class="ft">${u?`<span class="sub">${e?'Equipped':'Unlocked'}</span><button class="btn ${e?'line':''}" data-t="${t.id}" aria-pressed="${e}" style="padding:5px 14px">${e?'Unequip':'Equip'}</button>`:
+   `<span class="ic">${lock}Locked</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${t.p[1]}" aria-valuenow="${t.p[0]}"><i style="width:${pct}%"></i></div><span class="pp">${t.p[0]}/${t.p[1]}</span>`}</div></article>`}).join('');
   flashId=null}
 $('titles').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;const id=b.dataset.t;
-  if(eq===id){eq=null;toast('Title dilepas')}else{eq=id;toast(`Title dipasang: ${TT.find(t=>t.id===id).n}`);blip();flashId=id}
+  if(eq===id){eq=null;toast('Title unequipped')}else{eq=id;toast(`Title equipped: ${TT.find(t=>t.id===id).n}`);blip();flashId=id}
   titles();const p=$('pv');p.classList.remove('pop');void p.offsetWidth;p.classList.add('pop')};
-$('demo').onclick=()=>{const t=TT.find(x=>!un.has(x.id));if(!t){toast('Semua title sudah terbuka');return}un.add(t.id);flashId=t.id;titles();toast(`Title baru terbuka: ${t.n}`);blip();document.querySelector('.t.flash')?.scrollIntoView({block:'nearest',behavior:motionOn?'smooth':'auto'})};
+$('demo').onclick=()=>{const t=TT.find(x=>!un.has(x.id));if(!t){toast('All titles are unlocked');return}un.add(t.id);flashId=t.id;titles();toast(`Title unlocked: ${t.n}`);blip();document.querySelector('.t.flash')?.scrollIntoView({block:'nearest',behavior:motionOn?'smooth':'auto'})};
 
 /* ===== Data: export / import ===== */
 let lastBackup=Date.now()-9*864e5;
 function backup(){const d=Math.floor((Date.now()-lastBackup)/864e5),old=d>=7,b=$('bk');b.classList.toggle('ok',!old);
-  $('bkT').textContent=d<1?'Backup terakhir: baru saja':`Backup terakhir: ${d} hari lalu`;
-  $('bkS').textContent=old?'Disarankan backup minimal seminggu sekali agar progres tidak hilang.':'Cadangan Anda masih baru.'}
+  $('bkT').textContent=d<1?'Last backup: just now':`Last backup: ${d} days ago`;
+  $('bkS').textContent=old?'Back up at least once a week so you do not lose progress.':'Your backup is recent.'}
 $('exp').onclick=()=>{const data={app:'daily-tracker',version:1,exportedAt:new Date().toISOString(),state:{rank:'E',lifetimeXP:65,wallet:65,equippedTitle:eq,unlockedTitles:[...un]}};
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download=`daily-tracker-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-  lastBackup=Date.now();backup();toast('Data berhasil diekspor')};
+  lastBackup=Date.now();backup();toast('Data exported')};
 $('imp').onclick=()=>$('file').click();
-$('file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const m=$('impMsg');
-  try{const j=JSON.parse(await f.text());if(j.app!=='daily-tracker'||!j.state)throw 0;
-    m.innerHTML=`<div class="msg"><b>Impor ${esc(f.name)}?</b><br>Berisi Rank ${esc(String(j.state.rank))} · ${esc(String(j.state.lifetimeXP))} XP. Data saat ini akan <b>ditimpa seluruhnya</b>. Export dulu bila ragu.<div class="btns"><button class="btn danger" id="ok">Timpa data saya</button><button class="btn ghost" id="no">Batal</button></div></div>`;
-    $('ok').onclick=()=>{m.innerHTML='';toast('Impor berhasil (demo: tidak ada yang berubah)')};$('no').onclick=()=>m.innerHTML=''}
-  catch{m.innerHTML='<div class="msg bad" role="alert">File tidak valid. Pilih file JSON hasil Export dari Daily Tracker.</div>'}};
+$('file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const m=$('impMsg');const fail=r=>`<div class="msg bad" role="alert">Import failed. ${r}. Your data was not changed.</div>`;
+  let j;try{j=JSON.parse(await f.text())}catch{m.innerHTML=fail('The file is not valid JSON');return}if(!j||j.app!=='daily-tracker'||!j.state){m.innerHTML=fail('Some data is missing or invalid');return}if(j.version>1){m.innerHTML=fail('The file is from a newer version');return}try{
+    m.innerHTML=`<div class="msg"><b>Replace all current data with this file?</b><br>${esc(f.name)}: Rank ${esc(String(j.state.rank))}, ${esc(String(j.state.lifetimeXP))} XP.<div class="btns"><button class="btn danger" id="ok">Replace data</button><button class="btn ghost" id="no">Cancel</button></div></div>`;
+    $('ok').onclick=()=>{m.innerHTML='';toast('Import complete (demo: nothing changed)')};$('no').onclick=()=>m.innerHTML=''}
+  catch{m.innerHTML=fail('Some data is missing or invalid')}};
 
 /* ===== Partikel ===== */
 const cv=$('fx'),cx=cv.getContext('2d');let P=[],raf;const size=()=>{cv.width=innerWidth;cv.height=innerHeight};

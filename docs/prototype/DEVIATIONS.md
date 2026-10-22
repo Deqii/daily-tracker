@@ -46,6 +46,52 @@ No deviations are currently approved. Deviations 1 and 2 were withdrawn on
    weekday reading gives 4 pips, not 5. Issue 2 implements this in the Today
    component; no engine API is needed.
 
+## Audit decisions (2026-10-19)
+
+Source: audit of the five prototypes against `design.md` (read in full) and D20.
+`design.md` is the old visual brief, so the prototypes win for anything visual;
+these decisions cover behaviour and copy.
+
+1. **UI language: English.** All interface copy follows `design.md` §7 and the
+   original screens. User content (task and reward names, title names such as
+   "Konsisten 7 hari") stays as the user wrote it. The earlier Indonesian copy in
+   the prototypes was an unrequested translation and is withdrawn. Locale
+   formatting: dates `en-GB`, numbers `en-US`.
+2. **Mobile navigation (design.md §8).** Up to 1023px the top bar is two rows:
+   wordmark and chips, then the five nav items equally wide, at least 44px tall.
+   The nav is never hidden. At 380px and below the Rank chip is hidden on every
+   page.
+3. **Deleting a task or reward (design.md §7; resolves Q4).** Inline confirmation
+   row "Delete {name}?" with Delete and Cancel. No undo toast. Escape cancels.
+   Purchase history keeps its snapshots when a reward is deleted.
+4. **Purchases (resolves Q1).** No undo after a purchase.
+5. **Empty states.** "No tasks yet" and "No rewards yet" with the §7 copy and an
+   add button.
+6. **Validation and import copy** follows §7 ("Describe what to do.", "Enter
+   points.", "Max {cap} points at Rank {rank}.", "Over cap: counts as {cap}", the
+   three import failure reasons).
+7. **Redesign additions beyond design.md** (approved by the redesign request, not
+   deviations): summary cards, calendar, events and purchase-history panels,
+   wallet panel, toolbar filters, stat group panels, rotating emblem, particles
+   and scan sweep, animated brackets.
+8. **Coin placement.** The coin icon follows the number in the Rewards section
+   (requested after design.md); design.md §3 places it before.
+
+## Deferred audit items (prototype update pending, 2026-10-19)
+
+- Today: inline tier picker on rotating rows with variants (a range such as +3 to
+  +8); freeze line variants (2 freezes / 1 freeze / No freezes left this week);
+  the "Rank-up blocked: raise {stat} to {n} xp (now {m})" line; title chip omitted
+  when no title is equipped; empty state when no tasks exist.
+- History: range buttons 7 days / 30 days / All with Show more; the "Freeze used"
+  label; a pending circle for the open day.
+- Rank accent via `data-rank` on `<html>` (brackets, rank chip, rank letter, level
+  number, XP bar, radar).
+- A sixth prototype for overlays and notices: level up, rank up, rank down
+  notice, storage failure banner, recovery notice.
+- Responsive details of design.md §8: 16px inputs and 44px controls on small
+  screens, 16px brackets below 640px, radar minimum 240px.
+
 ## Mechanical renames
 
 Added 2026-10-18 (Issue 2, Today page). `@keyframes` names are global CSS, and the
@@ -80,10 +126,10 @@ each needs an answer before the page named ships.
 
 | #   | Page     | Question                                                                                                                                                                                             | Recommendation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | --- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Q1  | Rewards  | The prototype offers an undo toast after a purchase that refunds it. The PRD defines no refund.                                                                                                      | Drop the purchase undo. Delete-with-undo is not a refund and stays.                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Q1  | Rewards  | The prototype offers an undo toast after a purchase that refunds it. The PRD defines no refund.                                                                                                      | Resolved 2026-10-19: no undo after a purchase; delete asks an inline confirmation (Audit decisions 3 and 4).                                                                                                                                                                                                                                                                                                                                                                                                               |
 | Q2  | Settings | The animation and sound switches are not in the PRD.                                                                                                                                                 | Resolved 2026-10-18: keep both as local preferences. They read `daily-tracker:motion`, are not part of Export, and every prototype page now honours `data-motion="off"`.                                                                                                                                                                                                                                                                                                                                                   |
 | Q3  | Settings | The "Demo: buka title berikutnya" button is prototype-only.                                                                                                                                          | Do not ship it. Already recorded as note 3.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| Q4  | Tasks    | The prototype deletes immediately with an undo toast; the PRD says delete. An archive option is unspecified.                                                                                         | Keep delete + undo. Do not add archiving; it would change the data model.                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Q4  | Tasks    | The prototype deletes immediately with an undo toast; the PRD says delete. An archive option is unspecified.                                                                                         | Resolved 2026-10-19: inline confirmation row, no undo toast, no archiving (Audit decision 3).                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Q5  | Settings | Only `settings.html` defines light-theme tokens. Whether the other four pages must support light in this milestone is undecided.                                                                     | Resolved 2026-10-18: support light globally. All five prototypes now carry the identical `:root` and `[data-theme=light]` token blocks, no hardcoded dark colours remain outside them, and each page applies the stored theme before first paint.                                                                                                                                                                                                                                                                          |
 | Q6  | Today    | The heat strip and the streak chip could not both match the prototype from one state.                                                                                                                | Resolved by correcting the prototype. See the resolved table below.                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | Q7  | Rewards  | "Total dibelanjakan" summed a truncated five-row log; the app sums all fifteen purchases.                                                                                                            | Resolved by correcting the prototype. `rewards.html` now logs all fifteen purchases.                                                                                                                                                                                                                                                                                                                                                                                                                                       |
@@ -112,6 +158,7 @@ counts in the original screenshots.
 | 2026-10-17 | `today.html`, `rewards.html` | Q6 and Q7 data corrections (see note 1, Q6, Q7).                                                                                                                                                                                                                                                                              |
 | 2026-10-18 | all five                     | Light theme made global (Q5): identical token blocks on every page, hardcoded dark colours replaced by tokens, SVG colours via `var(--...)`, theme and motion init script. `daily-tracker:motion` honoured on every page (Q2). `today.html`: last heat-strip cell tooltip now reads "Hari ini".                               |
 | 2026-10-18 | all five                     | Shared rules normalised across prototypes (body transition, one `.coin`, one `.panel` rule with default padding 22 and component overrides, one bracket selector list, combined nav hover rule, `.scan` via `--scan`); `color-scheme` added to the token blocks; Today pips label renamed "Streak" and pips defined (note 4). |
+| 2026-10-19 | all five                     | Audit batch 1: English copy, two-row mobile navigation up to 1023px, inline delete confirmation (tasks, rewards), no purchase undo, empty states, validation and import copy, radar aria-label with the five values.                                                                                                          |
 
 Fixtures derived from these values (the `today` heat strip and the `rewards`
 purchase log) were regenerated from the corrected prototypes in PR #158
