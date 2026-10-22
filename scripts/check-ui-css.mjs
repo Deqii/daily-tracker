@@ -203,6 +203,12 @@ const RULES = [
   // Design tokens.
   { context: '', selector: ':root' },
   { context: '', selector: '[data-theme=light]' },
+  { context: '', selector: '[data-rank=E]' },
+  { context: '', selector: '[data-rank=D]' },
+  { context: '', selector: '[data-rank=C]' },
+  { context: '', selector: '[data-rank=B]' },
+  { context: '', selector: '[data-rank=A]' },
+  { context: '', selector: '[data-rank=S]' },
 
   // base.css
   { context: '', selector: '*' },
@@ -237,6 +243,8 @@ const RULES = [
   { context: '@keyframes brk-in', selector: 'to' },
   { context: '@keyframes brk-breathe', selector: 'from' },
   { context: '@keyframes brk-breathe', selector: 'to' },
+  { context: '@media(max-width:640px)', selector: '.panel::before' },
+  { context: '@media(max-width:640px)', selector: '.drawer::before' },
 
   // boot.css
   { context: '', selector: '.boot' },
@@ -257,6 +265,8 @@ const RULES = [
   { context: '', selector: '.chips' },
   { context: '', selector: '.chip' },
   { context: '', selector: '.chip span' },
+  { context: '', selector: '.chip.rk' },
+  { context: '', selector: '.chip.rk b' },
   { context: '', selector: '.coin' },
   // The two-row header from 1023px down. `nav` is never hidden; the 700px
   // block only compacts the first row, so it is compared for header, logo and
@@ -350,6 +360,21 @@ const RULES = [
   { context: '', selector: '.nm small' },
   { context: '', selector: '.pts' },
   { context: '', selector: '.need' },
+  { context: '', selector: '.qgroup' },
+  { context: '', selector: '.chev' },
+  { context: '', selector: '.qrow[aria-expanded=true] .chev' },
+  { context: '', selector: '.tiers' },
+  { context: '@keyframes tiers-in', selector: 'from' },
+  { context: '', selector: '.tier' },
+  { context: '', selector: '.tier:hover' },
+  { context: '', selector: '.tier:focus-visible' },
+  { context: '', selector: '.tier span' },
+  { context: '', selector: '.tier small' },
+  { context: '', selector: '.tier b' },
+  { context: '', selector: '.blocked' },
+  { context: '', selector: '.empty' },
+  { context: '', selector: '.empty h2' },
+  { context: '', selector: '.empty .btn' },
   { context: '', selector: '.qrow.done .need' },
   { context: '', selector: '.float' },
   { context: '', selector: '.ring' },
@@ -389,6 +414,10 @@ const RULES = [
   { context: '@media(max-width:1100px)', selector: '.bottom' },
   { context: '@media(max-width:700px)', selector: 'main' },
   { context: '@media(max-width:700px)', selector: '.stats' },
+  { context: '@media(max-width:640px)', selector: '.qrow' },
+  { context: '@media(max-width:640px)', selector: '.tier' },
+  { context: '@media(max-width:640px)', selector: '.btn' },
+  { context: '@media(max-width:640px)', selector: '.obtn' },
 
   // Page keyframes, compared by the prototype's name (today.html:89, 96, 116,
   // 121-122, 134, 136).
@@ -400,6 +429,9 @@ const RULES = [
   { context: '@keyframes fl', selector: 'to' },
   { context: '@keyframes rg', selector: 'from' },
   { context: '@keyframes rg', selector: 'to' },
+  { context: '@keyframes ov-fade', selector: 'from' },
+  { context: '@keyframes ov-in', selector: 'from' },
+  { context: '@keyframes ov-pulse', selector: '50%' },
 ];
 
 /* ------------------------------------------------------------------ indexing */

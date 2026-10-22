@@ -155,7 +155,7 @@
     {/each}
   </nav>
   <div class="chips">
-    <div class="chip"><span>Rank</span><b>{$rank}</b></div>
+    <div class="chip rk"><span>Rank</span><b>{$rank}</b></div>
     <div class="chip"><span>Streak</span><b>{$streak}</b></div>
     <div class="chip"><span>Wallet</span><i class="coin"></i><b>{$walletDisplay}</b></div>
   </div>

@@ -123,6 +123,7 @@
   --tier-r: #4ade9a;
   --tier-s: #3da9ff;
   --tier-b: #ff8a9a;
+  --accent: var(--rk-e);
   color-scheme: dark;
 }
 [data-theme='light'] {
@@ -169,6 +170,24 @@
   --tier-b: #c8365a;
   color-scheme: light;
 }
+[data-rank='E'] {
+  --accent: var(--rk-e);
+}
+[data-rank='D'] {
+  --accent: var(--rk-d);
+}
+[data-rank='C'] {
+  --accent: var(--rk-c);
+}
+[data-rank='B'] {
+  --accent: var(--rk-b);
+}
+[data-rank='A'] {
+  --accent: var(--rk-a);
+}
+[data-rank='S'] {
+  --accent: var(--rk-s);
+}
 
 /*
  * ============================================================================
@@ -212,8 +231,7 @@
   --rank-a: #f0a93a;
   --rank-s: #ffe9a8;
 
-  /* current rank */
-  --accent: var(--rank-e);
+  /* current rank (accent is owned by the prototype token blocks) */
   --glow-px: 6px;
   --glow-alpha: 60%;
 }
@@ -236,27 +254,21 @@
 }
 
 :root[data-rank='E'] {
-  --accent: var(--rank-e);
   --glow-px: 6px;
 }
 :root[data-rank='D'] {
-  --accent: var(--rank-d);
   --glow-px: 8px;
 }
 :root[data-rank='C'] {
-  --accent: var(--rank-c);
   --glow-px: 10px;
 }
 :root[data-rank='B'] {
-  --accent: var(--rank-b);
   --glow-px: 12px;
 }
 :root[data-rank='A'] {
-  --accent: var(--rank-a);
   --glow-px: 14px;
 }
 :root[data-rank='S'] {
-  --accent: var(--rank-s);
   --glow-px: 18px;
 }
 

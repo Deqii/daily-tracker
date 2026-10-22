@@ -28,6 +28,7 @@
           return v;
         };
         d.dataset.theme = read('daily-tracker:theme') === 'light' ? 'light' : 'dark';
+        d.dataset.rank = 'E';
         if (read('daily-tracker:motion') === 'off') d.dataset.motion = 'off';
       } catch (e) {
         document.documentElement.dataset.theme = 'dark';

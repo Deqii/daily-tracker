@@ -49,7 +49,7 @@
   position: absolute;
   inset: -1px;
   pointer-events: none;
-  --k: var(--bc, var(--blue));
+  --k: var(--bc, var(--accent));
   --a0: 14px;
   --a1: 26px;
   --w: 2px;
@@ -94,5 +94,13 @@
   to {
     --arm: var(--a1);
     filter: drop-shadow(0 0 7px var(--k));
+  }
+}
+
+@media (max-width: 640px) {
+  .panel::before,
+  .drawer::before {
+    --a0: 10px;
+    --a1: 16px;
   }
 }
