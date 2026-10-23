@@ -318,6 +318,9 @@
   .v.over .pt {
     color: var(--danger);
   }
+  .v .pt .bd {
+    margin-right: 6px;
+  }
   .empty {
     text-align: center;
     padding: 48px 20px;
@@ -580,6 +583,18 @@
     .in {
       font-size: 16px;
       min-height: 44px;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  @scope (body[data-page='tasks']) {
+    .v.over {
+      grid-template-columns: 62px 1fr;
+    }
+    .v.over .pt {
+      grid-column: 1/-1;
+      white-space: normal;
     }
   }
 }

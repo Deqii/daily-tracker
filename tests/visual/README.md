@@ -52,6 +52,20 @@ First run only:
 npx playwright install chromium
 ```
 
+## CSS minification in the visual build
+
+The visual build (`vite build --mode visual`) disables CSS minification
+(`build.cssMinify: false` in `vite.config.ts`). The prototypes are served as
+hand-written CSS, while Vite 8 minifies CSS with Lightning CSS, which rewrites
+`background: none` to `background: 0 0`. Chromium then reports
+`backgroundPosition: 0px 0px` for the app and `0% 0%` for the prototype, so the
+computed-style diff fails on a property that paints identically. Production
+builds still minify.
+
+Consequence: the visual suite no longer exercises minified CSS. A production
+smoke check (build `dist/`, load the real app, assert no console errors and the
+main regions render) is therefore recommended for Issue 7. Do not build it here.
+
 ## The shell test
 
 `shell.spec.ts` is the required check for Issue 1 and, from Issue 7, for every

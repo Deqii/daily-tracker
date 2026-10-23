@@ -330,9 +330,8 @@
                   >
                     <em>{display.name}</em><span>{effort.description}</span>
                     <div class="pt">
-                      {#if cap !== null && effort.points > cap}<span
-                          class="bd o"
-                          style="margin-right:6px">{overCapCopy}</span
+                      {#if cap !== null && effort.points > cap}<span class="bd o"
+                          >{overCapCopy}</span
                         >{/if}{effort.points} pts<small>+{taskXp(effort.points)} XP</small>
                     </div>
                   </div>
