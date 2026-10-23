@@ -697,21 +697,24 @@ function pseudoKeys(st: Record<string, string>): string[] {
 }
 
 /**
- * The page-local keyframe renames (UI Revamp Issue 2), listed in
+ * The page-local keyframe renames (UI Revamp Issues 2 and 3), listed in
  * `docs/prototype/DEVIATIONS.md` under "Mechanical renames".
  *
- * `@keyframes` names are global CSS, so the five prototypes' identical names for
- * five different animations cannot share one global stylesheet: the app's page
- * keyframes carry a `today-` prefix and the animation bodies are the
+ * `@keyframes` names are global CSS, so pages that reuse a name for different
+ * animations cannot share one global stylesheet: the app's page keyframes carry
+ * a page prefix (`today-`, `tasks-`) and the animation bodies are the
  * prototype's, unchanged. `computedStyle.animationName` therefore reports a
  * different identifier for the same animation, so both sides are un-prefixed
  * before they are compared. Nothing else in a computed style contains these
  * tokens, and no other value is touched.
  */
 const KEYFRAME_RENAMES = ['spin', 'shine', 'blink', 'pen', 'pulse', 'fl', 'rg'];
+const TASKS_KEYFRAME_RENAMES = ['flash', 'out'];
 
 function unrenameKeyframes(value: string): string {
-  return value.replace(new RegExp(`\\btoday-(${KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1');
+  return value
+    .replace(new RegExp(`\\btoday-(${KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1')
+    .replace(new RegExp(`\\btasks-(${TASKS_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1');
 }
 
 /** Style report for two trees that line up element for element. */

@@ -104,7 +104,7 @@ export interface AppDeps {
 export interface AppStore extends Readable<AppState> {
   completeTask(taskId: string, variantTier: Tier | null): CompleteTaskResult;
   deleteTask(taskId: string): void;
-  saveTask(draft: TaskFormDraft, editingId: string | null): void;
+  saveTask(draft: TaskFormDraft, editingId: string | null): string;
   saveReward(draft: RewardFormDraft, editingId: string | null): void;
   purchaseReward(rewardId: string): PurchaseResult;
   equipTitle(id: TitleId | null): void;
@@ -446,6 +446,8 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
 
       commit(next);
       persist(next);
+
+      return task.id;
     },
     deleteTask(taskId) {
       const task = current.tasks.find((entry) => entry.id === taskId);
