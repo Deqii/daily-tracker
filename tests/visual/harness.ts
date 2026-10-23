@@ -151,6 +151,23 @@ export async function open(page: Page, url: string): Promise<void> {
   // it is hidden on both sides rather than diffed.
   await page.addStyleTag({ content: '#fx,.scan,#demo{display:none!important}' });
   await page.waitForTimeout(SETTLE_MS);
+  // The app mounts after a dynamic import, so on a slow run the settle window can
+  // start before its first panel exists. Wait for the page to have content and for
+  // every staggered `.boot` entrance to reach its end state, then for the finite
+  // transitions (the XP bar's width). The prototype already has both.
+  await page.waitForFunction(
+    () => (document.querySelector('main')?.children.length ?? 0) > 0,
+    undefined,
+    { timeout: 10000 }
+  );
+  await page.waitForFunction(
+    () =>
+      [...document.querySelectorAll('.boot')].every(
+        (element) => getComputedStyle(element).opacity === '1'
+      ),
+    undefined,
+    { timeout: 10000 }
+  );
   await settleFiniteAnimations(page);
   await settleFrames(page);
 }
@@ -698,6 +715,20 @@ function unrenameKeyframes(value: string): string {
 }
 
 /** Style report for two trees that line up element for element. */
+/**
+ * Chromium serialises a finished entrance differently depending on whether the
+ * animation was still on the compositor when the style was read: the end of
+ * `transform: none` can come back as the identity matrix, and the end of
+ * `filter: none` as `blur(0px)`. Both are pixel-identical to `none`, so they
+ * are compared as such; a real transform or a non-zero blur still differs.
+ */
+function normaliseIdentity(value: string): string {
+  if (value === 'matrix(1, 0, 0, 1, 0, 0)') return 'none';
+  if (value === 'blur(0px)') return 'none';
+
+  return value;
+}
+
 export function compareStyles(A: StyleEntry[], B: StyleEntry[]): string[] {
   const lines: string[] = [];
   const problems: { path: string; found: string[] }[] = [];
@@ -724,8 +755,8 @@ export function compareStyles(A: StyleEntry[], B: StyleEntry[]): string[] {
     const shared = Object.keys(a.st).filter((k) => !k.startsWith('::'));
 
     for (const k of shared) {
-      const left = unrenameKeyframes(a.st[k]);
-      const right = unrenameKeyframes(b.st[k]);
+      const left = normaliseIdentity(unrenameKeyframes(a.st[k]));
+      const right = normaliseIdentity(unrenameKeyframes(b.st[k]));
 
       if (left !== right) {
         found.push(`[${k}] ${left || '(empty)'} -> ${right || '(empty)'}`);
