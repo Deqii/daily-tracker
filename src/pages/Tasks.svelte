@@ -117,7 +117,7 @@
     drawerRendered = true;
     drawerOpen = true;
 
-    setTimeout(() => nameInput?.focus(), 150);
+    setTimeout(() => nameInput?.focus(), 300);
   }
 
   function closeDrawer(): void {
@@ -147,10 +147,6 @@
         .querySelector(`[data-id="${id}"]`)
         ?.scrollIntoView({ block: 'center', behavior: motionIsReduced() ? 'auto' : 'smooth' });
     }, 60);
-
-    setTimeout(() => {
-      if (flashId === id) flashId = null;
-    }, 1100);
   }
 
   function askDelete(task: Task): void {

@@ -1,7 +1,7 @@
 # Visual fidelity harness (UI Revamp)
 
 Compares each `docs/prototype/*.html` page with the Svelte app at 1280x800 and
-390x844, in the dark and the light theme. Six independent specs:
+390x844, in the dark and the light theme. Eight independent specs:
 
 | Spec                                | Asserts                                                                               |
 | ----------------------------------- | ------------------------------------------------------------------------------------- |
@@ -12,6 +12,7 @@ Compares each `docs/prototype/*.html` page with the Svelte app at 1280x800 and
 | `today-interactions.spec.ts`        | the Today page's interactions: the same action on both sides, then the same diffs     |
 | `today-states.spec.ts`              | every reusable Today state (`?state=`) at 1280x800 dark, 390x844 dark, 1280x800 light |
 | `today-states-interactions.spec.ts` | the states' mechanics and keyboard/ARIA paths                                         |
+| `tasks-interactions.spec.ts`        | the Tasks page's drawers, validation, filters, add and delete interactions            |
 
 They are separate on purpose. Health describes whether the app works, the diffs
 describe whether it matches, the self-test describes whether the diffs can be
@@ -27,6 +28,7 @@ npm run test:visual -- shell             # header region only
 npm run test:visual -- fidelity health   # the page diffs and health checks
 npm run test:visual -- today-interactions # the Today interactions (3 scenarios x 2 themes)
 npm run test:visual -- today-states   # the Today state diffs + interactions
+npm run test:visual -- tasks-interactions # the Tasks interactions (6 scenarios x 2 themes)
 npm run test:visual -- --grep "today"    # one page
 npm run test:visual -- --grep "@ 390"    # one viewport
 npm run test:visual -- --grep "light"    # one theme

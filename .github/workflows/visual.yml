@@ -67,6 +67,13 @@ jobs:
       # 1280x800 light, plus the state mechanics, keyboard paths and ARIA roles.
       - run: npx playwright test today-states
       - run: npx playwright test today-states-interactions
+      # The Tasks page is ported too (Issue 3): the static diff, the health
+      # check, and the six interaction scenarios (drawer open/close and focus,
+      # empty and over-cap validation, combined filters, adding a single-tier
+      # task, and delete) in both themes.
+      - run: npx playwright test fidelity --grep tasks
+      - run: npx playwright test health --grep tasks
+      - run: npx playwright test tasks-interactions
 
   visual-fidelity:
     name: visual-fidelity (informational)
