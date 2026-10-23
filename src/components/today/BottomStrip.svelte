@@ -53,7 +53,7 @@
     const result = app.purchaseReward(reward.id);
 
     if (result.ok) {
-      showToast(`${reward.title} dibeli (−${reward.cost})`);
+      showToast(`${reward.title} bought (−${reward.cost})`);
     }
   }
 </script>

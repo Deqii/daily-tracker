@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { closeDayStreak, displayStreak, type StreakState } from '../../engine/streak';
 import { getRankConfig } from '../../engine/rank';
+import { passesBalanceGate } from '../../engine/balance';
 import { addDays, weekStart } from '../date';
 import { STATS, type DailyQuestDay } from '../types';
 import type { StorageSchema } from '../storage';
 import { FIXTURES, FIXED_TODAY } from './data';
 import rewardsSnapshot from './rewards-snapshot.json';
 import todaySnapshot from './today-snapshot.json';
+import todayStatesSnapshot from './today-states-snapshot.json';
+import historyLong from './history-long-snapshot.json';
+import historyOpen from './history-open-snapshot.json';
 
 /**
  * Proof that the seeded fixtures reproduce the prototypes' demo data.
@@ -219,5 +223,113 @@ describe('rewards fixture', () => {
     // purchase is therefore the day before the fixed clock.
     expect(rewards.rewardPurchases[0]?.localDate).toBe(addDays(FIXED_TODAY, -1));
     expect(rewards.rewardPurchases.every((p) => p.purchasedAt.startsWith(p.localDate))).toBe(true);
+  });
+});
+
+describe('today state fixtures', () => {
+  const states = FIXTURES.today.states ?? {};
+  const dumps = (todayStatesSnapshot as unknown as { states: Record<string, unknown> }).states;
+  const snapshot = (name: string) =>
+    dumps[name] as unknown as {
+      freezes: number;
+      xp: number;
+      stats: Record<string, number>;
+      quests: { tiers: { name: string; description: string; nominal: number }[] | null }[];
+    };
+
+  it('seeds every representable state and omits the two-freeze state', () => {
+    expect(Object.keys(states).sort()).toEqual([
+      'blocked',
+      'empty',
+      'freeze0',
+      'levelup',
+      'notitle',
+      'rankdown',
+      'rankup',
+      'recovery',
+      'storage',
+      'tiers',
+    ]);
+    expect(states.freeze2).toBeUndefined();
+  });
+
+  it('builds the tier picker from the dumped variants', () => {
+    const tiers = snapshot('tiers').quests.find((q) => q.tiers !== null)?.tiers ?? [];
+    const task = states.tiers?.schema.tasks.find((t) => t.id === 't-int');
+
+    expect(task?.familyName).toBe('Belajar coding');
+    expect(task?.variants.map((v) => [v.tier, v.description, v.points])).toEqual(
+      tiers.map((t, i) => [['easy', 'medium', 'hard'][i], t.description, t.nominal])
+    );
+  });
+
+  it('derives no freezes left from the rank config', () => {
+    const freeze0 = states.freeze0?.schema.userState;
+
+    expect(freeze0).toBeDefined();
+    expect(snapshot('freeze0').freezes).toBe(0);
+    expect(getRankConfig('E').freezesPerWeek - (freeze0?.freezesUsedThisWeek ?? 0)).toBe(0);
+  });
+
+  it('builds the blocked state from the dumped level and stats', () => {
+    const user = states.blocked?.schema.userState;
+
+    expect(user?.lifetimeXP).toBe(snapshot('blocked').xp);
+    expect(user?.statXP).toEqual(snapshot('blocked').stats);
+    const gate = passesBalanceGate(user?.statXP ?? { STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 });
+
+    expect(gate.passes).toBe(false);
+    expect(gate.weakest).toBe('SOC');
+    expect(gate.threshold).toBe(36);
+  });
+
+  it('omits the title chip and the tasks in their states', () => {
+    expect(states.notitle?.schema.userState.equippedTitle).toBeNull();
+    expect(states.empty?.schema.tasks).toHaveLength(0);
+  });
+
+  it('seeds unseen milestone events for the overlays and notice', () => {
+    expect(states.levelup?.schema.milestoneEvents[0]).toMatchObject({
+      type: 'levelUp',
+      from: 3,
+      to: 4,
+      seen: false,
+    });
+    expect(states.rankup?.schema.milestoneEvents[0]).toMatchObject({
+      type: 'rankUp',
+      to: 'D',
+      seen: false,
+    });
+    expect(states.rankdown?.schema.milestoneEvents[0]).toMatchObject({
+      type: 'rankDown',
+      to: 'E',
+      seen: false,
+    });
+  });
+
+  it('uses the app post-seed paths for storage failure and recovery', () => {
+    expect(states.storage?.post).toBe('storage-failure');
+    expect(states.recovery?.post).toBe('recovery');
+  });
+});
+
+describe('history state snapshots', () => {
+  const long = historyLong as unknown as { days: { freeze: boolean; open: boolean }[] };
+  const open = historyOpen as unknown as { days: { mask: string; open: boolean }[] };
+
+  it('dumps 150 days for the long history range', () => {
+    expect(long.days).toHaveLength(150);
+  });
+
+  it('marks the last three-of-five day as open', () => {
+    const last = open.days[open.days.length - 1];
+
+    expect(last?.open).toBe(true);
+    expect(last?.mask).toBe('11010');
+    expect(open.days.filter((d) => d.open)).toHaveLength(1);
+  });
+
+  it('carries the freeze flag on every dumped day', () => {
+    expect(long.days.every((d) => typeof d.freeze === 'boolean')).toBe(true);
   });
 });

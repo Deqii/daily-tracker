@@ -1,4 +1,5 @@
 <script lang="ts">
+  import StorageNotices from './StorageNotices.svelte';
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
   import { currentRoute, type Route } from '../lib/router';
@@ -145,6 +146,8 @@
 <canvas id="fx" aria-hidden="true"></canvas>
 <div class="scan" aria-hidden="true"></div>
 
+<StorageNotices />
+
 <header>
   <div class="logo">Daily Tracker</div>
   <nav aria-label="Primary">
@@ -155,7 +158,7 @@
     {/each}
   </nav>
   <div class="chips">
-    <div class="chip"><span>Rank</span><b>{$rank}</b></div>
+    <div class="chip rk"><span>Rank</span><b>{$rank}</b></div>
     <div class="chip"><span>Streak</span><b>{$streak}</b></div>
     <div class="chip"><span>Wallet</span><i class="coin"></i><b>{$walletDisplay}</b></div>
   </div>

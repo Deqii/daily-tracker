@@ -65,11 +65,11 @@ describe('the toast', () => {
   });
 
   it('can be hidden early, and the text stays', () => {
-    showToast('Main game 2 jam dibeli (−60)');
+    showToast('Main game 2 jam bought (−60)');
     hideToast();
 
     expect(get(toastVisible)).toBe(false);
-    expect(get(toastText)).toBe('Main game 2 jam dibeli (−60)');
+    expect(get(toastText)).toBe('Main game 2 jam bought (−60)');
 
     // An early hide cancels the timer, so nothing fires later.
     vi.advanceTimersByTime(TOAST_MS * 2);

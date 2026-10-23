@@ -29,7 +29,7 @@ export function getStorageNotices({
   if (saveError !== null) {
     notices.push({
       type: 'write-failure',
-      message: "Your data could not be saved. Export it now so you don't lose progress.",
+      message: 'Your data could not be saved. Export it now so you don’t lose progress.',
       hasExport: true,
       hasDismiss: false,
     });

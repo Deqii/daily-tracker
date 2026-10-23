@@ -70,10 +70,10 @@
   }
   .rank {
     font: 700 76px/1 var(--font-display);
-    color: var(--cyan);
+    color: var(--accent);
     text-shadow:
-      0 0 28px var(--blue),
-      0 0 4px var(--blue);
+      0 0 28px var(--accent),
+      0 0 4px var(--accent);
   }
   .lv {
     text-align: center;
@@ -81,6 +81,7 @@
   .lv b {
     font: 700 34px var(--font-display);
     margin-left: 6px;
+    color: var(--accent);
   }
   .title {
     align-self: center;
@@ -101,8 +102,8 @@
   .xpbar i {
     display: block;
     height: 100%;
-    background: linear-gradient(90deg, #1e6fd0, var(--cyan));
-    box-shadow: 0 0 12px var(--blue);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 55%, #000), var(--accent));
+    box-shadow: 0 0 12px var(--accent);
     transition: width var(--t-slow) var(--ease);
     position: relative;
   }
@@ -158,6 +159,7 @@
   }
   #radar {
     width: 100%;
+    min-width: 240px;
     max-width: 440px;
     overflow: visible;
   }
@@ -346,6 +348,85 @@
   .qrow.done .need {
     color: var(--ok);
   }
+  .qgroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .chev {
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(45deg);
+    margin: 0 4px 3px 2px;
+    transition: transform var(--t-fast);
+  }
+  .qrow[aria-expanded='true'] .chev {
+    transform: rotate(225deg) translate(-2px, -2px);
+  }
+  .tiers {
+    display: grid;
+    gap: 6px;
+    margin-left: 32px;
+    animation: today-tiers-in var(--t-base) var(--ease);
+  }
+  .tier {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--tc);
+    background: var(--ins);
+    cursor: pointer;
+    transition:
+      background var(--t-fast),
+      transform var(--t-fast);
+  }
+  .tier:hover {
+    background: rgba(61, 169, 255, 0.09);
+    transform: translateX(3px);
+  }
+  .tier:focus-visible {
+    outline: 2px solid var(--cyan);
+  }
+  .tier span {
+    font-weight: 600;
+    color: var(--tc);
+    min-width: 58px;
+  }
+  .tier small {
+    flex: 1;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .tier b {
+    font: 500 13px var(--font-mono);
+    color: var(--cyan);
+  }
+  .blocked {
+    font-size: 13px;
+    color: var(--muted);
+    border-top: 1px dashed var(--line);
+    padding-top: 10px;
+  }
+  .empty {
+    text-align: center;
+    padding: 28px 16px;
+    border: 1px dashed var(--line);
+    color: var(--muted);
+  }
+  .empty h2 {
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .empty .btn {
+    margin-top: 12px;
+    display: inline-flex;
+  }
   .float {
     position: fixed;
     z-index: 20;
@@ -526,7 +607,8 @@
 }
 
 /* Page-local keyframes. Renamed from the prototype's `spin`, `shine`, `blink`,
-   `pen`, `pulse`, `fl` and `rg`; the bodies are the prototype's, unchanged. */
+   `pen`, `pulse`, `fl`, `rg` and `tiers-in`; the bodies are the prototype's,
+   unchanged. */
 @keyframes today-spin {
   to {
     transform: rotate(360deg);
@@ -572,5 +654,23 @@
   to {
     transform: translate(-50%, -50%) scale(3);
     opacity: 0;
+  }
+}
+
+@keyframes today-tiers-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 640px) {
+  @scope (body[data-page='today']) {
+    .qrow,
+    .tier,
+    .btn,
+    .obtn {
+      min-height: 44px;
+    }
   }
 }

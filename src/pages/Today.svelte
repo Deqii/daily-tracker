@@ -2,6 +2,7 @@
   import BottomStrip from '../components/today/BottomStrip.svelte';
   import QuestColumn from '../components/today/QuestColumn.svelte';
   import RadarPanel from '../components/today/RadarPanel.svelte';
+  import RankDownNotice from '../components/today/RankDownNotice.svelte';
   import StatusWindow from '../components/today/StatusWindow.svelte';
 </script>
 
@@ -12,6 +13,7 @@
   rendered DOM is not. The page rules are in `src/styles/ui/today.css`, scoped to
   `body[data-page="today"]`.
 -->
+<RankDownNotice />
 <StatusWindow />
 <RadarPanel />
 <QuestColumn />

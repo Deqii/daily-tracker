@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Daily Tracker – Today (prototype)</title>
-<script>try{var d=document.documentElement,t=localStorage.getItem('daily-tracker:theme');d.dataset.theme=t==='light'?'light':'dark';if(localStorage.getItem('daily-tracker:motion')==='off')d.dataset.motion='off'}catch(e){}</script>
+<script>try{var d=document.documentElement,t=localStorage.getItem('daily-tracker:theme');d.dataset.theme=t==='light'?'light':'dark';d.dataset.rank='E';if(localStorage.getItem('daily-tracker:motion')==='off')d.dataset.motion='off'}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
@@ -22,6 +22,7 @@
   --ease:cubic-bezier(.2,.8,.2,1); --t-fast:.15s; --t-base:.35s; --t-slow:.7s; --stagger:70ms;
   --ins2:rgba(5,7,13,.6); --scan:rgba(61,169,255,.12); --track:rgba(255,255,255,.08); --lock-text:#c3d0e4; --monarch-soft:#b7a4ff;
   --tier-r:#4ade9a; --tier-s:#3da9ff; --tier-b:#ff8a9a;
+  --accent:var(--rk-e);
   color-scheme:dark;
 }
 [data-theme=light]{
@@ -37,6 +38,7 @@
   --tier-r:#12804a; --tier-s:#1673c9; --tier-b:#c8365a;
   color-scheme:light;
 }
+[data-rank=E]{--accent:var(--rk-e)}[data-rank=D]{--accent:var(--rk-d)}[data-rank=C]{--accent:var(--rk-c)}[data-rank=B]{--accent:var(--rk-b)}[data-rank=A]{--accent:var(--rk-a)}[data-rank=S]{--accent:var(--rk-s)}
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);color:var(--text);font:400 15px/1.5 var(--font-body);min-height:100vh;overflow-x:hidden;transition:background var(--t-base),color var(--t-base)}
 body::before{content:"";position:fixed;inset:0;z-index:-2;
@@ -57,6 +59,7 @@ nav a[aria-current]::after{content:"";position:absolute;left:12px;right:12px;bot
 .chips{display:flex;gap:8px}
 .chip{border:1px solid var(--line);border-radius:var(--r-chip);padding:4px 12px;font:500 13px var(--font-mono);background:var(--panel);display:flex;gap:8px;align-items:center}
 .chip span{color:var(--muted);font-family:var(--font-body)}
+.chip.rk{border-color:var(--accent);color:var(--accent)}.chip.rk b{color:var(--accent)}
 .coin{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 30%,#fff3b8,var(--gold) 55%,#b8860b)}
 /* Layout */
 main{max-width:1280px;margin:0 auto;padding:28px 32px 48px;display:grid;grid-template-columns:320px 1fr 380px;gap:20px}
@@ -64,7 +67,7 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 48px;display:grid;grid-tem
 .panel{padding:22px}
 @property --arm{syntax:'<length>';inherits:false;initial-value:14px}
 .panel,.penalty,.stat,.rw{position:relative}
-.panel::before,.drawer::before,.penalty::before,.stat::before,.rw::before{content:"";position:absolute;inset:-1px;pointer-events:none;--k:var(--bc,var(--blue));--a0:14px;--a1:26px;--w:2px;
+.panel::before,.drawer::before,.penalty::before,.stat::before,.rw::before{content:"";position:absolute;inset:-1px;pointer-events:none;--k:var(--bc,var(--accent));--a0:14px;--a1:26px;--w:2px;
   background:linear-gradient(var(--k),var(--k)) 0 0/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 0 0/var(--w) var(--arm) no-repeat,
   linear-gradient(var(--k),var(--k)) 100% 0/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 100% 0/var(--w) var(--arm) no-repeat,
   linear-gradient(var(--k),var(--k)) 0 100%/var(--arm) var(--w) no-repeat,linear-gradient(var(--k),var(--k)) 0 100%/var(--w) var(--arm) no-repeat,
@@ -87,11 +90,11 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
 .emblem{position:relative;width:150px;height:150px;margin:4px auto 0;display:grid;place-items:center}
 .emblem svg{position:absolute;inset:0;animation:spin 40s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.rank{font:700 76px/1 var(--font-display);color:var(--cyan);text-shadow:0 0 28px var(--blue),0 0 4px var(--blue)}
-.lv{text-align:center}.lv b{font:700 34px var(--font-display);margin-left:6px}
+.rank{font:700 76px/1 var(--font-display);color:var(--accent);text-shadow:0 0 28px var(--accent),0 0 4px var(--accent)}
+.lv{text-align:center}.lv b{font:700 34px var(--font-display);margin-left:6px;color:var(--accent)}
 .title{align-self:center;border:1px solid rgba(139,108,255,.55);color:#c9bbff;padding:3px 12px;border-radius:var(--r-chip);font-size:13px;background:rgba(139,108,255,.1)}
 .xpbar{height:8px;background:rgba(61,169,255,.12);border:1px solid var(--line);overflow:hidden;position:relative}
-.xpbar i{display:block;height:100%;background:linear-gradient(90deg,#1e6fd0,var(--cyan));box-shadow:0 0 12px var(--blue);transition:width var(--t-slow) var(--ease);position:relative}
+.xpbar i{display:block;height:100%;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 55%,#000),var(--accent));box-shadow:0 0 12px var(--accent);transition:width var(--t-slow) var(--ease);position:relative}
 .xpbar i::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.55),transparent 70%);transform:translateX(-100%);animation:shine 3.2s ease-in-out infinite}
 @keyframes shine{60%,100%{transform:translateX(100%)}}
 .row{display:flex;justify-content:space-between;align-items:center}
@@ -100,7 +103,7 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
 .shield{display:inline-flex;align-items:center;gap:6px;color:var(--cyan);font-size:13px}
 /* Radar */
 .radar-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
-#radar{width:100%;max-width:440px;overflow:visible}
+#radar{width:100%;min-width:240px;max-width:440px;overflow:visible}
 .legend{display:flex;gap:16px;font-size:12px;color:var(--muted)}
 .legend s{display:inline-block;width:18px;border-top:2px dashed var(--monarch);margin-right:6px;vertical-align:middle;text-decoration:none}
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;margin-top:6px}
@@ -151,9 +154,35 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
 .toast.show{transform:translate(-50%,0);opacity:1}
 .toast button{all:unset;cursor:pointer;color:var(--cyan);font-weight:700}.toast button:hover{text-decoration:underline}
 @media(max-width:1100px){main{grid-template-columns:1fr 1fr}.quest{grid-column:1/-1;order:-1}.bottom{grid-template-columns:1fr}}
+.qgroup{display:flex;flex-direction:column;gap:6px}
+.chev{width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:0 4px 3px 2px;transition:transform var(--t-fast)}
+.qrow[aria-expanded=true] .chev{transform:rotate(225deg) translate(-2px,-2px)}
+.tiers{display:grid;gap:6px;margin-left:32px;animation:tiers-in var(--t-base) var(--ease)}
+@keyframes tiers-in{from{opacity:0;transform:translateY(-4px)}}
+.tier{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--line);border-left:3px solid var(--tc);background:var(--ins);cursor:pointer;transition:background var(--t-fast),transform var(--t-fast)}
+.tier:hover{background:rgba(61,169,255,.09);transform:translateX(3px)}.tier:focus-visible{outline:2px solid var(--cyan)}
+.tier span{font-weight:600;color:var(--tc);min-width:58px}.tier small{flex:1;color:var(--muted);font-size:13px}.tier b{font:500 13px var(--font-mono);color:var(--cyan)}
+.blocked{font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
+.empty{text-align:center;padding:28px 16px;border:1px dashed var(--line);color:var(--muted)}.empty h2{color:var(--text);margin-bottom:4px}.empty .btn{margin-top:12px;display:inline-flex}
+.ov{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:color-mix(in srgb,var(--bg) 80%,transparent);animation:ov-fade .2s ease both}
+.ovp{width:min(360px,100%);text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;animation:ov-in .4s var(--ease) both}
+.ovp small{color:var(--muted);font-size:14px}.ovp p{color:var(--muted)}
+.ovp .big{font:700 84px/1 var(--font-mono);color:var(--accent);text-shadow:0 0 28px var(--accent);animation:ov-pulse .8s ease 1}
+.ovp dl{display:grid;grid-template-columns:1fr auto;gap:6px 16px;width:100%;margin:0;text-align:left;font:500 14px var(--font-mono)}.ovp dt{color:var(--muted)}.ovp dd{margin:0}
+@keyframes ov-fade{from{opacity:0}}@keyframes ov-in{from{opacity:0;transform:scale(.96)}}@keyframes ov-pulse{50%{text-shadow:0 0 46px var(--accent),0 0 12px var(--accent)}}
+.banner{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 32px;border-bottom:1px solid var(--danger);background:color-mix(in srgb,var(--danger) 10%,transparent)}
+.banner.recovery{border-bottom-color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,transparent)}.banner span:last-child{display:flex;gap:12px;align-items:center}
+.notice{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--danger)}
+.obtn{all:unset;box-sizing:border-box;cursor:pointer;background:var(--accent);color:var(--on-accent);font:700 14px var(--font-display);padding:8px 20px;border-radius:var(--r-chip);transition:box-shadow var(--t-fast),transform var(--t-fast)}.obtn:hover{box-shadow:0 0 16px var(--accent)}.obtn:active{transform:scale(.95)}.obtn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.lnk{all:unset;cursor:pointer;color:var(--cyan);text-decoration:underline}.lnk:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.ovp{animation:ov-fade .001s both}.ovp .big{animation:none}}
+[data-motion=off] .ovp{animation:ov-fade .001s both}[data-motion=off] .ovp .big{animation:none}
+@media(max-width:700px){.banner{padding:10px 16px;flex-wrap:wrap}}
 @media(max-width:1023px){header{flex-wrap:wrap;padding:12px 16px 0;gap:8px 12px}.chips{margin-left:auto}nav{order:3;flex:0 0 100%;margin:0 -16px;padding:0;gap:0;border-top:1px solid var(--line)}nav a{flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 4px}nav a[aria-current]::after{bottom:0}}
 @media(max-width:700px){header{padding:12px 16px 0;gap:8px 12px}.logo{font-size:16px;white-space:nowrap}.chips{margin-left:auto;gap:6px}.chip{padding:3px 8px;gap:5px;font-size:12px;white-space:nowrap}main{grid-template-columns:1fr;padding:16px}.stats{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:380px){.chips .chip:first-child{display:none}}
+@media(max-width:640px){.panel::before,.drawer::before{--a0:10px;--a1:16px}}
+@media(max-width:640px){.qrow,.tier,.btn,.obtn{min-height:44px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}}
 [data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
 [data-motion=off] #fx,[data-motion=off] .scan{display:none}
@@ -165,19 +194,19 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
 <header>
   <div class="logo">Daily Tracker</div>
   <nav aria-label="Primary"><a href="#" aria-current="page">Today</a><a href="#">Tasks</a><a href="#">Rewards</a><a href="#">History</a><a href="#">Settings</a></nav>
-  <div class="chips"><div class="chip"><span>Rank</span><b>E</b></div><div class="chip"><span>Streak</span><b id="streakChip">5</b></div><div class="chip"><span>Wallet</span><i class="coin"></i><b id="walletChip">65</b></div></div>
+  <div class="chips"><div class="chip rk"><span>Rank</span><b>E</b></div><div class="chip"><span>Streak</span><b id="streakChip">5</b></div><div class="chip"><span>Wallet</span><i class="coin"></i><b id="walletChip">65</b></div></div>
 </header>
 
 <main>
   <section class="panel status boot" style="--i:0" aria-label="Status">
     <div class="emblem">
-      <svg viewBox="0 0 150 150" aria-hidden="true"><polygon points="75,4 140,40 140,110 75,146 10,110 10,40" fill="none" stroke="var(--blue)" stroke-opacity=".6" stroke-width="1.5"/><polygon points="75,16 128,46 128,104 75,134 22,104 22,46" fill="none" stroke="var(--cyan)" stroke-opacity=".25" stroke-dasharray="4 6"/></svg>
+      <svg viewBox="0 0 150 150" aria-hidden="true"><polygon points="75,4 140,40 140,110 75,146 10,110 10,40" fill="none" stroke="var(--accent)" stroke-opacity=".6" stroke-width="1.5"/><polygon points="75,16 128,46 128,104 75,134 22,104 22,46" fill="none" stroke="var(--accent)" stroke-opacity=".25" stroke-dasharray="4 6"/></svg>
       <div class="rank">E</div>
     </div>
     <div class="lv"><span class="sub">Level</span><b id="lvl">3</b></div>
-    <div class="title">Hadiah pertama</div>
+    <div class="title" id="title">Hadiah pertama</div>
     <div><div class="row sub" style="margin-bottom:6px"><span id="xpTxt">9 / 70 XP</span><span id="xpNext">to Level 4</span></div><div class="xpbar"><i id="xpFill" style="width:0"></i></div></div>
-    <div><div class="row sub" style="margin-bottom:6px"><span>Streak</span><span class="shield"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1l5.5 2v5c0 3.5-2.4 6-5.5 7C3.9 14 1.5 11.500 1.500 8V3z"/></svg>1 freeze left this week</span></div>
+    <div><div class="row sub" style="margin-bottom:6px"><span>Streak</span><span class="shield"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1l5.5 2v5c0 3.5-2.4 6-5.5 7C3.9 14 1.5 11.500 1.500 8V3z"/></svg><span id="frz">1 freeze left this week</span></span></div>
       <div class="pips" aria-label="Streak 5 days"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on today"></i><i></i><i></i></div></div>
   </section>
 
@@ -207,6 +236,12 @@ const STATS=[{k:'STR',n:'Str',c:'--stat-str'},{k:'VIT',n:'Vit',c:'--stat-vit'},{
 const S={xp:65,wallet:65,stat:{STR:16,VIT:12,INT:20,DISC:10,SOC:7},mult:.5};
 const Q=[{s:'STR',n:'Squat 15x2 set',nom:5,need:1,done:1},{s:'VIT',n:'Minum air 2L',nom:5,need:1,done:1},{s:'INT',n:'Baca 10 halaman',nom:5,need:1,done:0},{s:'DISC',n:'Ibadah',nom:5,need:1,done:1},{s:'SOC',n:'Chat 1 teman',nom:5,need:2,done:0}];
 const R=[{n:'Main game 2 jam',cost:60},{n:'Kopi susu santai',cost:35},{n:'Beli buku baru',cost:150},{n:'Jajan favorit',cost:250},{n:'Nonton bioskop',cost:800}];
+/* prototype states: ?state=freeze2 | freeze0 | notitle | empty | blocked | tiers (default: none) */
+const STATE=new URLSearchParams(location.search).get('state')||'';
+let FREEZES=STATE==='freeze2'?2:STATE==='freeze0'?0:1,TITLE=STATE==='notitle'?null:'Hadiah pertama',openTier=null;
+if(STATE==='empty')Q.length=0;
+if(STATE==='blocked'){S.xp=360;S.stat={STR:110,VIT:90,INT:100,DISC:53,SOC:7}}
+if(STATE==='tiers')Q[2]={s:'INT',n:'Belajar coding',tiers:[{n:'Easy',d:'30 menit',nom:5},{n:'Medium',d:'1 jam',nom:9},{n:'Hard',d:'2 jam',nom:15}],need:1,done:0};
 const $=id=>document.getElementById(id),css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const award=n=>Math.ceil(n*S.mult), lvOf=x=>Math.floor(Math.sqrt(x/14))+1;
 const reduce=(matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.dataset.motion==='off');
@@ -224,7 +259,7 @@ function drawRadar(vals){
   [.25,.5,.75,1].forEach(r=>h+=`<polygon points="${STATS.map((_,i)=>pt(i,MAX*r).join(',')).join(' ')}" fill="none" stroke="var(--blue)" stroke-opacity="${r==1?.35:.14}"/>`);
   STATS.forEach((s,i)=>{const[x,y]=pt(i,MAX);h+=`<line x1="${CX}" y1="${CY}" x2="${x}" y2="${y}" stroke="var(--blue)" stroke-opacity=".14"/>`});
   h+=`<polygon points="${STATS.map((_,i)=>pt(i,gate()).join(',')).join(' ')}" fill="rgba(139,108,255,.06)" stroke="var(--monarch)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
-  h+=`<polygon points="${STATS.map((s,i)=>pt(i,vals[s.k]).join(',')).join(' ')}" fill="rgba(61,169,255,.22)" stroke="var(--cyan)" stroke-width="2" style="filter:drop-shadow(0 0 8px var(--blue))"/>`;
+  h+=`<polygon points="${STATS.map((s,i)=>pt(i,vals[s.k]).join(',')).join(' ')}" fill="color-mix(in srgb,var(--accent) 22%,transparent)" stroke="var(--accent)" stroke-width="2" style="filter:drop-shadow(0 0 8px var(--accent))"/>`;
   STATS.forEach((s,i)=>{const[x,y]=pt(i,vals[s.k]);h+=`<circle cx="${x}" cy="${y}" r="4" fill="${css(s.c)}"/>`;
     const[lx,ly]=pt(i,MAX*1.2);h+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" fill="var(--text)" font-family="Chakra Petch" font-weight="600" font-size="15">${s.n} <tspan fill="${css(s.c)}">${Math.round(vals[s.k])}</tspan></text>`});
   $('radar').innerHTML=h;
@@ -233,18 +268,24 @@ function stats(){MAX=scaleMax();$('radar').setAttribute('aria-label','Radar char
   $('gateTxt').textContent=`Gate threshold: ${gate()} XP`}
 
 /* quests */
-const sat=k=>{const q=Q.find(x=>x.s===k);return q.done>=q.need};
+const sat=k=>{const q=Q.find(x=>x.s===k);return !!q&&q.done>=q.need};
 function quests(){
+  const pen=$('penalty');
+  if(!Q.length){$('quests').innerHTML='<div class="empty"><h2>No tasks yet</h2><p>Add your first task to start your daily quest.</p><a class="btn" href="tasks.html">Add task</a></div>';$('qCount').textContent='';pen.style.display='none';msg('Complete at least 1 task in every stat today.');return}
+  pen.style.display='';
+  const box='<span class="box"><svg viewBox="0 0 14 14"><path d="M2 7.5l3.2 3L12 3.500"/></svg></span>';
   $('quests').innerHTML=Q.map((q,i)=>{const st=STATS.find(s=>s.k===q.s);const d=q.done>=q.need;
+   if(q.tiers){const lo=award(q.tiers[0].nom),hi=award(q.tiers[q.tiers.length-1].nom),open=openTier===i&&!d;
+    return `<div class="qgroup"><button class="qrow${d?' done':''}" style="--c:var(${st.c})" data-i="${i}" ${d?'role="checkbox" aria-checked="true"':`aria-expanded="${open}" aria-controls="tiers-${i}"`}>${box}<span class="nm">${q.n}<small>${st.n}</small></span><span class="pts">${d?'+'+award(q.tiers[q.tierDone].nom):`+${lo} to +${hi}`}</span>${d?'':'<span class="chev" aria-hidden="true"></span>'}</button>${open?`<div class="tiers" id="tiers-${i}" role="group" aria-label="Choose effort for ${q.n}" style="--c:var(${st.c})">${q.tiers.map((t,k)=>`<button class="tier" data-i="${i}" data-t="${k}" style="--tc:var(--tier-${'rsb'[k]})"><span>${t.n}</span><small>${t.d}</small><b>+${award(t.nom)}</b></button>`).join('')}</div>`:''}</div>`}
    return `<button class="qrow${d?' done':''}" style="--c:var(${st.c})" data-i="${i}" role="checkbox" aria-checked="${d}"><span class="box"><svg viewBox="0 0 14 14"><path d="M2 7.5l3.2 3L12 3.500"/></svg></span><span class="nm">${q.n}<small>${st.n}</small></span>${q.need>1?`<span class="need">${q.done}/${q.need}</span>`:''}<span class="pts">+${award(q.nom)}</span></button>`}).join('');
   const n=STATS.filter(s=>sat(s.k)).length;$('qCount').textContent=`${n}/5`;
-  const p=$('penalty'),ok=sat('SOC');p.classList.toggle('clear',ok);
+  const ok=sat('SOC');pen.classList.toggle('clear',ok);
   $('penTitle').textContent=ok?'Penalty cleared':'Penalty active';$('penSub').textContent=ok?'Soc has 2 completions.':'Soc needs 2 completions today.';
   $('timer').style.color=ok?'var(--ok)':'';
   msg(n===5?'All stats completed. Daily quest done.':ok?'Penalty cleared. Finish the remaining stats.':'Complete at least 1 task in every stat today.');
 }
-function apply(i,dir,ev){
-  const q=Q[i];const pts=award(q.nom)*dir;
+function apply(i,dir,ev,tier){
+  const q=Q[i];const nom=q.tiers?q.tiers[dir>0?tier:q.tierDone].nom:q.nom;if(q.tiers&&dir>0)q.tierDone=tier;const pts=award(nom)*dir;
   q.done+=dir;S.xp+=pts;S.wallet+=pts;S.stat[q.s]+=pts;
   const from={...disp},fw=dispW;
   tween(0,1,p=>{STATS.forEach(s=>disp[s.k]=from[s.k]+(S.stat[s.k]-from[s.k])*p);drawRadar(disp)});
@@ -252,7 +293,12 @@ function apply(i,dir,ev){
   quests();stats();xp();rewards();
   if(dir>0&&ev){fx(ev,q.s,pts);last=i;toast(`${q.n} completed`)}
 }
-$('quests').addEventListener('click',e=>{const b=e.target.closest('.qrow');if(!b)return;const i=+b.dataset.i;if(Q[i].done<Q[i].need)apply(i,1,e)});
+$('quests').addEventListener('click',e=>{
+  const t=e.target.closest('.tier');if(t){openTier=null;apply(+t.dataset.i,1,e,+t.dataset.t);return}
+  const b=e.target.closest('.qrow');if(!b)return;const i=+b.dataset.i,q=Q[i];
+  if(q.tiers){if(q.done<q.need){openTier=openTier===i?null:i;quests();document.querySelector(`.qrow[data-i="${i}"]`)?.focus()}return}
+  if(q.done<q.need)apply(i,1,e)});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&openTier!=null){const i=openTier;openTier=null;quests();document.querySelector(`.qrow[data-i="${i}"]`)?.focus()}});
 $('undo').onclick=()=>{if(last!=null&&Q[last].done>0){apply(last,-1);last=null}hide()};
 function fx(e,k,pts){const r=e.currentTarget?.getBoundingClientRect?.()||{left:e.clientX,top:e.clientY,width:0};const x=e.clientX||r.left+30,y=e.clientY||r.top;
   const c=css(STATS.find(s=>s.k===k).c);
@@ -263,13 +309,17 @@ function toast(t){$('toastTxt').textContent=t;$('toast').classList.add('show');c
 function hide(){$('toast').classList.remove('show')}
 
 /* xp / level */
-function xp(){const L=lvOf(S.xp),a=14*(L-1)**2,b=14*L*L;$('lvl').textContent=L;$('xpTxt').textContent=`${S.xp-a} / ${b-a} XP`;$('xpNext').textContent=`to Level ${L+1}`;$('xpFill').style.width=((S.xp-a)/(b-a)*100)+'%'}
+function xp(){const L=lvOf(S.xp),a=14*(L-1)**2,b=14*L*L;$('lvl').textContent=L;$('xpTxt').textContent=`${S.xp-a} / ${b-a} XP`;$('xpNext').textContent=`to Level ${L+1}`;$('xpFill').style.width=((S.xp-a)/(b-a)*100)+'%';renderBlocked()}
+function renderBlocked(){const el=document.getElementById('blocked'),L=lvOf(S.xp),w=STATS.map(x=>({n:x.n,v:S.stat[x.k]})).reduce((a,b)=>b.v<a.v?b:a);
+  if(!(L>=6&&w.v<gate())){el&&el.remove();return}
+  const t=`Rank-up blocked: raise ${w.n} to ${gate()} xp (now ${w.v})`;
+  if(el)el.textContent=t;else document.querySelector('.status').insertAdjacentHTML('beforeend',`<div class="blocked" id="blocked">${t}</div>`)}
 
 /* rewards */
 function teaser(){const x=R.map((r,i)=>({r,i})),by=(a,b)=>b.r.cost-a.r.cost,af=x.filter(o=>S.wallet>=o.r.cost).sort(by)[0],lk=x.filter(o=>S.wallet<o.r.cost).sort(by)[0];return [af,lk].filter(Boolean)}
 function rewards(){$('rewards').innerHTML=teaser().map(({r,i})=>{const can=S.wallet>=r.cost;return `<div class="rw"><div class="row"><b>${r.n}</b><span class="pts price">${r.cost}<i class="coin"></i></span></div>${can?`<button class="btn" data-r="${i}">Buy</button>`:`<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${r.cost}" aria-valuenow="${S.wallet}"><i style="width:${S.wallet/r.cost*100}%"></i></div><span class="sub">${r.cost-S.wallet} more coins</span>`}</div>`}).join('')}
 $('rewards').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b)return;const r=R[+b.dataset.r];if(S.wallet<r.cost)return;
-  const fw=S.wallet;S.wallet-=r.cost;tween(fw,S.wallet,v=>{$('walletChip').textContent=$('wal2').textContent=Math.round(v)},500);last=null;rewards();toast(`${r.n} dibeli (−${r.cost})`)});
+  const fw=S.wallet;S.wallet-=r.cost;tween(fw,S.wallet,v=>{$('walletChip').textContent=$('wal2').textContent=Math.round(v)},500);last=null;rewards();toast(`${r.n} bought (−${r.cost})`)});
 
 /* typing message */
 let mt;function msg(t){clearInterval(mt);const el=$('typed');if(reduce){el.textContent=t;return}el.textContent='';let i=0;mt=setInterval(()=>{el.textContent=t.slice(0,++i);if(i>=t.length)clearInterval(mt)},18)}
@@ -292,6 +342,19 @@ if(!reduce){size();addEventListener('resize',size);P=Array.from({length:36},()=>
 drawRadar({STR:0,VIT:0,INT:0,DISC:0,SOC:0});
 setTimeout(()=>{const from={STR:0,VIT:0,INT:0,DISC:0,SOC:0};tween(0,1,p=>{STATS.forEach(s=>disp[s.k]=S.stat[s.k]*p);drawRadar(disp)},1100)},500);
 quests();stats();xp();rewards();
+if(!TITLE)$('title').remove();
+$('frz').textContent=FREEZES>1?`${FREEZES} freezes left this week`:FREEZES===1?'1 freeze left this week':'No freezes left this week';
+
+/* overlays and notices: ?state=levelup | rankup | rankdown | storage | recovery */
+(function(){const A='<button class="obtn" id="exp">Export data</button>';
+ const open=(h)=>{const prev=document.activeElement;document.body.insertAdjacentHTML('beforeend',`<div class="ov" role="dialog" aria-modal="true" aria-labelledby="ovl"><div class="panel ovp">${h}<button class="obtn" id="ovc">Continue</button></div></div>`);
+  const ov=document.querySelector('.ov'),close=()=>{ov.remove();removeEventListener('keydown',esc);prev&&prev.focus&&prev.focus()},esc=e=>{if(e.key==='Escape')close()};
+  $('ovc').onclick=close;addEventListener('keydown',esc);$('ovc').focus()};
+ if(STATE==='levelup')open('<small id="ovl">Level up</small><div class="big">4</div><p>Level 3 to 4</p>');
+ if(STATE==='rankup')open('<small id="ovl">Rank up</small><div class="big">D</div><p>Rank D</p><dl><dt>Freezes per week</dt><dd>1</dd><dt>Max points per task</dt><dd>25</dd><dt>Multiplier</dt><dd>\u00d70.7</dd><dt>Penalty per missed stat</dt><dd>\u22128</dd></dl>');
+ if(STATE==='rankdown'){document.querySelector('main').insertAdjacentHTML('afterbegin','<div class="notice" role="status"><span>Rank dropped to E</span><button class="lnk" id="ndis">Dismiss</button></div>');$('ndis').onclick=()=>document.querySelector('.notice').remove()}
+ if(STATE==='storage')document.querySelector('header').insertAdjacentHTML('beforebegin','<div class="banner" role="alert"><span>Your data could not be saved. Export it now so you don\u2019t lose progress.</span>'+A+'</div>');
+ if(STATE==='recovery'){document.querySelector('header').insertAdjacentHTML('beforebegin','<div class="banner recovery" role="status"><span>Some saved data could not be used, so it was reset. A copy was kept.</span><span>'+A+'<button class="lnk" id="rdis">Dismiss</button></span></div>');$('rdis').onclick=()=>document.querySelector('.banner').remove()}})();
 </script>
 </body>
 </html>

@@ -1,8 +1,10 @@
 import { addDays, weekStart, type LocalDate } from '../date';
 import { closeDayStreak, type StreakState } from '../../engine/streak';
+import { getRankConfig } from '../../engine/rank';
 import type {
   Completion,
   DailyQuestDay,
+  MilestoneEvent,
   Reward,
   RewardPurchase,
   Stat,
@@ -10,11 +12,12 @@ import type {
   Tier,
   UserState,
 } from '../types';
-import { STATS } from '../types';
+import { RANKS, STATS, TIERS } from '../types';
 import { SCHEMA_VERSION, type StorageSchema } from '../storage';
 import historySnapshot from './history-snapshot.json';
 import rewardsSnapshot from './rewards-snapshot.json';
 import todaySnapshot from './today-snapshot.json';
+import todayStatesSnapshot from './today-states-snapshot.json';
 
 /**
  * Deterministic seed data for the visual-diff harness.
@@ -372,6 +375,189 @@ function buildToday(): { schema: StorageSchema; heatLevels: (number | null)[] } 
 }
 
 /* -------------------------------------------------------------------------- */
+/* today.html?state=...                                                        */
+/* -------------------------------------------------------------------------- */
+
+interface TodayStateQuest {
+  readonly stat: Stat;
+  readonly name: string;
+  readonly nominal: number | null;
+  readonly need: number;
+  readonly done: number;
+  readonly tiers:
+    | readonly {
+        readonly name: string;
+        readonly description: string;
+        readonly nominal: number;
+      }[]
+    | null;
+}
+
+interface TodayStateDump {
+  readonly rank: string;
+  readonly level: number;
+  readonly xp: number;
+  readonly wallet: number;
+  readonly stats: Record<Stat, number>;
+  readonly multiplier: number;
+  readonly title: string | null;
+  readonly freezes: number;
+  readonly quests: readonly TodayStateQuest[];
+  readonly qCount: string | null;
+  readonly blocked: string | null;
+  readonly emptyTitle: string | null;
+  readonly penaltyTitle: string | null;
+  readonly message: string | null;
+  readonly overlay: {
+    readonly role: string | null;
+    readonly label: string | null;
+    readonly big: string | null;
+    readonly text: string | null;
+    readonly details: readonly (readonly [string | null, string | null])[];
+  } | null;
+  readonly notice: string | null;
+  readonly banner: {
+    readonly role: string | null;
+    readonly recovery: boolean;
+    readonly text: string;
+  } | null;
+}
+
+/** Dumped by `buildTodayStates` in `scripts/dump-fixtures.mjs`. */
+const TODAY_STATE_DUMPS = (
+  todayStatesSnapshot as unknown as { states: Record<string, TodayStateDump> }
+).states;
+
+const TODAY_BASE = buildToday();
+
+function levelUpEvent(dump: TodayStateDump, id: string): MilestoneEvent {
+  const match = /Level ([0-9]+) to ([0-9]+)/.exec(dump.overlay?.text ?? '');
+
+  if (match === null) {
+    throw new Error('today-states-snapshot.json: level-up overlay has no "Level N to M" text');
+  }
+
+  return {
+    id,
+    type: 'levelUp',
+    localDate: FIXED_TODAY,
+    from: Number(match[1]),
+    to: Number(match[2]),
+    seen: false,
+  };
+}
+
+function rankChangeEvent(
+  dump: TodayStateDump,
+  type: 'rankUp' | 'rankDown',
+  id: string
+): MilestoneEvent {
+  const to = (
+    type === 'rankUp' ? dump.overlay?.big : /Rank dropped to ([A-Z])/.exec(dump.notice ?? '')?.[1]
+  ) as string | undefined;
+
+  if (to === undefined || RANKS.includes(to as (typeof RANKS)[number]) === false) {
+    throw new Error(`today-states-snapshot.json: ${type} state has no valid target rank`);
+  }
+
+  const index = RANKS.indexOf(to as (typeof RANKS)[number]);
+
+  return {
+    id,
+    type,
+    localDate: FIXED_TODAY,
+    from: RANKS[Math.max(0, index - 1)] ?? 'E',
+    to: to as (typeof RANKS)[number],
+    seen: false,
+  };
+}
+
+interface BuiltTodayState {
+  readonly schema: StorageSchema;
+  readonly post?: 'storage-failure' | 'recovery';
+}
+
+function buildTodayState(name: string, dump: TodayStateDump): BuiltTodayState {
+  const schema = structuredClone(TODAY_BASE.schema);
+  const rank = dump.rank as UserState['rank'];
+
+  schema.userState.rank = rank;
+
+  if (dump.title === null) {
+    schema.userState.equippedTitle = null;
+  }
+
+  if (dump.blocked !== null) {
+    schema.userState.lifetimeXP = dump.xp;
+    schema.userState.statXP = { ...dump.stats };
+  }
+
+  const used = getRankConfig(rank).freezesPerWeek - dump.freezes;
+
+  if (used >= 0 && used !== schema.userState.freezesUsedThisWeek) {
+    schema.userState.freezesUsedThisWeek = used;
+    schema.userState.lastFreezeWeekReset = FIXED_WEEK_START;
+  }
+
+  if (dump.quests.length === 0) {
+    schema.tasks = [];
+    schema.completions = [];
+    const open = schema.dailyQuestLog[schema.dailyQuestLog.length - 1];
+
+    if (open !== undefined) {
+      open.selectedTaskIdPerStat = {};
+    }
+  }
+
+  const tierQuest = dump.quests.find((q) => q.tiers !== null);
+
+  if (tierQuest?.tiers != null) {
+    const index = schema.tasks.findIndex((task) => task.id === 't-int');
+
+    if (index < 0) {
+      throw new Error('today fixture has no t-int task to replace with the tier picker');
+    }
+
+    const existing = schema.tasks[index];
+
+    if (existing === undefined) {
+      throw new Error('today fixture has no t-int task to replace with the tier picker');
+    }
+
+    schema.tasks[index] = {
+      id: existing.id,
+      familyName: tierQuest.name,
+      stat: existing.stat,
+      isAnchor: existing.isAnchor,
+      createdAt: existing.createdAt,
+      variants: tierQuest.tiers.map((tier, i) => ({
+        tier: TIERS[i] ?? 'easy',
+        description: tier.description,
+        points: tier.nominal,
+      })),
+    };
+  }
+
+  if (dump.overlay?.label === 'Level up') {
+    schema.milestoneEvents = [levelUpEvent(dump, `today-${name}`)];
+  } else if (dump.overlay?.label === 'Rank up') {
+    schema.milestoneEvents = [rankChangeEvent(dump, 'rankUp', `today-${name}`)];
+  } else if (dump.notice !== null) {
+    schema.milestoneEvents = [rankChangeEvent(dump, 'rankDown', `today-${name}`)];
+  }
+
+  if (name === 'storage') {
+    return { schema, post: 'storage-failure' };
+  }
+
+  if (name === 'recovery') {
+    return { schema, post: 'recovery' };
+  }
+
+  return { schema };
+}
+
+/* -------------------------------------------------------------------------- */
 /* tasks.html                                                                  */
 /* -------------------------------------------------------------------------- */
 
@@ -620,6 +806,8 @@ type SnapshotDay = {
   levelEnd: number;
   rankEnd: string;
   streakEnd: number;
+  freeze: boolean;
+  open: boolean;
   events: { kind: string; title: string; subtitle: string }[];
 };
 
@@ -656,8 +844,8 @@ function buildHistory(): StorageSchema {
     requiredCompletions: maskToRequired(day.mask),
     actualCompletions: maskToActual(day.mask),
     netPointsChange: day.netPointsChange,
-    freezeUsed: false,
-    closed: true,
+    freezeUsed: day.freeze,
+    closed: !day.open,
     lifetimeXPEnd: day.lifetimeXPEnd,
     levelEnd: day.levelEnd,
     rankEnd: day.rankEnd as DailyQuestDay['rankEnd'],
@@ -787,16 +975,40 @@ export interface ExtraSeed {
 export interface Fixture {
   readonly schema: StorageSchema;
   readonly extra?: ExtraSeed[];
+  /** Named `?state=` variants, used through `?fixture=today&state=<name>`. */
+  readonly states?: Record<string, Fixture>;
+  /** A real app condition to induce after seeding, never a visual override. */
+  readonly post?: 'storage-failure' | 'recovery';
 }
 
 export type FixtureName = 'today' | 'tasks' | 'rewards' | 'history' | 'settings';
 
 const today = buildToday();
 
+/**
+ * Today's deterministic states. `freeze2` is deliberately absent: at Rank E the
+ * engine allows one freeze per week, so the prototype's two-freeze state cannot
+ * be produced without changing the rank (DEVIATIONS.md Q10).
+ */
+const todayStates: Record<string, Fixture> = {};
+
+for (const [name, dump] of Object.entries(TODAY_STATE_DUMPS)) {
+  if (name === 'default' || name === 'freeze2') continue;
+
+  const built = buildTodayState(name, dump);
+
+  todayStates[name] = {
+    schema: built.schema,
+    extra: [{ key: 'daily-tracker:motion', value: 'on' }],
+    ...(built.post === undefined ? {} : { post: built.post }),
+  };
+}
+
 export const FIXTURES: Record<FixtureName, Fixture> = {
   today: {
     schema: today.schema,
     extra: [{ key: 'daily-tracker:motion', value: 'on' }],
+    states: todayStates,
   },
   tasks: {
     schema: buildTasks(),

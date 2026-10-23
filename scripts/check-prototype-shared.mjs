@@ -133,6 +133,12 @@ const RULES = [
   // Design tokens: both blocks end with `color-scheme`.
   { context: '', selector: ':root' },
   { context: '', selector: '[data-theme=light]' },
+  { context: '', selector: '[data-rank=E]' },
+  { context: '', selector: '[data-rank=D]' },
+  { context: '', selector: '[data-rank=C]' },
+  { context: '', selector: '[data-rank=B]' },
+  { context: '', selector: '[data-rank=A]' },
+  { context: '', selector: '[data-rank=S]' },
 
   // base.css
   { context: '', selector: '*' },
@@ -161,6 +167,8 @@ const RULES = [
   { context: '@keyframes brk-in', selector: 'to' },
   { context: '@keyframes brk-breathe', selector: 'from' },
   { context: '@keyframes brk-breathe', selector: 'to' },
+  { context: '@media(max-width:640px)', selector: '.panel::before' },
+  { context: '@media(max-width:640px)', selector: '.drawer::before' },
 
   // boot.css
   { context: '', selector: '.boot' },
@@ -181,6 +189,8 @@ const RULES = [
   { context: '', selector: '.chips' },
   { context: '', selector: '.chip' },
   { context: '', selector: '.chip span' },
+  { context: '', selector: '.chip.rk' },
+  { context: '', selector: '.chip.rk b' },
   { context: '', selector: '.coin' },
 
   // The two-row header from 1023px down. `nav` is never hidden; the 700px
@@ -374,6 +384,15 @@ for (const page of PAGES) {
     failures.push(
       `.chip b\n      ${page}.html has a .chip b rule; the prototypes no longer style it`
     );
+  }
+}
+
+for (const page of PAGES) {
+  const html = readFileSync(join('docs', 'prototype', `${page}.html`), 'utf8');
+
+  if (html.includes('<div class="chip rk"><span>Rank</span>') === false) {
+    failures.push(`header chip class
+      ${page}.html must mark the Rank chip with class "rk"`);
   }
 }
 

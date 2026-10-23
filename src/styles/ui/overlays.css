@@ -1,0 +1,160 @@
+/*
+ * Overlays and notices. Copied verbatim from `docs/prototype/today.html` <style>.
+ *
+ * They are shared shell rules, not Today-page rules: any page can show a level-up
+ * or rank-up overlay, and the storage banners sit above the header on every page.
+ * The rank-down notice is inserted as the first child of `<main>` on Today.
+ * `ov-fade`, `ov-in` and `ov-pulse` keep their prototype names because they are
+ * shared, unlike the page-local animations.
+ */
+
+.ov {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  animation: ov-fade 0.2s ease both;
+}
+.ovp {
+  width: min(360px, 100%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: ov-in 0.4s var(--ease) both;
+}
+.ovp small {
+  color: var(--muted);
+  font-size: 14px;
+}
+.ovp p {
+  color: var(--muted);
+}
+.ovp .big {
+  font: 700 84px/1 var(--font-mono);
+  color: var(--accent);
+  text-shadow: 0 0 28px var(--accent);
+  animation: ov-pulse 0.8s ease 1;
+}
+.ovp dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 16px;
+  width: 100%;
+  margin: 0;
+  text-align: left;
+  font: 500 14px var(--font-mono);
+}
+.ovp dt {
+  color: var(--muted);
+}
+.ovp dd {
+  margin: 0;
+}
+@keyframes ov-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ov-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@keyframes ov-pulse {
+  50% {
+    text-shadow:
+      0 0 46px var(--accent),
+      0 0 12px var(--accent);
+  }
+}
+.banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 32px;
+  border-bottom: 1px solid var(--danger);
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+.banner.recovery {
+  border-bottom-color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 10%, transparent);
+}
+.banner span:last-child {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.notice {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--danger);
+}
+.obtn {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--on-accent);
+  font: 700 14px var(--font-display);
+  padding: 8px 20px;
+  border-radius: var(--r-chip);
+  transition:
+    box-shadow var(--t-fast),
+    transform var(--t-fast);
+}
+.obtn:hover {
+  box-shadow: 0 0 16px var(--accent);
+}
+.obtn:active {
+  transform: scale(0.95);
+}
+.obtn:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+.lnk {
+  all: unset;
+  cursor: pointer;
+  color: var(--cyan);
+  text-decoration: underline;
+}
+.lnk:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ovp {
+    animation: ov-fade 0.001s both;
+  }
+  .ovp .big {
+    animation: none;
+  }
+}
+[data-motion='off'] .ovp {
+  animation: ov-fade 0.001s both;
+}
+[data-motion='off'] .ovp .big {
+  animation: none;
+}
+@media (max-width: 640px) {
+  .obtn {
+    min-height: 44px;
+  }
+}
+@media (max-width: 700px) {
+  .banner {
+    padding: 10px 16px;
+    flex-wrap: wrap;
+  }
+}
