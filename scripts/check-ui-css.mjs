@@ -18,10 +18,13 @@
  *
  * Node built-ins only. Usage: node scripts/check-ui-css.mjs
  */
-import { readdirSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const PROTOTYPE = join('docs', 'prototype', 'today.html');
+const PROTOTYPES = {
+  today: join('docs', 'prototype', 'today.html'),
+  tasks: join('docs', 'prototype', 'tasks.html'),
+};
 const APP_CSS = [join('src', 'app.css'), ...uiStylesheets()];
 
 /* ------------------------------------------------------------------ parsing */
@@ -37,7 +40,7 @@ const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '');
  * checker reads through it: a wrapped rule is compared against the prototype's
  * unwrapped rule, exactly as if the wrapper were not there.
  */
-const SCOPE_ROOTS = ['@scope (body[data-page=today])'];
+const SCOPE_ROOTS = ['@scope (body[data-page=today])', '@scope (body[data-page=tasks])'];
 
 /**
  * Page-local keyframes, renamed with a `today-` prefix because `@keyframes`
@@ -45,11 +48,16 @@ const SCOPE_ROOTS = ['@scope (body[data-page=today])'];
  * bodies are the prototype's; only the name moved. Every rename is listed in
  * `docs/prototype/DEVIATIONS.md` under "Mechanical renames".
  */
-const KEYFRAME_RENAMES = ['spin', 'shine', 'blink', 'pen', 'pulse', 'fl', 'rg', 'tiers-in'];
+const KEYFRAME_RENAMES = {
+  today: ['spin', 'shine', 'blink', 'pen', 'pulse', 'fl', 'rg', 'tiers-in'],
+  tasks: ['flash', 'out'],
+};
 
-/** `today-spin` -> `spin`, but only for a name on the rename list. */
+/** `today-spin` -> `spin` and `tasks-flash` -> `flash`, only for the rename lists. */
 function unrenameKeyframes(text) {
-  return text.replace(new RegExp(`\\btoday-(${KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1');
+  return text
+    .replace(new RegExp(`\\btoday-(${KEYFRAME_RENAMES.today.join('|')})\\b`, 'g'), '$1')
+    .replace(new RegExp(`\\btasks-(${KEYFRAME_RENAMES.tasks.join('|')})\\b`, 'g'), '$1');
 }
 
 /** Drops the `@scope` wrappers from a context chain. */
@@ -457,6 +465,111 @@ const RULES = [
   { context: '@keyframes fl', selector: 'to' },
   { context: '@keyframes rg', selector: 'from' },
   { context: '@keyframes rg', selector: 'to' },
+
+  // tasks.css (tasks.html). Shell rules shared with today.html are checked above;
+  // these are the page's own selectors, read through its `@scope` wrapper and
+  // with the `tasks-` keyframe prefix removed. `.drawer` is the second block for
+  // that selector (the shared surface is the first) and `.drawer::before` is the
+  // page override of the shared bracket rule.
+  { prototype: 'tasks', context: '', selector: 'h1' },
+  { prototype: 'tasks', context: '', selector: 'h2' },
+  { prototype: 'tasks', context: '', selector: '.sub' },
+  { prototype: 'tasks', context: '', selector: '.row' },
+  { prototype: 'tasks', context: '', selector: '.btn' },
+  { prototype: 'tasks', context: '', selector: '.btn:hover' },
+  { prototype: 'tasks', context: '', selector: '.btn:active' },
+  { prototype: 'tasks', context: '', selector: '.btn:focus-visible' },
+  { prototype: 'tasks', context: '', selector: '.btn.ghost' },
+  { prototype: 'tasks', context: '', selector: '.btn.ghost:hover' },
+  { prototype: 'tasks', context: '', selector: 'main' },
+  { prototype: 'tasks', context: '', selector: '.head' },
+  { prototype: 'tasks', context: '', selector: '.head .sub' },
+  { prototype: 'tasks', context: '', selector: '.tools' },
+  { prototype: 'tasks', context: '', selector: '.search' },
+  { prototype: 'tasks', context: '', selector: '.search:focus' },
+  { prototype: 'tasks', context: '', selector: '.fc' },
+  { prototype: 'tasks', context: '', selector: '.f' },
+  { prototype: 'tasks', context: '', selector: '.f:hover' },
+  { prototype: 'tasks', context: '', selector: '.f:focus-visible' },
+  { prototype: 'tasks', context: '', selector: '.f[aria-pressed=true]' },
+  { prototype: 'tasks', context: '', selector: '.f i' },
+  { prototype: 'tasks', context: '', selector: '.sep' },
+  { prototype: 'tasks', context: '', selector: '.warn' },
+  { prototype: 'tasks', context: '', selector: '.warn b' },
+  { prototype: 'tasks', context: '', selector: '.groups' },
+  { prototype: 'tasks', context: '', selector: '.group' },
+  { prototype: 'tasks', context: '', selector: '.group header' },
+  { prototype: 'tasks', context: '', selector: '.group h2' },
+  { prototype: 'tasks', context: '', selector: '.group h2 i' },
+  { prototype: 'tasks', context: '', selector: '.task' },
+  { prototype: 'tasks', context: '', selector: '.task:hover' },
+  { prototype: 'tasks', context: '', selector: '.task.flash' },
+  { prototype: 'tasks', context: '@keyframes flash', selector: 'from' },
+  { prototype: 'tasks', context: '', selector: '.task.out' },
+  { prototype: 'tasks', context: '@keyframes out', selector: 'to' },
+  { prototype: 'tasks', context: '', selector: '.nm' },
+  { prototype: 'tasks', context: '', selector: '.badges' },
+  { prototype: 'tasks', context: '', selector: '.bd' },
+  { prototype: 'tasks', context: '', selector: '.bd.a' },
+  { prototype: 'tasks', context: '', selector: '.bd.t' },
+  { prototype: 'tasks', context: '', selector: '.bd.o' },
+  { prototype: 'tasks', context: '', selector: '.acts' },
+  { prototype: 'tasks', context: '', selector: '.ib' },
+  { prototype: 'tasks', context: '', selector: '.ib:hover' },
+  { prototype: 'tasks', context: '', selector: '.ib.del:hover' },
+  { prototype: 'tasks', context: '', selector: '.ib:focus-visible' },
+  { prototype: 'tasks', context: '', selector: '.ib svg' },
+  { prototype: 'tasks', context: '', selector: '.pt' },
+  { prototype: 'tasks', context: '', selector: '.pt small' },
+  { prototype: 'tasks', context: '', selector: '.vs' },
+  { prototype: 'tasks', context: '', selector: '.v' },
+  { prototype: 'tasks', context: '', selector: '.v em' },
+  { prototype: 'tasks', context: '', selector: '.v em::before' },
+  { prototype: 'tasks', context: '', selector: '.v span' },
+  { prototype: 'tasks', context: '', selector: '.v.over .pt' },
+  { prototype: 'tasks', context: '', selector: '.empty' },
+  { prototype: 'tasks', context: '', selector: '.scrim' },
+  { prototype: 'tasks', context: '', selector: '.scrim.on' },
+  { prototype: 'tasks', context: '', selector: '.drawer', occurrence: 2 },
+  { prototype: 'tasks', context: '', selector: '.drawer.on' },
+  { prototype: 'tasks', context: '', selector: '.drawer::before', occurrence: 2 },
+  { prototype: 'tasks', context: '', selector: '.lab' },
+  { prototype: 'tasks', context: '', selector: '.in' },
+  { prototype: 'tasks', context: '', selector: '.in:focus' },
+  { prototype: 'tasks', context: '', selector: '.in.bad' },
+  { prototype: 'tasks', context: '', selector: '.seg' },
+  { prototype: 'tasks', context: '', selector: '.seg .f' },
+  { prototype: 'tasks', context: '', selector: '.tg' },
+  { prototype: 'tasks', context: '', selector: '.tg:focus-visible' },
+  { prototype: 'tasks', context: '', selector: '.sw' },
+  { prototype: 'tasks', context: '', selector: '.sw::after' },
+  { prototype: 'tasks', context: '', selector: '.tg[aria-checked=true] .sw' },
+  { prototype: 'tasks', context: '', selector: '.tg[aria-checked=true] .sw::after' },
+  { prototype: 'tasks', context: '', selector: '.tier' },
+  { prototype: 'tasks', context: '', selector: '.tier.off' },
+  { prototype: 'tasks', context: '', selector: '.tier label.h' },
+  { prototype: 'tasks', context: '', selector: '.tier input[type=checkbox]' },
+  { prototype: 'tasks', context: '', selector: '.tg2' },
+  { prototype: 'tasks', context: '', selector: '.hint' },
+  { prototype: 'tasks', context: '', selector: '.err' },
+  { prototype: 'tasks', context: '', selector: '.dfoot' },
+  { prototype: 'tasks', context: '', selector: '.toast' },
+  { prototype: 'tasks', context: '', selector: '.toast.show' },
+  { prototype: 'tasks', context: '', selector: '.toast button' },
+  { prototype: 'tasks', context: '', selector: '.toast button:hover' },
+  { prototype: 'tasks', context: '', selector: '.confirm' },
+  { prototype: 'tasks', context: '', selector: '.confirm span:last-child' },
+  { prototype: 'tasks', context: '', selector: '.btn.dng' },
+  { prototype: 'tasks', context: '', selector: '.btn.dng:hover' },
+  { prototype: 'tasks', context: '@media(max-width:1000px)', selector: '.groups' },
+  { prototype: 'tasks', context: '@media(max-width:1000px)', selector: '.head' },
+  { prototype: 'tasks', context: '@media(max-width:700px)', selector: 'main' },
+  { prototype: 'tasks', context: '@media(max-width:700px)', selector: '.sep' },
+  { prototype: 'tasks', context: '@media(max-width:640px)', selector: '.btn' },
+  { prototype: 'tasks', context: '@media(max-width:640px)', selector: '.f' },
+  { prototype: 'tasks', context: '@media(max-width:640px)', selector: '.ib', occurrence: 2 },
+  { prototype: 'tasks', context: '@media(max-width:640px)', selector: '.search' },
+  { prototype: 'tasks', context: '@media(max-width:640px)', selector: '.in' },
 ];
 
 /* ------------------------------------------------------------------ indexing */
@@ -516,19 +629,22 @@ function diff(expected, actual) {
 
 function uiStylesheets() {
   const dir = join('src', 'styles', 'ui');
+  const appCss = readFileSync(join('src', 'app.css'), 'utf8');
+  const imports = [...appCss.matchAll(/@import '\.\/styles\/ui\/([^']+)'/g)].map((m) => m[1]);
 
-  return readdirSync(dir)
-    .filter((f) => f.endsWith('.css'))
-    .sort()
-    .map((f) => join(dir, f));
+  return imports.map((f) => join(dir, f));
 }
 
-const prototypeRecords = parse(
-  stripComments(readFileSync(PROTOTYPE, 'utf8').match(/<style>([\s\S]*?)<\/style>/)[1])
+const allPrototype = Object.fromEntries(
+  Object.entries(PROTOTYPES).map(([name, file]) => [
+    name,
+    indexAll(
+      parse(stripComments(readFileSync(file, 'utf8')).match(/<style>([\s\S]*?)<\/style>/)[1])
+    ),
+  ])
 );
 const appRecords = APP_CSS.flatMap((f) => parse(stripComments(readFileSync(f, 'utf8'))));
 
-const allPrototype = indexAll(prototypeRecords);
 const allApp = indexAll(appRecords);
 
 /**
@@ -548,25 +664,29 @@ const failures = [];
 const seen = new Set();
 
 for (const rule of RULES) {
+  const prototypeName = rule.prototype ?? 'today';
+  const prototypeFile = PROTOTYPES[prototypeName];
   const ctx = rule.context === '' ? '' : condition(rule.context);
   const key = `${ctx}|${rule.selector}`;
   const occurrence = rule.occurrence ?? 1;
-  const seenKey = `${key}#${occurrence}`;
+  const seenKey = `${prototypeName}|${key}#${occurrence}`;
 
   if (seen.has(seenKey)) continue;
 
   seen.add(seenKey);
 
-  const expected = block(allPrototype, key, occurrence);
+  const expected = block(allPrototype[prototypeName], key, occurrence);
 
   if (expected === undefined) {
     failures.push(
-      `${label(rule)}\n      not found in ${PROTOTYPE}; the check itself is out of date`
+      `${label(rule)}\n      not found in ${prototypeFile}; the check itself is out of date`
     );
     continue;
   }
 
-  const actual = block(allApp, key, occurrence);
+  const appOccurrence =
+    prototypeName === 'tasks' ? (allApp.get(key)?.length ?? occurrence) : occurrence;
+  const actual = block(allApp, key, appOccurrence);
 
   if (actual === undefined) {
     failures.push(`${label(rule)}\n      missing from the app CSS`);
@@ -574,7 +694,7 @@ for (const rule of RULES) {
   }
 
   if (actual === null) {
-    failures.push(`${label(rule)}\n      has fewer declaration blocks than ${PROTOTYPE}`);
+    failures.push(`${label(rule)}\n      has fewer declaration blocks than ${prototypeFile}`);
     continue;
   }
 
@@ -586,7 +706,9 @@ for (const rule of RULES) {
 }
 
 if (failures.length > 0) {
-  console.error(`\n${failures.length} of ${seen.size} ported rules do not match ${PROTOTYPE}:\n`);
+  console.error(
+    `\n${failures.length} of ${seen.size} ported rules do not match their prototype:\n`
+  );
 
   for (const failure of failures) console.error(`    ${failure}`);
 
@@ -594,4 +716,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`ok    ${seen.size} ported rules match ${PROTOTYPE} verbatim`);
+console.log(`ok    ${seen.size} ported rules match their prototype verbatim`);

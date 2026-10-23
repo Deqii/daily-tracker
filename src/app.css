@@ -71,6 +71,7 @@
  * the current route.
  */
 @import './styles/ui/today.css';
+@import './styles/ui/tasks.css';
 
 /* ===== DESIGN TOKENS (extract to src/app.css) ===== */
 :root {
