@@ -117,6 +117,7 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 64px;display:flex;flex-dir
 .v em{font-style:normal;font-weight:600;display:flex;gap:6px;align-items:center;color:var(--tc)}.v em::before{content:"";width:7px;height:7px;background:var(--tc)}
 .v span{color:var(--muted)}
 .v.over .pt{color:var(--danger)}
+.v .pt .bd{margin-right:6px}
 .empty{text-align:center;padding:48px 20px;border:1px dashed var(--line);color:var(--muted)}
 /* drawer */
 .scrim{position:fixed;inset:0;background:rgba(2,4,9,.62);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity var(--t-base);z-index:40}
@@ -150,6 +151,7 @@ main{max-width:1280px;margin:0 auto;padding:28px 32px 64px;display:flex;flex-dir
 @media(max-width:380px){.chips .chip:first-child{display:none}}
 @media(max-width:640px){.panel::before,.drawer::before{--a0:10px;--a1:16px}}
 @media(max-width:640px){.btn,.f,.ib{min-height:44px}.ib{min-width:44px}.search,.in{font-size:16px;min-height:44px}}
+@media(max-width:640px){.v.over{grid-template-columns:62px 1fr}.v.over .pt{grid-column:1/-1;white-space:normal}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}}
 [data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
 [data-motion=off] #fx,[data-motion=off] .scan{display:none}
@@ -226,7 +228,7 @@ function render(flashId){
     g.map(t=>{const v=vs(t),multi=v.length>1;
       return `<article class="task${t.id===flashId?' flash':''}" data-id="${t.id}"><div class="row"><div><div class="nm">${esc(t.name)}</div><div class="badges"><span class="bd ${t.anchor?'a':''}">${t.anchor?'Anchor':'Rotating'}</span>${t.pick?'<span class="bd t">Today’s quest</span>':''}${!multi&&v[0].p>CAP?'<span class="bd o">Over cap: counts as ${CAP}</span>':''}</div></div>
       <div class="row">${multi?'':`<div class="pt">${v[0].p} pts<small>+${xp(v[0].p)} XP</small></div>`}<div class="acts"><button class="ib" data-e="${t.id}" aria-label="Edit ${esc(t.name)}">${ico.e}</button><button class="ib del" data-d="${t.id}" aria-label="Delete ${esc(t.name)}">${ico.d}</button></div></div></div>
-      ${multi?`<div class="vs">${v.map(x=>`<div class="v ${x.p>CAP?'over':''}" style="--tc:var(${x.c})"><em>${x.n}</em><span>${esc(x.d)}</span><div class="pt">${x.p>CAP?'<span class="bd o" style="margin-right:6px">Over cap: counts as ${CAP}</span>':''}${x.p} pts<small>+${xp(x.p)} XP</small></div></div>`).join('')}</div>`:''}${confirmId===t.id?`<div class="confirm" role="alertdialog" aria-label="Delete ${esc(t.name)}?"><span>Delete ${esc(t.name)}?</span><span><button class="btn dng" data-cd="${t.id}">Delete</button><button class="btn ghost" data-cc="1">Cancel</button></span></div>`:''}</article>`}).join('')+`</section>`});
+      ${multi?`<div class="vs">${v.map(x=>`<div class="v ${x.p>CAP?'over':''}" style="--tc:var(${x.c})"><em>${x.n}</em><span>${esc(x.d)}</span><div class="pt">${x.p>CAP?'<span class="bd o">Over cap: counts as ${CAP}</span>':''}${x.p} pts<small>+${xp(x.p)} XP</small></div></div>`).join('')}</div>`:''}${confirmId===t.id?`<div class="confirm" role="alertdialog" aria-label="Delete ${esc(t.name)}?"><span>Delete ${esc(t.name)}?</span><span><button class="btn dng" data-cd="${t.id}">Delete</button><button class="btn ghost" data-cc="1">Cancel</button></span></div>`:''}</article>`}).join('')+`</section>`});
   $('groups').innerHTML=h||(T.length?'<div class="empty" style="grid-column:1/-1">No tasks match your filters.</div>':'<div class="empty" style="grid-column:1/-1"><h2>No tasks yet</h2><p>Add your first task to start your daily quest.</p><button class="btn" data-add="1">Add task</button></div>');
 }
 /* filters */
