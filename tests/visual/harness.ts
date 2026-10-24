@@ -152,22 +152,26 @@ export async function open(page: Page, url: string): Promise<void> {
   await page.addStyleTag({ content: '#fx,.scan,#demo{display:none!important}' });
   await page.waitForTimeout(SETTLE_MS);
   // The app mounts after a dynamic import, so on a slow run the settle window can
-  // start before its first panel exists. Wait for the page to have content and for
-  // every staggered `.boot` entrance to reach its end state, then for the finite
-  // transitions (the XP bar's width). The prototype already has both.
+  // start before its first panel exists. Wait for the page to have content, then
+  // force every finite animation (the staggered `.boot` entrances, the XP bar's
+  // width) to its end state instead of polling an opacity that a busy machine can
+  // miss inside the 10s window. Infinite animations (the caret, the bracket
+  // breathe) cannot finish, so they are left alone.
   await page.waitForFunction(
     () => (document.querySelector('main')?.children.length ?? 0) > 0,
     undefined,
     { timeout: 10000 }
   );
-  await page.waitForFunction(
-    () =>
-      [...document.querySelectorAll('.boot')].every(
-        (element) => getComputedStyle(element).opacity === '1'
-      ),
-    undefined,
-    { timeout: 10000 }
-  );
+  await page.evaluate(() => {
+    for (const animation of document.getAnimations()) {
+      const timing = animation.effect?.getTiming();
+
+      if (timing === undefined || timing.iterations === Infinity) continue;
+
+      animation.finish();
+    }
+  });
+  await settleFrames(page);
   await settleFiniteAnimations(page);
   await settleFrames(page);
 }
