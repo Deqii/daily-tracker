@@ -74,6 +74,16 @@ jobs:
       - run: npx playwright test fidelity --grep tasks
       - run: npx playwright test health --grep tasks
       - run: npx playwright test tasks-interactions
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: quality-results-${{ github.run_number }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+          if-no-files-found: ignore
 
   visual-fidelity:
     name: visual-fidelity (informational)
