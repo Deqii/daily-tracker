@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from './harness';
+import type { Page } from '@playwright/test';
 import { passesBalanceGate } from '../../src/engine/balance';
 import { pointsAwarded } from '../../src/engine/points';
 import { STATS, type Stat } from '../../src/lib/types';

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './harness';
 import {
   CONTEXT_OPTIONS,
   FIXED_TIME,
@@ -96,9 +96,6 @@ for (const vp of VIEWPORTS) {
           const problems = compareStyleReports(stylesA, stylesB);
 
           expect(problems, problems.join('\n')).toEqual([]);
-
-          await first.close();
-          await second.close();
         });
 
         /**
@@ -147,9 +144,6 @@ for (const vp of VIEWPORTS) {
           const problems = compareStyleReports(stylesA, stylesB);
 
           expect(problems, problems.join('\n')).toEqual([]);
-
-          await first.close();
-          await second.close();
         });
       });
     }

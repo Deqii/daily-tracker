@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from './harness';
+import type { Page } from '@playwright/test';
 import {
   CONTEXT_OPTIONS,
   PAGES,
@@ -68,8 +69,6 @@ for (const vp of VIEWPORTS) {
           heading,
           `expected the ${p.name} page to start with <main> heading "${p.heading}", got "${heading}" (${appUrl(p)})`
         ).toBe(p.heading);
-
-        await context.close();
       });
     });
   }
@@ -106,9 +105,6 @@ test.describe('health tasks overflow @ 390', () => {
         `prototype tasks.html overflows 390px in ${theme}`
       ).toBeLessThanOrEqual(390);
       expect(appWidth, `app tasks page overflows 390px in ${theme}`).toBeLessThanOrEqual(390);
-
-      await prototype.context().close();
-      await app.context().close();
     });
   }
 });

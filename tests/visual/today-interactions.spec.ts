@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from './harness';
+import type { Page } from '@playwright/test';
 import { PNG } from 'pngjs';
 import { passesBalanceGate } from '../../src/engine/balance';
 import { level as levelOf, xpForLevel } from '../../src/engine/level';
@@ -16,6 +17,7 @@ import {
   openApp,
   openPrototype,
   overlapNote,
+  settle,
   settleFrames,
   sideBySide,
   writeArtifact,
@@ -39,17 +41,6 @@ import {
  * Only 1280x800 is used: the interactions do not move the layout, and the two
  * viewports are already covered by the static fidelity tests.
  */
-
-/**
- * Long enough for the ring burst and the floating `+N XP` to be gone. Both sides
- * remove them 1100 ms after the click (`today.html` line 260, the app's `FX_MS`),
- * so the comparison is of the settled result and not of a particle that may or
- * may not still be on screen. The toast stays up on both sides for 8 s.
- */
-const AFTER_MS = 1400;
-
-/** The pause between the two clicks that clear the penalty zone. */
-const BETWEEN_CLICKS_MS = 300;
 
 /** The rank the fixture seeds, which decides the cap and the multiplier. */
 const FIXTURE_RANK = 'E' as const;
@@ -126,6 +117,22 @@ function lifetimeXp(level: number, xpIntoLevel: number): number {
   return xpForLevel(level) + xpIntoLevel;
 }
 
+/**
+ * Both sides remove the ring and the floating `+N XP` 1100 ms after a click
+ * (`today.html` line 260, the app's `FX_MS`). Waiting for their removal is the
+ * condition; settling afterwards finishes the CSS work the action started.
+ */
+async function settleAfterAction(page: Page, label: string): Promise<void> {
+  await page.waitForFunction(
+    () => document.querySelectorAll('.ring,.float').length === 0,
+    undefined,
+    {
+      timeout: 10000,
+    }
+  );
+  await settle(page, label);
+}
+
 const scenarios: readonly Scenario[] = [
   {
     name: 'complete Baca 10 halaman',
@@ -167,7 +174,7 @@ const scenarios: readonly Scenario[] = [
       const row = page.locator('.qrow[data-i="4"]');
 
       await row.click();
-      await page.waitForTimeout(BETWEEN_CLICKS_MS);
+      await expect(row.locator('.need')).toHaveText('1/2');
       await row.click();
     },
     async assertEngine(page, before) {
@@ -252,8 +259,8 @@ for (const theme of THEMES) {
         await scenario.act(protoPage);
         await scenario.act(appPage);
 
-        await protoPage.waitForTimeout(AFTER_MS);
-        await appPage.waitForTimeout(AFTER_MS);
+        await settleAfterAction(protoPage, `today prototype after "${scenario.name}"`);
+        await settleAfterAction(appPage, `today app after "${scenario.name}"`);
 
         // Park the cursor off the page on both sides. The clicked row keeps
         // `:hover` (a 3px translate and a lighter fill) for as long as the cursor
@@ -330,9 +337,6 @@ for (const theme of THEMES) {
           ratio,
           `diff ratio ${(ratio * 100).toFixed(3)}% over ${a.width}x${a.height} after "${scenario.name}"`
         ).toBeLessThanOrEqual(MAX_DIFF_RATIO);
-
-        await protoPage.context().close();
-        await appPage.context().close();
       });
     }
   });

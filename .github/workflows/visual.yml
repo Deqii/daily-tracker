@@ -65,7 +65,7 @@ jobs:
       # The reusable Today states from the batch-2 audit: the same pixel and
       # computed-style diffs for each state at 1280x800 dark, 390x844 dark and
       # 1280x800 light, plus the state mechanics, keyboard paths and ARIA roles.
-      - run: npx playwright test today-states
+      - run: npx playwright test tests/visual/today-states.spec.ts
       - run: npx playwright test today-states-interactions
       # The Tasks page is ported too (Issue 3): the static diff, the health
       # check, and the six interaction scenarios (drawer open/close and focus,

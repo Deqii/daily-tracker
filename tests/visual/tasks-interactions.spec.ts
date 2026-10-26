@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from './harness';
+import type { Page } from '@playwright/test';
 import { PNG } from 'pngjs';
 import {
   CONTEXT_OPTIONS,
@@ -11,6 +12,7 @@ import {
   openApp,
   openPrototype,
   overlapNote,
+  settle,
   settleFrames,
   sideBySide,
   writeArtifact,
@@ -32,8 +34,6 @@ import {
  * the page's toast deliberately carries no action. See DEVIATIONS.md.
  */
 
-const AFTER_MS = 600;
-
 const VIEWPORT: Viewport = { width: 1280, height: 800 };
 
 const TASKS: PageSpec | undefined = PAGES.find((page) => page.name === 'tasks');
@@ -53,9 +53,26 @@ async function summary(page: Page): Promise<string> {
   return ((await page.locator('#summary').textContent()) ?? '').trim();
 }
 
+async function waitForDrawer(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () => {
+      const input = document.querySelector('#drawer input');
+
+      if (!(input instanceof HTMLElement)) return false;
+
+      const rect = input.getBoundingClientRect();
+
+      return rect.width > 0 && rect.height > 0;
+    },
+    undefined,
+    { timeout: 10000 }
+  );
+}
+
 async function openDrawer(page: Page): Promise<void> {
   await page.locator('#add').click();
-  await page.waitForTimeout(800);
+  await waitForDrawer(page);
+  await settle(page, 'tasks drawer open');
 }
 
 const scenarios: readonly Scenario[] = [
@@ -65,14 +82,19 @@ const scenarios: readonly Scenario[] = [
     async act(page) {
       await page.locator('#add').focus();
       await page.keyboard.press('Enter');
-      await page.waitForTimeout(800);
+      await waitForDrawer(page);
 
       if (page.url().includes('4173')) {
         expect(await page.evaluate(() => document.activeElement?.id)).toBe('fname');
       }
 
+      await settle(page, 'tasks drawer open');
+
       await page.keyboard.press('Escape');
-      await page.waitForTimeout(100);
+      await page.waitForFunction(() => document.activeElement?.id === 'add', undefined, {
+        timeout: 10000,
+      });
+      await settle(page, 'tasks drawer closed');
 
       expect(await page.evaluate(() => document.activeElement?.id)).toBe('add');
     },
@@ -158,10 +180,11 @@ const scenarios: readonly Scenario[] = [
       await page.locator('.task .confirm [data-cd]').click();
     },
     async assertApp(page, before) {
+      await expect(page.locator('.task .nm', { hasText: 'Telepon keluarga' })).toHaveCount(0);
+
       const count = summaryCount(await summary(page));
 
       expect(count).toBe(summaryCount(before) - 1);
-      await expect(page.locator('.task .nm', { hasText: 'Telepon keluarga' })).toHaveCount(0);
       await expect(page.locator('.toast span')).toHaveText('"Telepon keluarga" deleted');
       await expect(page.locator('.toast')).toHaveClass(/\bshow\b/);
     },
@@ -188,8 +211,8 @@ for (const theme of THEMES) {
         await scenario.act(protoPage);
         await scenario.act(appPage);
 
-        await protoPage.waitForTimeout(AFTER_MS);
-        await appPage.waitForTimeout(AFTER_MS);
+        await settle(protoPage, `tasks prototype after "${scenario.name}"`);
+        await settle(appPage, `tasks app after "${scenario.name}"`);
 
         for (const page of [protoPage, appPage]) {
           await page.locator('#drawer').evaluate((el) => {
@@ -262,9 +285,6 @@ for (const theme of THEMES) {
           ratio,
           `diff ratio ${(ratio * 100).toFixed(3)}% over ${a.width}x${a.height} after "${scenario.name}"`
         ).toBeLessThanOrEqual(MAX_DIFF_RATIO);
-
-        await protoPage.context().close();
-        await appPage.context().close();
       });
     }
   });

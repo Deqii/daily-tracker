@@ -27,8 +27,11 @@ npm run test:visual -- selftest          # harness self-test only
 npm run test:visual -- shell             # header region only
 npm run test:visual -- fidelity health   # the page diffs and health checks
 npm run test:visual -- today-interactions # the Today interactions (3 scenarios x 2 themes)
-npm run test:visual -- today-states   # the Today state diffs + interactions
+npm run test:visual -- today-states.spec.ts # the Today state diffs (60 tests)
+npm run test:visual -- today-states-interactions # the state mechanics (11 tests)
 npm run test:visual -- tasks-interactions # the Tasks interactions (6 scenarios x 2 themes)
+npm run test:visual:page -- today        # one page: fidelity, health, interactions, states
+npm run test:visual:quick                # ported pages at 1280x800 dark, no self-test
 npm run test:visual -- --grep "today"    # one page
 npm run test:visual -- --grep "@ 390"    # one viewport
 npm run test:visual -- --grep "light"    # one theme
@@ -45,6 +48,39 @@ npm run check:no-fixtures [dist]         # prove no build ships the fixtures
 `test:visual` builds the app with `--mode visual` into `dist-visual/` and serves
 it on port 4173; it serves `docs/prototype/` (plus `tests/visual/fonts/` at
 `/__fonts__/`) on port 4174. Both servers start automatically.
+
+`test:visual:page` takes the page name as its argument and runs that page's
+fidelity, health, interaction and state tests (`today` and `tasks` have the
+interaction/state files; the other three pages only have fidelity and health
+until they are ported). `test:visual:quick` runs every ported page at 1280x800
+in the dark theme, including shell and both pages' interactions and states, and
+skips the self-test.
+
+## Test tiers
+
+Use the smallest tier that can catch a regression; do not run the full suite
+when a narrower tier is enough (the rules are in `docs/agent-prompts/common.md`
+section 8):
+
+- **Tier 0, after every edit (seconds):** `npm run check`, the unit tests of the
+  files you touched (`npx vitest run <path>`), and the one Playwright test that
+  covers the change (`npx playwright test <file> -g "<name>"`, plus
+  `--last-failed` while iterating). Use `--reporter=line`; keep the preview and
+  prototype servers running between runs; run `npm run build:visual` only after
+  source changes.
+- **Tier 1, end of a stage (once):** `npm run check:ui-css`,
+  `npm run check:prototype-shared`, and the current page's fidelity, health,
+  interaction and state tests in all combinations with
+  `npm run test:visual:page -- <page>`.
+- **Tier 2, end of an issue (once):** `lint`, `check`, unit tests,
+  `format:check`, `npm run build && npm run check:no-fixtures`,
+  `check:fixtures`, `check:ui-css`, `check:prototype-shared`,
+  `npx playwright test shell`, the current page's tests, and one previously
+  ported page as a regression smoke at 1280x800 dark.
+- **Tier 3, full (once):** `npx playwright test` for the whole suite, or a single
+  self-test run. This tier is required only when the harness, the Playwright
+  config, a prototype, the shared token blocks or the shell CSS changed.
+  Otherwise CI is the full-suite gate.
 
 First run only:
 
@@ -162,8 +198,9 @@ computed-style walk. Three scenarios at 1280x800 in both themes, six tests:
 
 Two details the ordering depends on:
 
-- the wait is **1400 ms**, past the 1100 ms the ring burst and the floating
-  `+N XP` live for, so both sides are compared settled;
+- both sides wait for the ring burst and the floating `+N XP` to be removed
+  (1100 ms after the click) and then call `settle()`, so they are compared
+  settled rather than at a fixed delay;
 - the engine assertions and the style walk run **before** the screenshots,
   because the toast hides itself after 8 s and four full-page captures plus two
   DOM walks take longer than that. Asserting the toast afterwards would test the
@@ -200,7 +237,7 @@ two-freeze page without changing the rank. It is recorded in
 | Timezone / locale | `Asia/Jakarta`, `id-ID`                                                                                                    |
 | Theme             | `dark` and `light`, seeded into `localStorage` on both sides before navigation                                             |
 | Motion            | `reducedMotion: 'reduce'`, `#fx` and `.scan` hidden                                                                        |
-| Settle window     | 2.5 s before capture, plus two committed frames                                                                            |
+| Settle condition  | fonts loaded, every finite animation finished, ten committed frames (10 s cap)                                             |
 | Fonts             | the same woff2 bytes on both sides, via `/__fonts__/`                                                                      |
 | Rasterisation     | `--disable-lcd-text`, `--disable-font-subpixel-positioning`, `--font-render-hinting=none`, `--force-device-scale-factor=1` |
 
@@ -219,9 +256,10 @@ real sources of non-determinism, all fixed in `harness.ts`:
 reduce` collapses the durations to 1ms but leaves `animation-delay` alone,
    and the prototypes stagger up to ~1.2s. `animations: 'disabled'` finished
    them at screenshot time, and the re-raster of the filtered, backdrop-blurred
-   panels jittered by one colour step on a handful of pixels. Fix: `open()` waits
-   2.5s so every animation has reached its end state before anything is
-   captured.
+   panels jittered by one colour step on a handful of pixels. Fix: `open()` calls
+   `settle()`, which waits for fonts, awaits every finite animation, and
+   commits ten frames before anything is captured. (It used to wait a fixed
+   2.5s; that was correct but spent most of the suite's time asleep.)
 2. **Beyond-viewport capture.** `page.screenshot({ fullPage: true })` asked
    Chromium to raster past the viewport, which resizes the `position: fixed`
    background (`body::before` gradients, `body::after` vignette) that every
