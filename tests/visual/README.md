@@ -121,7 +121,7 @@ would otherwise either lose the required check or require every new shard to be
 added to branch protection by hand. `quality` therefore has no tests of its own:
 it `needs:` the real jobs, runs with `if: always()`, and exits non-zero when any
 needed job is not `success` (a skipped or cancelled shard counts as a failure).
-Keep its name; never rename or remove it.
+Keep the name; never rename or remove it.
 
 ### Local workers
 
