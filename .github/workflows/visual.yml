@@ -1,13 +1,16 @@
-# UI Revamp visual fidelity (UI Revamp Issue 0).
+# UI Revamp visual fidelity.
 #
-# Two jobs:
-#   quality          - required. Everything that must be green before a PR lands.
-#   visual-fidelity  - informational for now. The app has not been ported to the
-#                      prototypes yet, so the page diffs and health tests are
-#                      expected to fail. They are wired up and running so that
-#                      each page's report is already on record.
+# Required jobs:
+#   plan             - reads .github/ci-shards.json and builds the shard matrix.
+#   static           - lint, types, unit tests, production build and the static
+#                      guards.
+#   build            - one visual build, shared by every shard as an artifact.
+#   visual (shard)   - four independent shards of the visual suite.
+#   quality          - the aggregate gate. This is the required status check.
 #
-# This job becomes REQUIRED in Issue 7, when every page is expected to pass.
+# Informational job:
+#   visual-fidelity  - only on workflow_dispatch. Runs the fidelity and health
+#                      tests of pages that are not ported yet. Not required.
 
 name: visual
 
@@ -15,6 +18,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,10 +28,30 @@ permissions:
   contents: read
 
 jobs:
-  quality:
-    name: quality
+  plan:
+    name: plan
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 10
+    outputs:
+      shards: ${{ steps.matrix.outputs.shards }}
+      informational: ${{ steps.matrix.outputs.informational }}
+    steps:
+      - uses: actions/checkout@v6.1.0
+      - id: matrix
+        run: |
+          node - <<'NODE'
+          const { readFileSync, appendFileSync } = require('node:fs');
+          const config = JSON.parse(readFileSync('.github/ci-shards.json', 'utf8'));
+          const shards = config.shards.map(({ name, args, extra }) => ({ name, args, extra }));
+          const informational = config.informational.join('|');
+          appendFileSync(process.env.GITHUB_OUTPUT, `shards=${JSON.stringify(shards)}\n`);
+          appendFileSync(process.env.GITHUB_OUTPUT, `informational=${informational}\n`);
+          NODE
+
+  static:
+    name: static
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6.1.0
       - uses: actions/setup-node@v6.5.0
@@ -41,57 +65,119 @@ jobs:
       # The production build must not carry the ?fixture= seeder or the
       # prototypes' demo data.
       - run: npm run build && npm run check:no-fixtures
-      - run: npx playwright install --with-deps chromium
       # The ported global CSS must still be the prototypes' CSS, rule for rule.
-      # A pixel diff cannot catch a changed --ease or a dropped bracket arm: by
-      # the time anything is captured every animation has finished, so the
-      # screenshot is identical and the rule is silently wrong.
       - run: npm run check:ui-css
-      # The five prototypes are edited one file at a time and each keeps its own
-      # copy of the token blocks and the shell rules. check:ui-css compares the
-      # app against today.html alone, so drift between the other four would be
-      # invisible to it.
+      # The five prototypes keep their own token blocks and shell rules.
       - run: npm run check:prototype-shared
-      # Proves the harness itself is deterministic: the same page rendered twice
-      # must produce the same pixels. A failure here invalidates every diff the
-      # other job reports.
-      - run: npx playwright test selftest
-      # The app shell is ported, so the header region is now a hard guarantee:
-      # 5 pages x 2 viewports x 2 themes, dimensions and pixels and computed
-      # styles all against the prototype.
-      - run: npx playwright test shell
-      # The Today page is ported too (Issue 2): 2 viewports x 2 themes of the
-      # full-page pixel and computed-style diff, its health check, and the three
-      # interaction scenarios x 2 themes. The grep keeps the other four pages out
-      # of this required job; they are still reported by visual-fidelity below.
-      - run: npx playwright test fidelity --grep today
-      - run: npx playwright test health --grep today
-      - run: npx playwright test today-interactions
-      # The reusable Today states from the batch-2 audit: the same pixel and
-      # computed-style diffs for each state at 1280x800 dark, 390x844 dark and
-      # 1280x800 light, plus the state mechanics, keyboard paths and ARIA roles.
-      - run: npx playwright test tests/visual/today-states.spec.ts
-      - run: npx playwright test today-states-interactions
-      # The Tasks page is ported too (Issue 3): the static diff, the health
-      # check, and the six interaction scenarios (drawer open/close and focus,
-      # empty and over-cap validation, combined filters, adding a single-tier
-      # task, and delete) in both themes.
-      - run: npx playwright test fidelity --grep tasks
-      - run: npx playwright test health --grep tasks
-      - run: npx playwright test tasks-interactions
-      - name: Upload test artifacts
+      # Every visual test must be in a shard unless it is explicitly
+      # informational. The shards run in the visual job below.
+      - run: npm run check:ci-coverage
+
+  build:
+    name: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6.1.0
+      - uses: actions/setup-node@v6.5.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build:visual
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: dist-visual
+          path: dist-visual
+          retention-days: 1
+
+  visual:
+    name: visual (${{ matrix.shard.name }})
+    needs: [plan, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.plan.outputs.shards) }}
+    steps:
+      - uses: actions/checkout@v6.1.0
+      - uses: actions/setup-node@v6.5.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - id: playwright-version
+        run: echo "version=$(node -p "require('./package.json').devDependencies['@playwright/test']")" >> "$GITHUB_OUTPUT"
+      - id: playwright-cache
+        uses: actions/cache@v4.3.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
+      - name: Install Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
+      - name: Install Chromium system dependencies
+        run: npx playwright install-deps chromium
+      - uses: actions/download-artifact@v8.0.2
+        with:
+          name: dist-visual
+          path: dist-visual
+      - name: Run shard
+        env:
+          PW_SKIP_BUILD: '1'
+        run: |
+          ${{ matrix.shard.extra }}
+          npx playwright test ${{ matrix.shard.args }}
+      - name: Upload failure artifacts
         if: failure()
         uses: actions/upload-artifact@v7.0.2
         with:
-          name: quality-results-${{ github.run_number }}
+          name: visual-${{ matrix.shard.name }}-failure
           path: |
             test-results/
             playwright-report/
           retention-days: 7
           if-no-files-found: ignore
+      - name: Upload results
+        if: success()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: visual-${{ matrix.shard.name }}-results
+          path: test-results/results.json
+          retention-days: 3
+          if-no-files-found: ignore
+
+  quality:
+    name: quality
+    if: always()
+    needs: [plan, static, build, visual]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Verify every required job succeeded
+        env:
+          PLAN: ${{ needs.plan.result }}
+          STATIC: ${{ needs.static.result }}
+          BUILD: ${{ needs.build.result }}
+          VISUAL: ${{ needs.visual.result }}
+        run: |
+          failed=0
+          for entry in "plan=$PLAN" "static=$STATIC" "build=$BUILD" "visual=$VISUAL"; do
+            name=${entry%%=*}
+            result=${entry#*=}
+            echo "$name: $result"
+            if [ "$result" != "success" ]; then
+              echo "::error::$name did not succeed ($result)"
+              failed=1
+            fi
+          done
+          exit "$failed"
 
   visual-fidelity:
     name: visual-fidelity (informational)
+    if: github.event_name == 'workflow_dispatch'
+    needs: plan
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     continue-on-error: true
@@ -103,16 +189,16 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      # Expected to fail until each page is ported. Excludes selftest and
-      # shell, which the required job already gates.
-      - run: npx playwright test fidelity health
+      # Expected to fail until each page is ported. The patterns come from
+      # .github/ci-shards.json (`informational`).
+      - run: npx playwright test fidelity health --grep "${{ needs.plan.outputs.informational }}"
       - name: Upload visual artifacts
         if: always()
         uses: actions/upload-artifact@v7.0.2
         with:
-          name: visual-results-${{ github.run_number }}
+          name: visual-fidelity-${{ github.run_number }}
           path: |
             test-results/
             playwright-report/
-          retention-days: 14
+          retention-days: 7
           if-no-files-found: ignore
