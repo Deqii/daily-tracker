@@ -21,9 +21,15 @@ export default defineConfig({
   // Web fonts, the particle canvas and the .boot entrance all need a moment.
   timeout: 120_000,
   expect: { timeout: 15_000 },
-  fullyParallel: false,
-  workers: 1,
-  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
+  fullyParallel: true,
+  workers: 2,
+  reporter: process.env.CI
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+        ['json', { outputFile: 'test-results/results.json' }],
+      ]
+    : [['list']],
   use: {
     baseURL: `http://localhost:${APP_PORT}`,
     trace: 'retain-on-failure',
@@ -34,7 +40,10 @@ export default defineConfig({
       // `build:visual` compiles the ?fixture= seeder in; `npm run build` never does.
       // `--outDir` must match the visual build, because `vite preview` resolves
       // the production config otherwise and would serve `dist`.
-      command: `npm run build:visual && npm run preview -- --port ${APP_PORT} --outDir dist-visual --strictPort`,
+      command:
+        process.env.PW_SKIP_BUILD === '1'
+          ? `npm run preview -- --port ${APP_PORT} --outDir dist-visual --strictPort`
+          : `npm run build:visual && npm run preview -- --port ${APP_PORT} --outDir dist-visual --strictPort`,
       port: APP_PORT,
       reuseExistingServer: !process.env.CI,
       timeout: 180_000,

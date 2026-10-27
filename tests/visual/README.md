@@ -56,6 +56,83 @@ until they are ported). `test:visual:quick` runs every ported page at 1280x800
 in the dark theme, including shell and both pages' interactions and states, and
 skips the self-test.
 
+## CI layout
+
+The required gate is split so that the slow visual suite runs in parallel
+shards. Every shard still runs the same tests as before; nothing is skipped or
+retried.
+
+| Job                | What it does                                                                                                                              | Required |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `plan`             | Reads `.github/ci-shards.json` and outputs the shard matrix and the informational grep patterns.                                          | yes      |
+| `static`           | `npm ci`, lint, types, unit tests, production build + `check:no-fixtures`, `check:ui-css`, `check:prototype-shared`, `check:ci-coverage`. | yes      |
+| `build`            | One `npm run build:visual`, uploaded as the `dist-visual` artifact (1 day).                                                               | yes      |
+| `visual (<shard>)` | Matrix of the four shards below. Downloads `dist-visual`, sets `PW_SKIP_BUILD=1`, runs the shard's Playwright tests.                      | yes      |
+| `quality`          | Aggregate gate. `needs:` plan, static, build and visual and fails unless every one succeeded. This is the protected check.                | yes      |
+| `visual-fidelity`  | The unported pages' fidelity and health tests. Runs only on `workflow_dispatch`; not needed by `quality`.                                 | no       |
+
+### Shards
+
+| Shard          | Tests | Contents                                                                                     | Serial time (base run) | CI time (2 workers) |
+| -------------- | ----: | -------------------------------------------------------------------------------------------- | ---------------------: | ------------------: |
+| `core`         |    60 | `selftest.spec.ts`, `shell.spec.ts`, plus `npm run check:fixtures`                           |                  253 s |               176 s |
+| `today`        |    27 | Today's fidelity + health, `today-interactions.spec.ts`, `today-states-interactions.spec.ts` |                  120 s |                93 s |
+| `today-states` |    60 | `today-states.spec.ts`                                                                       |                  269 s |               171 s |
+| `tasks`        |    24 | Tasks' fidelity + health (including the 390 overflow check), `tasks-interactions.spec.ts`    |                  153 s |               122 s |
+
+The serial times are the matching steps of the last green base run; the CI times
+are from the first green run of the split workflow (2026-10-27), with
+`workers: 2`.
+
+### Adding a page
+
+1. Add the page's spec files to a shard's `args` in `.github/ci-shards.json`.
+   Keep `args` as a string: it is passed straight to `npx playwright test`.
+   Put scripts such as `check:fixtures` in `extra`.
+2. If the page is still being ported, add its grep pattern to `informational`
+   instead: those tests are run by `visual-fidelity` and are not required.
+3. Run `npm run check:ci-coverage`. It fails if a test is in no shard and not
+   informational, or if an informational pattern matches nothing, and prints the
+   number of tests per shard.
+
+`check:ci-coverage` runs `npx playwright test --list` once for the whole suite
+and once per shard (node built-ins only, no browser needed), so it also catches a
+typo in an `args` string before the shards start.
+
+### Failed shard artifacts
+
+A failed shard uploads `test-results/` and `playwright-report/` as
+`visual-<shard>-failure` (7 days); a passing shard uploads only
+`test-results/results.json` as `visual-<shard>-results` (3 days). Download them
+from the run page, or:
+
+```
+gh run download <run-id> -n visual-core-failure
+gh run download <run-id> -n visual-today-results
+```
+
+Open `playwright-report/index.html` for the failure; the images and style report
+are described under "How to read a failure" below.
+
+### Why `quality` is an aggregate
+
+Branch protection can only require one stable check name. Splitting the work
+would otherwise either lose the required check or require every new shard to be
+added to branch protection by hand. `quality` therefore has no tests of its own:
+it `needs:` the real jobs, runs with `if: always()`, and exits non-zero when any
+needed job is not `success` (a skipped or cancelled shard counts as a failure).
+Keep the name; never rename or remove it.
+
+### Local workers
+
+`playwright.config.ts` uses `fullyParallel: true` and `workers: 2` in CI and
+locally. The suite is parallel-safe after the harness stability work, but the
+4-core / 8 GB development machine crashed with 4 workers. Do not raise it without
+checking both CI and a local full run.
+
+Both `visual.yml` and `ci.yml` use `concurrency` keyed by workflow and ref with
+`cancel-in-progress: true`, so a superseded push does not keep a runner busy.
+
 ## Test tiers
 
 Use the smallest tier that can catch a regression; do not run the full suite
