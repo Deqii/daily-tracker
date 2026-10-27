@@ -16,6 +16,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -23,6 +27,7 @@ jobs:
   quality:
     name: quality
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6.1.0
       - uses: actions/setup-node@v6.5.0
@@ -88,6 +93,7 @@ jobs:
   visual-fidelity:
     name: visual-fidelity (informational)
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     continue-on-error: true
     steps:
       - uses: actions/checkout@v6.1.0
