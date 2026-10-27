@@ -22,6 +22,8 @@
     "check:ui-css": "node scripts/check-ui-css.mjs",
     "pretest:visual": "npm run test:visual:fonts",
     "test:visual": "playwright test",
+    "test:visual:page": "node tests/visual/run-suite.mjs page",
+    "test:visual:quick": "node tests/visual/run-suite.mjs quick",
     "test:visual:update": "npm run test:visual:fonts && npm run test:visual:fixtures",
     "check:prototype-shared": "node scripts/check-prototype-shared.mjs"
   },

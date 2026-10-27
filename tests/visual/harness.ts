@@ -1,9 +1,13 @@
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
-import type { Browser, BrowserContext, Page } from '@playwright/test';
+import { RADAR_CENTER_X, RADAR_CENTER_Y } from '../../src/lib/today-page';
+import { expect, test as base } from '@playwright/test';
+import type { Browser, BrowserContext, Page, TestInfo } from '@playwright/test';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+export { expect };
 
 /**
  * Shared machinery for every Playwright spec in this directory.
@@ -95,6 +99,77 @@ export const CONTEXT_OPTIONS = {
 } as const;
 
 /**
+ * Every browser context the harness creates is registered here and closed by
+ * the `contextRegistry` fixture below, including when the test fails or times
+ * out. Before this, most specs created contexts through `openPrototype` /
+ * `openApp` and never closed them; a worker accumulated them for the whole
+ * file, and the later tests in a long file slowed down until they timed out.
+ *
+ * `registries` is keyed by Playwright's test id so the fixture tears down only
+ * the contexts its own test created. Worker totals are cumulative across the
+ * files that one worker runs, which is what the integrity line reports.
+ */
+type ContextRegistry = {
+  created: number;
+  closed: number;
+  open: Set<BrowserContext>;
+};
+
+const registries = new Map<string, ContextRegistry>();
+const workerCounts = { created: 0, closed: 0 };
+
+function registryFor(testInfo: TestInfo): ContextRegistry {
+  const existing = registries.get(testInfo.testId);
+
+  if (existing !== undefined) return existing;
+
+  const registry: ContextRegistry = { created: 0, closed: 0, open: new Set() };
+
+  registries.set(testInfo.testId, registry);
+
+  return registry;
+}
+
+/**
+ * The test object every spec in this directory uses. The automatic fixture
+ * closes every context the test created and prints the worker's running
+ * created/closed totals. A mismatch fails the run instead of silently leaking
+ * another context into the next test.
+ */
+export const test = base.extend<{ contextRegistry: void }>({
+  contextRegistry: [
+    async ({ browser: _browser }, use, testInfo) => {
+      const registry = registryFor(testInfo);
+
+      try {
+        await use();
+      } finally {
+        for (const context of [...registry.open]) {
+          await context.close().catch((error: unknown) => {
+            const message = error instanceof Error ? error.message : String(error);
+
+            console.warn(`[harness] could not close a context in "${testInfo.title}": ${message}`);
+          });
+        }
+
+        registries.delete(testInfo.testId);
+
+        console.log(
+          `[harness] contexts created ${workerCounts.created} / closed ${workerCounts.closed}`
+        );
+      }
+
+      if (workerCounts.created !== workerCounts.closed) {
+        throw new Error(
+          `harness context leak: contexts created ${workerCounts.created} / closed ${workerCounts.closed}`
+        );
+      }
+    },
+    { auto: true },
+  ],
+});
+
+/**
  * Chromium flags every run shares.
  *
  * `--disable-lcd-text`, `--disable-font-subpixel-positioning` and
@@ -112,29 +187,13 @@ export const CHROMIUM_ARGS = [
 ];
 
 /**
- * Long enough for every staggered animation in every prototype to have reached
- * its end state.
- *
- * `prefers-reduced-motion: reduce` collapses the durations to 1ms but leaves
- * `animation-delay` alone, and the prototypes stagger up to ~1.2s
- * (`calc(var(--i) * var(--stagger) + 1200ms)`, `.mk` at `1s + var(--d) * 20ms`).
- * Screenshotting inside those delay windows is what made `selftest.spec.ts`
- * fail: `animations: 'disabled'` then finished them at capture time, and the
- * resulting rasterisation of the filtered, backdrop-blurred panels jittered by
- * one least-significant bit on a few pixels between two identical runs. Letting
- * the page settle first is the fix.
- */
-const SETTLE_MS = 2500;
-
-/**
  * Determinism contract for both sides of every comparison:
  *   - the clock is frozen before navigation, so `Date` cannot differ;
  *   - the Google Fonts request is replaced with the same local woff2 bytes;
- *   - animations are collapsed by `prefers-reduced-motion` and then given
- *     `SETTLE_MS` to reach their end state, so the screenshot freezes nothing;
+ *   - animations are collapsed by `prefers-reduced-motion`, every finite one is
+ *     awaited, and ten frames are committed before capture;
  *   - `#fx` (particle canvas), `.scan` (the sweep) and `#demo` (the
- *     prototype-only demo button) are display:none;
- *   - fonts are awaited and a frame is committed before capture.
+ *     prototype-only demo button) are display:none.
  */
 export async function open(page: Page, url: string): Promise<void> {
   await page.clock.setFixedTime(FIXED_TIME);
@@ -145,60 +204,139 @@ export async function open(page: Page, url: string): Promise<void> {
   );
 
   await page.goto(url);
-  await page.evaluate(() => document.fonts.ready);
   // `#demo` is the prototype-only "Demo: buka title berikutnya" button in
   // settings.html (DEVIATIONS.md note 3). It is prototype affordance, not UI, so
   // it is hidden on both sides rather than diffed.
   await page.addStyleTag({ content: '#fx,.scan,#demo{display:none!important}' });
-  await page.waitForTimeout(SETTLE_MS);
-  // The app mounts after a dynamic import, so on a slow run the settle window can
-  // start before its first panel exists. Wait for the page to have content, then
-  // force every finite animation (the staggered `.boot` entrances, the XP bar's
-  // width) to its end state instead of polling an opacity that a busy machine can
-  // miss inside the 10s window. Infinite animations (the caret, the bracket
-  // breathe) cannot finish, so they are left alone.
-  await page.waitForFunction(
-    () => (document.querySelector('main')?.children.length ?? 0) > 0,
-    undefined,
-    { timeout: 10000 }
-  );
-  await page.evaluate(() => {
-    for (const animation of document.getAnimations()) {
-      const timing = animation.effect?.getTiming();
+  // The app mounts after a dynamic import, so wait for its first panel before
+  // reading animations; otherwise the frames below commit an empty page.
+  await page
+    .waitForFunction(() => (document.querySelector('main')?.children.length ?? 0) > 0, undefined, {
+      timeout: 10000,
+    })
+    .catch(() => {
+      throw new Error(`open(${url}): the page rendered no <main> content within 10s`);
+    });
 
-      if (timing === undefined || timing.iterations === Infinity) continue;
-
-      animation.finish();
-    }
-  });
-  await settleFrames(page);
-  await settleFiniteAnimations(page);
-  await settleFrames(page);
+  await settle(page, `open(${url})`);
+  await settleRadar(page, `open(${url})`);
 }
 
 /**
- * Waits for every finite CSS animation and transition to reach its end state.
- *
- * The settle window is long enough for all of them on a warm page, but the app
- * mounts from a dynamic import, so on a cold or slow run the XP bar's width
- * transition can still be in flight at the end of it. The prototype and the app
- * would then be read at different points of the same transition. Infinite
- * animations (the caret, the bracket breathe) never finish, so they are skipped;
- * a timeout keeps a broken animation from hanging the harness.
+ * The Today radar's entrance is a 500ms `setTimeout` followed by a 1100ms JS
+ * tween (both prototypes and `RadarPanel.svelte`), so `document.getAnimations()`
+ * cannot see it. If the chart has data, wait until its stat polygon has left the
+ * zero shape the page draws at init; an all-zero chart is already at its end
+ * state. Without this the screenshots would capture the placeholder and the
+ * radar's data rendering would stop being covered, while every diff ratio would
+ * still read 0% because both sides were captured at the same wrong moment.
  */
-async function settleFiniteAnimations(page: Page): Promise<void> {
-  await page.evaluate(async () => {
-    const finite = document.getAnimations().filter((animation) => {
-      const timing = animation.effect?.getTiming();
+async function settleRadar(page: Page, label: string): Promise<void> {
+  const zeroPoint = `${RADAR_CENTER_X},${RADAR_CENTER_Y}`;
 
-      return timing !== undefined && timing.iterations !== Infinity;
+  try {
+    await page.waitForFunction(
+      (point) => {
+        const svg = document.querySelector<SVGSVGElement>('svg#radar');
+        const polygon = svg?.querySelector('polygon:last-of-type');
+
+        if (svg === null || polygon === null) return true;
+
+        const values = [...(svg.getAttribute('aria-label') ?? '').matchAll(/\d+(?:\.\d+)?/g)].map(
+          (match) => Number(match[0])
+        );
+
+        if (!values.some((value) => value > 0)) return true;
+
+        const points = polygon.getAttribute('points') ?? '';
+
+        return points.split(' ').some((value) => value !== point);
+      },
+      zeroPoint,
+      { timeout: 10000 }
+    );
+  } catch (error) {
+    throw new Error(`${label}: radar did not leave its zero shape within 10s`, { cause: error });
+  }
+}
+
+/**
+ * Waits until the page is visually settled: fonts loaded, every finite
+ * animation and transition finished, and ten committed frames. The old fixed
+ * 2.5s sleep after every page open was most of the suite's time; this reaches
+ * the same end state as soon as the page can.
+ *
+ * `document.getAnimations()` includes the staggered `.boot` entrances and the
+ * XP bar's width transition. They are awaited rather than jumped to the end with
+ * `finish()`: finishing a staggered entrance re-rasterised the filtered,
+ * backdrop-blurred panels and left a one-bit colour difference over ~15% of the
+ * Settings page at 390 light, which the self-test correctly rejected. Under
+ * reduced motion the durations are 1ms, so the only cost is waiting out the
+ * longest `animation-delay` (1.2s) instead of the old fixed 2.5s. Infinite
+ * animations (the caret, the bracket breathe) cannot finish, so they are
+ * skipped. Ten frames, not two, because the same panels were still re-rasterising
+ * for a few frames after an entrance ended. A 10s cap keeps a broken animation
+ * from hanging the harness.
+ */
+export async function settle(page: Page, label = page.url()): Promise<void> {
+  try {
+    await page.evaluate(async () => {
+      const deadline = performance.now() + 10_000;
+      const expired = (what: string): Promise<never> =>
+        new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error(`${what} did not settle within 10s`)),
+            Math.max(0, deadline - performance.now())
+          )
+        );
+
+      await Promise.race([document.fonts.ready, expired('fonts')]);
+
+      const isFinite = (animation: Animation): boolean => {
+        const timing = animation.effect?.getTiming();
+
+        return timing !== undefined && timing.iterations !== Infinity;
+      };
+      const unfinished = (): Animation[] =>
+        document
+          .getAnimations()
+          .filter((animation) => isFinite(animation) && animation.playState !== 'finished');
+
+      while (performance.now() < deadline) {
+        const pending = unfinished();
+
+        if (pending.length === 0) {
+          await new Promise<void>((resolve) => {
+            let left = 10;
+            const tick = (): void => {
+              left -= 1;
+              if (left <= 0) resolve();
+              else requestAnimationFrame(tick);
+            };
+
+            requestAnimationFrame(tick);
+          });
+
+          if (unfinished().length === 0) return;
+        } else {
+          await Promise.race([
+            Promise.all(pending.map((animation) => animation.finished.catch(() => undefined))),
+            new Promise<void>((resolve) =>
+              setTimeout(resolve, Math.max(0, Math.min(2000, deadline - performance.now())))
+            ),
+          ]);
+        }
+
+        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      }
+
+      throw new Error('finite animations did not settle within 10s');
     });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
 
-    await Promise.race([
-      Promise.all(finite.map((animation) => animation.finished.catch(() => undefined))),
-      new Promise((resolve) => setTimeout(resolve, 1000)),
-    ]);
-  });
+    throw new Error(`${label}: ${message}`, { cause: error });
+  }
 }
 
 /** Two committed frames: a style change is only guaranteed painted after one. */
@@ -227,18 +365,34 @@ export async function newIsolatedContext(
   vp: Viewport,
   theme: Theme = 'dark'
 ): Promise<BrowserContext> {
+  const registry = registryFor(test.info());
   const context = await browser.newContext({
     viewport: { width: vp.width, height: vp.height },
     ...CONTEXT_OPTIONS,
   });
 
-  await context.addInitScript((value) => {
-    try {
-      localStorage.setItem('daily-tracker:theme', value);
-    } catch {
-      // A storage-less context still renders; both sides fall back to dark.
-    }
-  }, theme);
+  registry.created++;
+  workerCounts.created++;
+  registry.open.add(context);
+  context.once('close', () => {
+    if (!registry.open.delete(context)) return;
+
+    registry.closed++;
+    workerCounts.closed++;
+  });
+
+  try {
+    await context.addInitScript((value) => {
+      try {
+        localStorage.setItem('daily-tracker:theme', value);
+      } catch {
+        // A storage-less context still renders; both sides fall back to dark.
+      }
+    }, theme);
+  } catch (error) {
+    await context.close().catch(() => undefined);
+    throw error;
+  }
 
   return context;
 }
