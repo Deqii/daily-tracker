@@ -1,0 +1,25 @@
+{
+  "shards": [
+    {
+      "name": "core",
+      "args": "tests/visual/selftest.spec.ts tests/visual/shell.spec.ts",
+      "extra": "npm run check:fixtures"
+    },
+    {
+      "name": "today",
+      "args": "tests/visual/fidelity.spec.ts tests/visual/health.spec.ts tests/visual/today-interactions.spec.ts tests/visual/today-states-interactions.spec.ts --grep \"today|tier picker|engine-derived lines|title and empty states|overlays and notices\"",
+      "extra": ""
+    },
+    {
+      "name": "today-states",
+      "args": "tests/visual/today-states.spec.ts",
+      "extra": ""
+    },
+    {
+      "name": "tasks",
+      "args": "tests/visual/fidelity.spec.ts tests/visual/health.spec.ts tests/visual/tasks-interactions.spec.ts --grep \"tasks\"",
+      "extra": ""
+    }
+  ],
+  "informational": ["rewards", "history", "settings"]
+}
