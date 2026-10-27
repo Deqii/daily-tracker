@@ -85,7 +85,9 @@ const scenarios: readonly Scenario[] = [
       await waitForDrawer(page);
 
       if (page.url().includes('4173')) {
-        expect(await page.evaluate(() => document.activeElement?.id)).toBe('fname');
+        await expect
+          .poll(() => page.evaluate(() => document.activeElement?.id), { timeout: 2000 })
+          .toBe('fname');
       }
 
       await settle(page, 'tasks drawer open');
