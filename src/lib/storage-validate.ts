@@ -173,6 +173,8 @@ function isMilestoneEvent(value: unknown): boolean {
     case 'rankUp':
     case 'rankDown':
       return isRank(value.from) && isRank(value.to);
+    case 'titleUnlock':
+      return isString(value.name) && isString(value.detail);
     default:
       return false;
   }

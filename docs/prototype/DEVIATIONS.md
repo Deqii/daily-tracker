@@ -144,6 +144,9 @@ them by the prototype's name.
 | `cn`       | `rewards-cn`     | Rewards |
 | `fl`       | `rewards-fl`     | Rewards |
 | `shake`    | `rewards-shake`  | Rewards |
+| `draw`     | `history-draw`   | History |
+| `fade`     | `history-fade`   | History |
+| `mk`       | `history-mk`     | History |
 
 The shared keyframes `brk-in`, `brk-breathe`, `boot` and `scan` are identical in
 all five prototypes and are NOT renamed; they live in the shared shell CSS. The
@@ -168,6 +171,25 @@ Added 2026-10-31 (Issue 4, Rewards page).
   copying the constant. This is fixture scaffolding for the visual diff, not a
   game rule; the PRD defines no average-income formula.
 
+## Test scaffolding
+
+Added 2026-10-31 (Issue 5, History page).
+
+- **Closed versus open last day.** `history.html`'s default state ends on a
+  closed day; only `?state=open` marks the last rendered day open. The
+  `history` fixture therefore replays the 30-day snapshot with its last day
+  closed, and the `open` state replays `history-open-snapshot.json` with the last
+  day open and 3/5 stats. This is fixture state, not a rule: the real store's
+  current day is open according to PRD §7.
+- **Title events.** The prototype appends `New title: ...` rows to its history
+  log. The engine records level-up and rank changes but has no title-unlock
+  event, so the fixture seeds the two title rows from
+  `history-snapshot.json` as stored `titleUnlock` milestone events
+  (`src/lib/types.ts`, `src/lib/storage-validate.ts`). The History page reads
+  them from `milestoneEvents` like every other event; no title rule is copied
+  from the prototype. Q16 asks whether the engine should emit this event in
+  production.
+
 ## Open questions
 
 From the "Likely entries" list in `docs/UI-REVAMP.md`. Q2 and Q5 are resolved; the rest are not decided;
@@ -190,11 +212,13 @@ each needs an answer before the page named ships.
 | Q13 | Tasks    | `tasks.html` still carries one Indonesian sentence in the drawer ("Satu varian saja = task single-tier, tanpa nama tier."), while Audit decision 1 says all interface copy is English and the earlier Indonesian copy is withdrawn. The prototype was not updated with the audit batch. | Open. Issue 3 keeps the sentence verbatim because the Fidelity Contract makes the prototype the source of truth for copy and the pixel diff would otherwise fail on the drawer. Decide whether the prototype should be corrected to English (recommended wording: "One variant only = a single-tier task, with no tier name.") or the audit decision relaxed for this line. |
 | Q14 | Tasks    | The over-cap badge in `tasks.html` renders the literal text "Over cap: counts as ${CAP}". The template uses a single-quoted string inside the render template, so `${CAP}` is never interpolated; the banner and the drawer error in the same file do interpolate correctly. | Open. Issue 3 matches the prototype verbatim (literal `${CAP}`) because the computed-style diff measures the badge width and the pixel diff would fail otherwise. Decide whether to correct the prototype to "Over cap: counts as 15" and regenerate the tasks fidelity expectations afterwards. |
 | Q15 | Tasks    | Audit decision 3 / Q4 say the delete flow has no undo toast, but `tasks.html` still renders `<button id="undo" hidden>Undo</button>` inside the toast and CSS `.toast button { all: unset; }` overrides the `hidden` attribute, so the button is visible (and inert) after a deletion. | Open. Issue 3 matches the prototype (the button is visible and inert) because the computed-style and pixel diffs would otherwise fail. Decide whether the prototype should drop the button or add a rule that honours `[hidden]`, then regenerate the tasks interaction artefacts. |
+| Q16 | History  | `history.html` shows title-unlock rows as milestone events, but the engine's `MilestoneEvent` union only emitted level-up and rank changes before Issue 5. | Open. Issue 5 added a `titleUnlock` variant to the stored event type and seeded it in the fixture so the page can render the prototype's rows; the engine still does not emit it at runtime. Decide whether title unlocks should become engine events (and then appear on Today's overlays too) or whether History should derive milestones only from existing events. |
 
 Q8 and Q9 were found while building the Today page (Issue 2, 2026-10-18). Q10-Q12
 were found while auditing batch 2 (2026-10-20); Q10-Q12 remain open.
 Q13-Q15 were found while building the Tasks page (Issue 3, 2026-10-23) and
-remain open.
+remain open. Q16 was found while building the History page (Issue 5, 2026-10-31)
+and remains open.
 
 Two more were found while building the harness. Both are resolved:
 

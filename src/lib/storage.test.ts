@@ -195,6 +195,25 @@ describe('loadState', () => {
     expect(state.tasks).toEqual([task]);
   });
 
+  it('accepts a stored title-unlock milestone event', () => {
+    const fake = stubStorage();
+    const event = {
+      id: 'evt-title',
+      type: 'titleUnlock',
+      localDate: '2026-10-11',
+      name: '100 tugas selesai',
+      detail: '100 tasks completed',
+      seen: true,
+    };
+    fake.setItem(STORAGE_KEYS.schemaVersion, String(SCHEMA_VERSION));
+    fake.setItem(STORAGE_KEYS.milestoneEvents, JSON.stringify([event]));
+
+    const { state, report } = loadState('2026-10-10');
+
+    expect(report.recoveredKeys).toEqual([]);
+    expect(state.milestoneEvents).toEqual([event]);
+  });
+
   it('never throws when getItem throws', () => {
     const throwing = {
       getItem() {
