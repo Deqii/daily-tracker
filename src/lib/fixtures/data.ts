@@ -768,6 +768,44 @@ function buildRewards(): StorageSchema {
 
   purchases.sort((a, b) => (a.purchasedAt < b.purchasedAt ? 1 : -1));
 
+  /**
+   * Test scaffolding for the Rewards page's average income (DEVIATIONS.md,
+   * "Test scaffolding"): thirteen closed days at +13 each plus today's open day
+   * at +9 average to exactly 13 over fourteen calendar days, the prototype's
+   * fixed `AVG`. The prototype hardcodes that number; the app derives it.
+   */
+  const dailyQuestLog: DailyQuestDay[] = [];
+
+  for (let offset = 13; offset >= 1; offset--) {
+    const date = addDays(FIXED_TODAY, -offset);
+
+    dailyQuestLog.push({
+      date,
+      selectedTaskIdPerStat: {},
+      requiredCompletions: emptyRequired(),
+      actualCompletions: emptyCounts(),
+      netPointsChange: 13,
+      freezeUsed: false,
+      closed: true,
+      lifetimeXPEnd: 65,
+      levelEnd: null,
+      rankEnd: 'E',
+    });
+  }
+
+  dailyQuestLog.push({
+    date: FIXED_TODAY,
+    selectedTaskIdPerStat: {},
+    requiredCompletions: emptyRequired(),
+    actualCompletions: emptyCounts(),
+    netPointsChange: 9,
+    freezeUsed: false,
+    closed: false,
+    lifetimeXPEnd: null,
+    levelEnd: null,
+    rankEnd: null,
+  });
+
   const userState = baseUserState();
   userState.wallet = 65;
   userState.lifetimeXP = 65;
@@ -778,12 +816,13 @@ function buildRewards(): StorageSchema {
   // Streak chip, as rewards.html's own header renders it: `5`. Nothing is
   // completed today in this fixture, so the display streak is the stored one.
   userState.currentStreak = 5;
+  userState.lastRolloverDate = FIXED_TODAY;
 
   return {
     schemaVersion: SCHEMA_VERSION,
     tasks: [],
     completions: [],
-    dailyQuestLog: [],
+    dailyQuestLog,
     rewards,
     rewardPurchases: purchases,
     userState,

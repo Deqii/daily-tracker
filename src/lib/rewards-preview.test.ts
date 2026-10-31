@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { selectRewardPreview } from './rewards-preview';
+import { FIXTURES } from './fixtures/data';
 import type { Reward } from './types';
 
 function reward(id: string, cost: number): Reward {
@@ -51,5 +52,20 @@ describe('selectRewardPreview', () => {
     const rewards = [reward('first', 50), reward('second', 50)];
 
     expect(selectRewardPreview(rewards, 0)).toEqual([{ reward: rewards[0], locked: true }]);
+  });
+
+  it('follows the rewards fixture before and after buying Main game 2 jam', () => {
+    const rewards = FIXTURES.rewards.schema.rewards;
+
+    expect(selectRewardPreview(rewards, 65).map((row) => row.reward.title)).toEqual([
+      'Main game 2 jam',
+      'Nonton bioskop',
+    ]);
+
+    // Buying the 60-coin reward leaves 5, so nothing is affordable and the
+    // dearest locked reward is still the single locked row.
+    expect(selectRewardPreview(rewards, 5)).toEqual([
+      { reward: rewards.find((row) => row.title === 'Nonton bioskop'), locked: true },
+    ]);
   });
 });

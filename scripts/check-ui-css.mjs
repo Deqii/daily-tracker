@@ -24,6 +24,7 @@ import { join } from 'node:path';
 const PROTOTYPES = {
   today: join('docs', 'prototype', 'today.html'),
   tasks: join('docs', 'prototype', 'tasks.html'),
+  rewards: join('docs', 'prototype', 'rewards.html'),
 };
 const APP_CSS = [join('src', 'app.css'), ...uiStylesheets()];
 
@@ -40,7 +41,11 @@ const stripComments = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '');
  * checker reads through it: a wrapped rule is compared against the prototype's
  * unwrapped rule, exactly as if the wrapper were not there.
  */
-const SCOPE_ROOTS = ['@scope (body[data-page=today])', '@scope (body[data-page=tasks])'];
+const SCOPE_ROOTS = {
+  today: '@scope (body[data-page=today])',
+  tasks: '@scope (body[data-page=tasks])',
+  rewards: '@scope (body[data-page=rewards])',
+};
 
 /**
  * Page-local keyframes, renamed with a `today-` prefix because `@keyframes`
@@ -51,21 +56,34 @@ const SCOPE_ROOTS = ['@scope (body[data-page=today])', '@scope (body[data-page=t
 const KEYFRAME_RENAMES = {
   today: ['spin', 'shine', 'blink', 'pen', 'pulse', 'fl', 'rg', 'tiers-in'],
   tasks: ['flash', 'out'],
+  rewards: ['flash', 'out', 'pop', 'cn', 'fl', 'shake'],
 };
 
 /** `today-spin` -> `spin` and `tasks-flash` -> `flash`, only for the rename lists. */
 function unrenameKeyframes(text) {
   return text
     .replace(new RegExp(`\\btoday-(${KEYFRAME_RENAMES.today.join('|')})\\b`, 'g'), '$1')
-    .replace(new RegExp(`\\btasks-(${KEYFRAME_RENAMES.tasks.join('|')})\\b`, 'g'), '$1');
+    .replace(new RegExp(`\\btasks-(${KEYFRAME_RENAMES.tasks.join('|')})\\b`, 'g'), '$1')
+    .replace(new RegExp(`\\brewards-(${KEYFRAME_RENAMES.rewards.join('|')})\\b`, 'g'), '$1');
 }
+
+const SCOPE_ROOT_LIST = Object.values(SCOPE_ROOTS);
 
 /** Drops the `@scope` wrappers from a context chain. */
 function unscopeContext(context) {
   return context
     .split(' / ')
-    .filter((segment) => !SCOPE_ROOTS.includes(segment))
+    .filter((segment) => !SCOPE_ROOT_LIST.includes(segment))
     .join(' / ');
+}
+
+/** The page whose `@scope` wrapper a context chain carries, if any. */
+function pageOfContext(context) {
+  for (const [page, root] of Object.entries(SCOPE_ROOTS)) {
+    if (context.split(' / ').includes(root)) return page;
+  }
+
+  return null;
 }
 
 /**
@@ -276,6 +294,8 @@ const RULES = [
   { context: '', selector: '.chip.rk' },
   { context: '', selector: '.chip.rk b' },
   { context: '', selector: '.coin' },
+  { prototype: 'rewards', context: '', selector: '.coin.l' },
+  { prototype: 'rewards', context: '', selector: '.coin.xl' },
   // The two-row header from 1023px down. `nav` is never hidden; the 700px
   // block only compacts the first row, so it is compared for header, logo and
   // chips, not for nav.
@@ -570,6 +590,114 @@ const RULES = [
   { prototype: 'tasks', context: '@media(max-width:640px)', selector: '.ib', occurrence: 2 },
   { prototype: 'tasks', context: '@media(max-width:640px)', selector: '.search' },
   { prototype: 'tasks', context: '@media(max-width:640px)', selector: '.in' },
+
+  // rewards.css (rewards.html). Shell rules shared with the other pages are
+  // checked above; these are the page's own selectors, read through its `@scope`
+  // wrapper and with the `rewards-` keyframe prefix removed. `.drawer` and
+  // `.drawer::before` are the page blocks (the shared surface/bracket rules are
+  // occurrence 1).
+  { prototype: 'rewards', context: '', selector: 'h1' },
+  { prototype: 'rewards', context: '', selector: 'h2' },
+  { prototype: 'rewards', context: '', selector: '.sub' },
+  { prototype: 'rewards', context: '', selector: '.row' },
+  { prototype: 'rewards', context: '', selector: '.btn' },
+  { prototype: 'rewards', context: '', selector: '.btn:hover' },
+  { prototype: 'rewards', context: '', selector: '.btn:active' },
+  { prototype: 'rewards', context: '', selector: '.btn:focus-visible' },
+  { prototype: 'rewards', context: '', selector: '.btn.gold' },
+  { prototype: 'rewards', context: '', selector: '.btn.gold:hover' },
+  { prototype: 'rewards', context: '', selector: '.btn.ghost' },
+  { prototype: 'rewards', context: '', selector: '.btn.ghost:hover' },
+  { prototype: 'rewards', context: '', selector: 'main' },
+  { prototype: 'rewards', context: '', selector: '.head' },
+  { prototype: 'rewards', context: '', selector: '.layout' },
+  { prototype: 'rewards', context: '', selector: '.side' },
+  { prototype: 'rewards', context: '', selector: '.tools' },
+  { prototype: 'rewards', context: '', selector: '.f' },
+  { prototype: 'rewards', context: '', selector: '.f:hover' },
+  { prototype: 'rewards', context: '', selector: '.f:focus-visible' },
+  { prototype: 'rewards', context: '', selector: '.f[aria-pressed=true]' },
+  { prototype: 'rewards', context: '', selector: '.sep' },
+  { prototype: 'rewards', context: '', selector: '.grid' },
+  { prototype: 'rewards', context: '', selector: '.card' },
+  { prototype: 'rewards', context: '', selector: '.card.can' },
+  { prototype: 'rewards', context: '', selector: '.card.can:hover' },
+  { prototype: 'rewards', context: '', selector: '.card.lock' },
+  { prototype: 'rewards', context: '', selector: '.card.flash' },
+  { prototype: 'rewards', context: '', selector: '.card.out' },
+  { prototype: 'rewards', context: '', selector: '.card.new' },
+  { prototype: 'rewards', context: '', selector: '.ttl' },
+  { prototype: 'rewards', context: '', selector: '.cost' },
+  { prototype: 'rewards', context: '', selector: '.lock .ttl' },
+  { prototype: 'rewards', context: '', selector: '.acts' },
+  { prototype: 'rewards', context: '', selector: '.ib' },
+  { prototype: 'rewards', context: '', selector: '.ib:hover' },
+  { prototype: 'rewards', context: '', selector: '.ib.del:hover' },
+  { prototype: 'rewards', context: '', selector: '.ib:focus-visible' },
+  { prototype: 'rewards', context: '', selector: '.ib svg' },
+  { prototype: 'rewards', context: '', selector: '.bought' },
+  { prototype: 'rewards', context: '', selector: '.bought b' },
+  { prototype: 'rewards', context: '', selector: '.bought b.pop' },
+  { prototype: 'rewards', context: '', selector: '.foot' },
+  { prototype: 'rewards', context: '', selector: '.ring' },
+  { prototype: 'rewards', context: '', selector: '.ring svg' },
+  { prototype: 'rewards', context: '', selector: '.ring circle' },
+  { prototype: 'rewards', context: '', selector: '.ring .bg' },
+  { prototype: 'rewards', context: '', selector: '.ring .fg' },
+  { prototype: 'rewards', context: '', selector: '.ring span' },
+  { prototype: 'rewards', context: '', selector: '.need' },
+  { prototype: 'rewards', context: '', selector: '.need b' },
+  { prototype: 'rewards', context: '', selector: '.need .lk' },
+  { prototype: 'rewards', context: '', selector: '.empty' },
+  { prototype: 'rewards', context: '', selector: '.wallet' },
+  { prototype: 'rewards', context: '', selector: '.big' },
+  { prototype: 'rewards', context: '', selector: '.kv' },
+  { prototype: 'rewards', context: '', selector: '.kv b' },
+  { prototype: 'rewards', context: '', selector: '.hist' },
+  { prototype: 'rewards', context: '', selector: '.log' },
+  { prototype: 'rewards', context: '', selector: '.log li' },
+  { prototype: 'rewards', context: '', selector: '.log li small' },
+  { prototype: 'rewards', context: '', selector: '.log li b' },
+  { prototype: 'rewards', context: '', selector: '.log li.fresh' },
+  { prototype: 'rewards', context: '', selector: '.cn' },
+  { prototype: 'rewards', context: '', selector: '.float' },
+  { prototype: 'rewards', context: '', selector: '.shake' },
+  { prototype: 'rewards', context: '', selector: '.scrim' },
+  { prototype: 'rewards', context: '', selector: '.scrim.on' },
+  { prototype: 'rewards', context: '', selector: '.drawer', occurrence: 2 },
+  { prototype: 'rewards', context: '', selector: '.drawer.on' },
+  { prototype: 'rewards', context: '', selector: '.drawer::before', occurrence: 2 },
+  { prototype: 'rewards', context: '', selector: '.lab' },
+  { prototype: 'rewards', context: '', selector: '.in' },
+  { prototype: 'rewards', context: '', selector: '.in:focus' },
+  { prototype: 'rewards', context: '', selector: '.in.bad' },
+  { prototype: 'rewards', context: '', selector: '.hint' },
+  { prototype: 'rewards', context: '', selector: '.err' },
+  { prototype: 'rewards', context: '', selector: '.dfoot' },
+  { prototype: 'rewards', context: '', selector: '.toast' },
+  { prototype: 'rewards', context: '', selector: '.toast.show' },
+  { prototype: 'rewards', context: '', selector: '.toast button' },
+  { prototype: 'rewards', context: '', selector: '.toast button:hover' },
+  { prototype: 'rewards', context: '', selector: '.confirm' },
+  { prototype: 'rewards', context: '', selector: '.confirm span:last-child' },
+  { prototype: 'rewards', context: '', selector: '.btn.dng' },
+  { prototype: 'rewards', context: '', selector: '.btn.dng:hover' },
+  { prototype: 'rewards', context: '@media(max-width:1000px)', selector: '.layout' },
+  { prototype: 'rewards', context: '@media(max-width:1000px)', selector: '.side' },
+  { prototype: 'rewards', context: '@media(max-width:1000px)', selector: '.head' },
+  { prototype: 'rewards', context: '@media(max-width:700px)', selector: 'main' },
+  { prototype: 'rewards', context: '@media(max-width:700px)', selector: '.sep' },
+  { prototype: 'rewards', context: '@media(max-width:640px)', selector: '.btn' },
+  { prototype: 'rewards', context: '@media(max-width:640px)', selector: '.f' },
+  { prototype: 'rewards', context: '@media(max-width:640px)', selector: '.ib' },
+  { prototype: 'rewards', context: '@media(max-width:640px)', selector: '.in' },
+  { prototype: 'rewards', context: '@keyframes flash', selector: 'from' },
+  { prototype: 'rewards', context: '@keyframes out', selector: 'to' },
+  { prototype: 'rewards', context: '@keyframes pop', selector: '40%' },
+  { prototype: 'rewards', context: '@keyframes cn', selector: 'to' },
+  { prototype: 'rewards', context: '@keyframes fl', selector: 'to' },
+  { prototype: 'rewards', context: '@keyframes shake', selector: '25%' },
+  { prototype: 'rewards', context: '@keyframes shake', selector: '75%' },
 ];
 
 /* ------------------------------------------------------------------ indexing */
@@ -583,10 +711,22 @@ const RULES = [
  * padding), so the cascade for `.panel` is the union of both. Reporting only
  * the first block would leave the second unguarded.
  */
-function indexAll(records) {
+function indexAll(records, onlyPage = null) {
   const map = new Map();
 
   for (const record of records) {
+    const page = pageOfContext(record.context);
+    const prefixedKeyframes = /(?:^| \/ )@keyframes (today|tasks|rewards)-/.exec(record.context);
+
+    if (page !== null && onlyPage !== null && page !== onlyPage) continue;
+    if (
+      onlyPage !== null &&
+      prefixedKeyframes !== null &&
+      prefixedKeyframes[1] !== onlyPage
+    ) {
+      continue;
+    }
+
     const unwrapped = unscopeContext(record.context);
     const ctx = unwrapped === '' ? '' : condition(unwrapped);
 
@@ -645,7 +785,9 @@ const allPrototype = Object.fromEntries(
 );
 const appRecords = APP_CSS.flatMap((f) => parse(stripComments(readFileSync(f, 'utf8'))));
 
-const allApp = indexAll(appRecords);
+const allApp = Object.fromEntries(
+  Object.keys(PROTOTYPES).map((name) => [name, indexAll(appRecords, name)])
+);
 
 /**
  * The Nth declaration block for a selector, 1-based. `occurrence` defaults to 1,
@@ -684,9 +826,7 @@ for (const rule of RULES) {
     continue;
   }
 
-  const appOccurrence =
-    prototypeName === 'tasks' ? (allApp.get(key)?.length ?? occurrence) : occurrence;
-  const actual = block(allApp, key, appOccurrence);
+  const actual = block(allApp[prototypeName], key, occurrence);
 
   if (actual === undefined) {
     failures.push(`${label(rule)}\n      missing from the app CSS`);

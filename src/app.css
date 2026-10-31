@@ -72,6 +72,7 @@
  */
 @import './styles/ui/today.css';
 @import './styles/ui/tasks.css';
+@import './styles/ui/rewards.css';
 
 /* ===== DESIGN TOKENS (extract to src/app.css) ===== */
 :root {

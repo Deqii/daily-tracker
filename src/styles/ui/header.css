@@ -84,6 +84,16 @@ nav a[aria-current]::after {
   flex: none;
   background: radial-gradient(circle at 35% 30%, #fff3b8, var(--gold) 55%, #b8860b);
 }
+.coin.l {
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 0 8px rgba(245, 196, 81, 0.5);
+}
+.coin.xl {
+  width: 26px;
+  height: 26px;
+  box-shadow: 0 0 14px rgba(245, 196, 81, 0.55);
+}
 
 @media (max-width: 1023px) {
   header {

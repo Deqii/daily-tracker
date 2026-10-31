@@ -25,3 +25,12 @@ body {
   outline: 2px solid var(--cyan);
   outline-offset: 2px;
 }
+
+/*
+ * Tailwind ships a `.ring` utility that sets `box-shadow`. The prototypes' `.ring`
+ * has no shadow, and an unlayered rule here cancels the layered utility so the
+ * Rewards progress ring keeps the prototype's computed style.
+ */
+:where(.ring) {
+  box-shadow: none;
+}
