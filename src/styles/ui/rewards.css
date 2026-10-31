@@ -1,0 +1,585 @@
+/*
+ * Rewards page rules (UI Revamp Issue 4).
+ *
+ * Copied verbatim from `docs/prototype/rewards.html` <style>. The prototype is
+ * a standalone document, so its class names are free; the app has one global
+ * stylesheet shared by five pages. Every page rule below is scoped to the
+ * Rewards route with `@scope (body[data-page="rewards"])`.
+ *
+ * Shared shell rules (tokens, header, nav, chips, panel surface, brackets, boot,
+ * scan, motion opt-outs) already live in `src/styles/ui/*.css` and are not
+ * repeated. Media queries stay outside the wrapper and repeat it, and page
+ * keyframes are renamed with a `rewards-` prefix because keyframe names are
+ * global; every rename is listed in `docs/prototype/DEVIATIONS.md`.
+ */
+
+@scope (body[data-page='rewards']) {
+  h1 {
+    font: 700 30px var(--font-display);
+  }
+  h2 {
+    font: 600 17px var(--font-display);
+  }
+  .sub {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .btn {
+    all: unset;
+    box-sizing: border-box;
+    cursor: pointer;
+    background: var(--blue);
+    color: var(--on-accent);
+    font: 700 14px var(--font-display);
+    padding: 8px 18px;
+    border-radius: var(--r-chip);
+    transition:
+      box-shadow var(--t-fast),
+      transform var(--t-fast);
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn:hover {
+    box-shadow: 0 0 18px var(--blue);
+  }
+  .btn:active {
+    transform: scale(0.96);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: 2px;
+  }
+  .btn.gold {
+    background: var(--gold);
+    color: #241a02;
+  }
+  .btn.gold:hover {
+    box-shadow: 0 0 20px var(--gold);
+  }
+  .btn.ghost {
+    background: none;
+    color: var(--muted);
+    padding: 8px 12px;
+  }
+  .btn.ghost:hover {
+    color: var(--text);
+    box-shadow: none;
+  }
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 32px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+    align-items: start;
+  }
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 84px;
+  }
+  .tools {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .f {
+    all: unset;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    padding: 5px 12px;
+    border-radius: var(--r-chip);
+    color: var(--muted);
+    font-size: 13px;
+    transition: all var(--t-fast);
+  }
+  .f:hover {
+    color: var(--text);
+    border-color: var(--line-strong);
+  }
+  .f:focus-visible {
+    outline: 2px solid var(--cyan);
+  }
+  .f[aria-pressed='true'] {
+    color: var(--text);
+    border-color: var(--blue);
+    background: rgba(61, 169, 255, 0.12);
+    box-shadow: 0 0 10px rgba(61, 169, 255, 0.25);
+  }
+  .sep {
+    width: 1px;
+    background: var(--line);
+    align-self: stretch;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 178px;
+    transition: transform var(--t-base) var(--ease);
+  }
+  .card.can {
+    --bc: var(--gold);
+    border-color: rgba(245, 196, 81, 0.4);
+  }
+  .card.can:hover {
+    transform: translateY(-3px);
+  }
+  .card.lock {
+    --bc: rgba(61, 169, 255, 0.4);
+  }
+  .card.flash {
+    animation: rewards-flash 0.9s var(--ease);
+  }
+  .card.out {
+    animation: rewards-out 0.3s var(--ease) forwards;
+  }
+  .card.new {
+    animation: boot 0.6s var(--ease);
+  }
+  .ttl {
+    font: 600 18px/1.25 var(--font-display);
+  }
+  .cost {
+    font: 500 15px var(--font-mono);
+    color: var(--gold);
+    display: inline-flex;
+    gap: 7px;
+    align-items: center;
+  }
+  .lock .ttl {
+    color: var(--lock-text);
+  }
+  .acts {
+    display: flex;
+    gap: 0;
+    margin: -6px -8px 0 0;
+  }
+  .ib {
+    all: unset;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    border-radius: var(--r-chip);
+    transition: all var(--t-fast);
+  }
+  .ib:hover {
+    color: var(--cyan);
+    background: rgba(61, 169, 255, 0.12);
+  }
+  .ib.del:hover {
+    color: var(--danger);
+    background: rgba(255, 84, 104, 0.12);
+  }
+  .ib:focus-visible {
+    outline: 2px solid var(--cyan);
+  }
+  .ib svg {
+    width: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+  }
+  .bought {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .bought b {
+    color: var(--text);
+    font-family: var(--font-mono);
+    display: inline-block;
+  }
+  .bought b.pop {
+    animation: rewards-pop 0.5s var(--ease);
+  }
+  .foot {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .ring {
+    width: 62px;
+    height: 62px;
+    flex: none;
+    position: relative;
+  }
+  .ring svg {
+    width: 62px;
+    height: 62px;
+    transform: rotate(-90deg);
+  }
+  .ring circle {
+    fill: none;
+    stroke-width: 4;
+  }
+  .ring .bg {
+    stroke: var(--track);
+  }
+  .ring .fg {
+    stroke: var(--gold);
+    stroke-linecap: square;
+    filter: drop-shadow(0 0 4px rgba(245, 196, 81, 0.6));
+    transition: stroke-dashoffset 1.1s var(--ease);
+  }
+  .ring span {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font: 500 13px var(--font-mono);
+  }
+  .need {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .need b {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .need .lk {
+    display: inline-flex;
+    gap: 5px;
+    align-items: center;
+    color: var(--cyan);
+  }
+  .empty {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 48px 20px;
+    border: 1px dashed var(--line);
+    color: var(--muted);
+  }
+  .wallet {
+    padding: 22px;
+  }
+  .big {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font: 700 46px/1 var(--font-display);
+    margin: 10px 0 14px;
+    text-shadow: 0 0 22px rgba(245, 196, 81, 0.35);
+  }
+  .kv {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 6px 0;
+    border-top: 1px solid var(--line);
+  }
+  .kv b {
+    font-family: var(--font-mono);
+    font-weight: 500;
+  }
+  .hist {
+    padding: 20px;
+  }
+  .log {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+    max-height: 320px;
+    overflow: auto;
+  }
+  .log li {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 0;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+  }
+  .log li small {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .log li b {
+    font: 500 14px var(--font-mono);
+    color: var(--danger);
+    white-space: nowrap;
+  }
+  .log li.fresh {
+    animation: boot 0.5s var(--ease);
+  }
+  .cn {
+    position: fixed;
+    z-index: 70;
+    pointer-events: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff3b8, var(--gold) 55%, #b8860b);
+    animation: rewards-cn 0.9s var(--ease) forwards;
+  }
+  .float {
+    position: fixed;
+    z-index: 71;
+    font: 700 20px var(--font-display);
+    color: var(--gold);
+    text-shadow: 0 0 10px var(--gold);
+    pointer-events: none;
+    animation: rewards-fl 1.1s var(--ease) forwards;
+  }
+  .shake {
+    animation: rewards-shake 0.4s;
+  }
+  .scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 4, 9, 0.62);
+    backdrop-filter: blur(3px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--t-base);
+    z-index: 40;
+  }
+  .scrim.on {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(420px, 100%);
+    z-index: 41;
+    background: var(--panel-solid);
+    border-radius: 0;
+    padding: 24px;
+    overflow-y: auto;
+    transform: translateX(104%);
+    visibility: hidden;
+    transition:
+      transform var(--t-base) var(--ease),
+      visibility 0s var(--t-base);
+  }
+  .drawer.on {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--t-base) var(--ease);
+  }
+  .drawer::before {
+    animation: none;
+    --arm: 18px;
+  }
+  .lab {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+    margin: 16px 0 6px;
+  }
+  .in {
+    width: 100%;
+    background: var(--ins2);
+    border: 1px solid var(--line);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: var(--r-chip);
+    font: inherit;
+  }
+  .in:focus {
+    border-color: var(--blue);
+    outline: none;
+    box-shadow: 0 0 12px rgba(61, 169, 255, 0.35);
+  }
+  .in.bad {
+    border-color: var(--danger);
+  }
+  .hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .err {
+    color: var(--danger);
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .dfoot {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translate(-50%, 30px);
+    opacity: 0;
+    z-index: 60;
+    background: var(--panel-solid);
+    border: 1px solid var(--line-strong);
+    padding: 10px 14px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    transition: all var(--t-base) var(--ease);
+    box-shadow: var(--glow);
+  }
+  .toast.show {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+  .toast button {
+    all: unset;
+    cursor: pointer;
+    color: var(--cyan);
+    font-weight: 700;
+  }
+  .toast button:hover {
+    text-decoration: underline;
+  }
+  .confirm {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--danger);
+  }
+  .confirm span:last-child {
+    display: flex;
+    gap: 6px;
+  }
+  .btn.dng {
+    background: none;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    padding: 5px 14px;
+  }
+  .btn.dng:hover {
+    box-shadow: 0 0 14px var(--danger);
+  }
+}
+
+@media (max-width: 1000px) {
+  @scope (body[data-page='rewards']) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+    .side {
+      position: static;
+      order: -1;
+    }
+    .head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  @scope (body[data-page='rewards']) {
+    main {
+      padding: 16px;
+    }
+    .sep {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  @scope (body[data-page='rewards']) {
+    .btn,
+    .f,
+    .ib {
+      min-height: 44px;
+    }
+    .ib {
+      min-width: 44px;
+    }
+    .in {
+      font-size: 16px;
+      min-height: 44px;
+    }
+  }
+}
+
+/* Page-local keyframes. Renamed from the prototype's `flash`, `out`, `pop`,
+   `cn`, `fl` and `shake`; the bodies are the prototype's, unchanged. */
+@keyframes rewards-flash {
+  from {
+    background: rgba(245, 196, 81, 0.28);
+    box-shadow: 0 0 30px var(--gold);
+  }
+}
+
+@keyframes rewards-out {
+  to {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+@keyframes rewards-pop {
+  40% {
+    transform: scale(1.7);
+    color: var(--gold);
+  }
+}
+
+@keyframes rewards-cn {
+  to {
+    transform: translate(var(--dx), var(--dy)) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes rewards-fl {
+  to {
+    transform: translateY(-56px);
+    opacity: 0;
+  }
+}
+
+@keyframes rewards-shake {
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}

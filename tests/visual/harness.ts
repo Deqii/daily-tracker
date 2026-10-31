@@ -868,11 +868,13 @@ function pseudoKeys(st: Record<string, string>): string[] {
  */
 const KEYFRAME_RENAMES = ['spin', 'shine', 'blink', 'pen', 'pulse', 'fl', 'rg'];
 const TASKS_KEYFRAME_RENAMES = ['flash', 'out'];
+const REWARDS_KEYFRAME_RENAMES = ['flash', 'out', 'pop', 'cn', 'fl', 'shake'];
 
 function unrenameKeyframes(value: string): string {
   return value
     .replace(new RegExp(`\\btoday-(${KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1')
-    .replace(new RegExp(`\\btasks-(${TASKS_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1');
+    .replace(new RegExp(`\\btasks-(${TASKS_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1')
+    .replace(new RegExp(`\\brewards-(${REWARDS_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1');
 }
 
 /** Style report for two trees that line up element for element. */

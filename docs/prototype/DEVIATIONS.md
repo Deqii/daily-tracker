@@ -138,6 +138,12 @@ them by the prototype's name.
 | `tiers-in` | `today-tiers-in` | Today |
 | `flash`    | `tasks-flash`    | Tasks |
 | `out`      | `tasks-out`      | Tasks |
+| `flash`    | `rewards-flash`  | Rewards |
+| `out`      | `rewards-out`    | Rewards |
+| `pop`      | `rewards-pop`    | Rewards |
+| `cn`       | `rewards-cn`     | Rewards |
+| `fl`       | `rewards-fl`     | Rewards |
+| `shake`    | `rewards-shake`  | Rewards |
 
 The shared keyframes `brk-in`, `brk-breathe`, `boot` and `scan` are identical in
 all five prototypes and are NOT renamed; they live in the shared shell CSS. The
@@ -148,6 +154,19 @@ This is also the only textual difference from the prototype anywhere else on the
 page. Today-specific rules are wrapped in `@scope (body[data-page="today"])` and
 `document.body.dataset.page` carries the current route; `@scope` changes where a
 rule applies and not what it says.
+
+## Test scaffolding
+
+Added 2026-10-31 (Issue 4, Rewards page).
+
+- **Average income.** `rewards.html` hardcodes `AVG = 13`. The app derives the
+  number from the engine's daily records (`src/lib/rewards-page.ts`,
+  `averageDailyIncome`): the mean `netPointsChange` over the last fourteen
+  calendar days ending today, rounded. The `rewards` fixture seeds thirteen
+  closed days at +13 each and today's open day at +9, which averages to exactly
+  13, so the page shows the prototype's `+13 / day` and countdowns without
+  copying the constant. This is fixture scaffolding for the visual diff, not a
+  game rule; the PRD defines no average-income formula.
 
 ## Open questions
 
