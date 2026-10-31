@@ -68,6 +68,10 @@ if (mode === 'page') {
     grep = TODAY_TITLES;
   } else if (page === 'tasks') {
     files.push('tests/visual/tasks-interactions.spec.ts');
+  } else if (page === 'rewards') {
+    files.push('tests/visual/rewards-interactions.spec.ts');
+  } else if (page === 'history') {
+    files.push('tests/visual/history-interactions.spec.ts');
   }
 
   run([...files, '--grep', grep]);

@@ -19,7 +19,19 @@
       "name": "tasks",
       "args": "tests/visual/fidelity.spec.ts tests/visual/health.spec.ts tests/visual/tasks-interactions.spec.ts --grep \"tasks\"",
       "extra": ""
+    },
+    {
+      "name": "rewards",
+      "args": "tests/visual/fidelity.spec.ts tests/visual/health.spec.ts tests/visual/rewards-interactions.spec.ts --grep \"rewards\"",
+      "extra": ""
+    },
+    {
+      "name": "history",
+      "args": "tests/visual/fidelity.spec.ts tests/visual/health.spec.ts tests/visual/history-interactions.spec.ts --grep \"history\"",
+      "extra": ""
     }
   ],
-  "informational": ["rewards", "history", "settings"]
+  "informational": [
+    "settings"
+  ]
 }

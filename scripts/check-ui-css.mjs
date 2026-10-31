@@ -25,6 +25,7 @@ const PROTOTYPES = {
   today: join('docs', 'prototype', 'today.html'),
   tasks: join('docs', 'prototype', 'tasks.html'),
   rewards: join('docs', 'prototype', 'rewards.html'),
+  history: join('docs', 'prototype', 'history.html'),
 };
 const APP_CSS = [join('src', 'app.css'), ...uiStylesheets()];
 
@@ -45,6 +46,7 @@ const SCOPE_ROOTS = {
   today: '@scope (body[data-page=today])',
   tasks: '@scope (body[data-page=tasks])',
   rewards: '@scope (body[data-page=rewards])',
+  history: '@scope (body[data-page=history])',
 };
 
 /**
@@ -57,6 +59,7 @@ const KEYFRAME_RENAMES = {
   today: ['spin', 'shine', 'blink', 'pen', 'pulse', 'fl', 'rg', 'tiers-in'],
   tasks: ['flash', 'out'],
   rewards: ['flash', 'out', 'pop', 'cn', 'fl', 'shake'],
+  history: ['draw', 'fade', 'mk'],
 };
 
 /** `today-spin` -> `spin` and `tasks-flash` -> `flash`, only for the rename lists. */
@@ -64,7 +67,8 @@ function unrenameKeyframes(text) {
   return text
     .replace(new RegExp(`\\btoday-(${KEYFRAME_RENAMES.today.join('|')})\\b`, 'g'), '$1')
     .replace(new RegExp(`\\btasks-(${KEYFRAME_RENAMES.tasks.join('|')})\\b`, 'g'), '$1')
-    .replace(new RegExp(`\\brewards-(${KEYFRAME_RENAMES.rewards.join('|')})\\b`, 'g'), '$1');
+    .replace(new RegExp(`\\brewards-(${KEYFRAME_RENAMES.rewards.join('|')})\\b`, 'g'), '$1')
+    .replace(new RegExp(`\\bhistory-(${KEYFRAME_RENAMES.history.join('|')})\\b`, 'g'), '$1');
 }
 
 const SCOPE_ROOT_LIST = Object.values(SCOPE_ROOTS);
@@ -698,6 +702,95 @@ const RULES = [
   { prototype: 'rewards', context: '@keyframes fl', selector: 'to' },
   { prototype: 'rewards', context: '@keyframes shake', selector: '25%' },
   { prototype: 'rewards', context: '@keyframes shake', selector: '75%' },
+
+  // history.css (history.html). Page selectors, read through its `@scope` wrapper
+  // and with the `history-` keyframe prefix removed.
+  { prototype: 'history', context: '', selector: 'h1' },
+  { prototype: 'history', context: '', selector: 'h2' },
+  { prototype: 'history', context: '', selector: '.sub' },
+  { prototype: 'history', context: '', selector: '.row' },
+  { prototype: 'history', context: '', selector: '.f' },
+  { prototype: 'history', context: '', selector: '.f:hover' },
+  { prototype: 'history', context: '', selector: '.f:focus-visible' },
+  { prototype: 'history', context: '', selector: '.f[aria-pressed=true]' },
+  { prototype: 'history', context: '', selector: 'main' },
+  { prototype: 'history', context: '', selector: '.head' },
+  { prototype: 'history', context: '', selector: '.sum' },
+  { prototype: 'history', context: '', selector: '.sum .panel' },
+  { prototype: 'history', context: '', selector: '.sum small' },
+  { prototype: 'history', context: '', selector: '.sum b' },
+  { prototype: 'history', context: '', selector: '.sum em' },
+  { prototype: 'history', context: '', selector: '.up' },
+  { prototype: 'history', context: '', selector: '.dn' },
+  { prototype: 'history', context: '', selector: '.g1' },
+  { prototype: 'history', context: '', selector: '.g2' },
+  { prototype: 'history', context: '', selector: '.cw' },
+  { prototype: 'history', context: '', selector: '#chart' },
+  { prototype: 'history', context: '', selector: '#chart:focus-visible' },
+  { prototype: 'history', context: '', selector: '.ln' },
+  { prototype: 'history', context: '@keyframes draw', selector: 'to' },
+  { prototype: 'history', context: '', selector: '.ar' },
+  { prototype: 'history', context: '@keyframes fade', selector: 'to' },
+  { prototype: 'history', context: '', selector: '.mk' },
+  { prototype: 'history', context: '@keyframes mk', selector: 'from' },
+  { prototype: 'history', context: '@keyframes mk', selector: 'to' },
+  { prototype: 'history', context: '', selector: '.tip' },
+  { prototype: 'history', context: '', selector: '.tip.on' },
+  { prototype: 'history', context: '', selector: '.tip b' },
+  { prototype: 'history', context: '', selector: '.tip div' },
+  { prototype: 'history', context: '', selector: '.tip div span:last-child' },
+  { prototype: 'history', context: '', selector: '.leg' },
+  { prototype: 'history', context: '', selector: '.leg i' },
+  { prototype: 'history', context: '', selector: '.evs' },
+  { prototype: 'history', context: '', selector: '.ev' },
+  { prototype: 'history', context: '', selector: '.ev:hover' },
+  { prototype: 'history', context: '', selector: '.ev:focus-visible' },
+  { prototype: 'history', context: '', selector: '.ev.big' },
+  { prototype: 'history', context: '', selector: '.ev .g' },
+  { prototype: 'history', context: '', selector: '.ev b' },
+  { prototype: 'history', context: '', selector: '.ev small' },
+  { prototype: 'history', context: '', selector: '.cal' },
+  { prototype: 'history', context: '', selector: '.cal span' },
+  { prototype: 'history', context: '', selector: '.cal button' },
+  { prototype: 'history', context: '', selector: '.cal button:hover' },
+  { prototype: 'history', context: '', selector: '.cal button:focus-visible' },
+  { prototype: 'history', context: '', selector: '.cal button[data-l=1]' },
+  { prototype: 'history', context: '', selector: '.cal button[data-l=2]' },
+  { prototype: 'history', context: '', selector: '.cal button[data-l=3]' },
+  { prototype: 'history', context: '', selector: '.cal button[data-l=x]' },
+  { prototype: 'history', context: '', selector: '.cal button.sel' },
+  { prototype: 'history', context: '', selector: '.cal i' },
+  { prototype: 'history', context: '', selector: '.lw' },
+  { prototype: 'history', context: '', selector: 'table' },
+  { prototype: 'history', context: '', selector: 'th' },
+  { prototype: 'history', context: '', selector: 'th:first-child' },
+  { prototype: 'history', context: '', selector: 'td:first-child' },
+  { prototype: 'history', context: '', selector: 'th:last-child' },
+  { prototype: 'history', context: '', selector: 'td:last-child' },
+  { prototype: 'history', context: '', selector: 'td' },
+  { prototype: 'history', context: '', selector: 'tr.d' },
+  { prototype: 'history', context: '', selector: 'tr.d:hover' },
+  { prototype: 'history', context: '', selector: 'tr.d.sel' },
+  { prototype: 'history', context: '', selector: 'tr.d:focus-visible' },
+  { prototype: 'history', context: '', selector: 'td svg' },
+  { prototype: 'history', context: '', selector: 'td .no' },
+  { prototype: 'history', context: '', selector: '.net' },
+  { prototype: 'history', context: '', selector: 'tr.e td' },
+  { prototype: 'history', context: '', selector: 'tr.e td:last-child' },
+  { prototype: 'history', context: '', selector: '.frz' },
+  { prototype: 'history', context: '', selector: '.pend' },
+  { prototype: 'history', context: '@media (max-width: 1100px)', selector: '.g1' },
+  { prototype: 'history', context: '@media (max-width: 1100px)', selector: '.g2' },
+  { prototype: 'history', context: '@media (max-width: 1100px)', selector: '.sum' },
+  { prototype: 'history', context: '@media (max-width: 1100px)', selector: '.head' },
+  { prototype: 'history', context: '@media (max-width: 700px)', selector: 'main' },
+  { prototype: 'history', context: '@media (max-width: 700px)', selector: 'td:nth-child(n+2):nth-child(-n+6)' },
+  { prototype: 'history', context: '@media (max-width: 700px)', selector: 'th:nth-child(n+2):nth-child(-n+6)' },
+  { prototype: 'history', context: '@media (max-width: 640px)', selector: '.f' },
+  { prototype: 'history', context: '@media (prefers-reduced-motion: reduce)', selector: '.ln' },
+  { prototype: 'history', context: '@media (prefers-reduced-motion: reduce)', selector: '.ar' },
+  { prototype: 'history', context: '@media (prefers-reduced-motion: reduce)', selector: '.mk' },
+
 ];
 
 /* ------------------------------------------------------------------ indexing */
@@ -716,7 +809,7 @@ function indexAll(records, onlyPage = null) {
 
   for (const record of records) {
     const page = pageOfContext(record.context);
-    const prefixedKeyframes = /(?:^| \/ )@keyframes (today|tasks|rewards)-/.exec(record.context);
+    const prefixedKeyframes = /(?:^| \/ )@keyframes (today|tasks|rewards|history)-/.exec(record.context);
 
     if (page !== null && onlyPage !== null && page !== onlyPage) continue;
     if (

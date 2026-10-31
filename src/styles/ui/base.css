@@ -26,6 +26,11 @@ body {
   outline-offset: 2px;
 }
 
+button {
+  font: inherit;
+  color: inherit;
+}
+
 /*
  * Tailwind ships a `.ring` utility that sets `box-shadow`. The prototypes' `.ring`
  * has no shadow, and an unlayered rule here cancels the layered utility so the

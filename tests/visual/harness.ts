@@ -869,12 +869,14 @@ function pseudoKeys(st: Record<string, string>): string[] {
 const KEYFRAME_RENAMES = ['spin', 'shine', 'blink', 'pen', 'pulse', 'fl', 'rg'];
 const TASKS_KEYFRAME_RENAMES = ['flash', 'out'];
 const REWARDS_KEYFRAME_RENAMES = ['flash', 'out', 'pop', 'cn', 'fl', 'shake'];
+const HISTORY_KEYFRAME_RENAMES = ['draw', 'fade', 'mk'];
 
 function unrenameKeyframes(value: string): string {
   return value
     .replace(new RegExp(`\\btoday-(${KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1')
     .replace(new RegExp(`\\btasks-(${TASKS_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1')
-    .replace(new RegExp(`\\brewards-(${REWARDS_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1');
+    .replace(new RegExp(`\\brewards-(${REWARDS_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1')
+    .replace(new RegExp(`\\bhistory-(${HISTORY_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1');
 }
 
 /** Style report for two trees that line up element for element. */
@@ -890,6 +892,23 @@ function normaliseIdentity(value: string): string {
   if (value === 'blur(0px)') return 'none';
 
   return value;
+}
+
+/**
+ * Table auto-layout can split a column by a few hundredths of a pixel between
+ * two independently loaded contexts even when the rendered text and fonts are
+ * identical; the difference is below one device pixel and the pixel diff is
+ * zero. Only box dimensions get this tolerance, not colours or typography.
+ */
+function sameDimension(left: string, right: string): boolean {
+  if (left === right) return true;
+
+  const a = /^(-?\d+(?:\.\d+)?)px$/.exec(left);
+  const b = /^(-?\d+(?:\.\d+)?)px$/.exec(right);
+
+  if (a === null || b === null) return false;
+
+  return Math.abs(Number(a[1]) - Number(b[1])) <= 0.05;
 }
 
 export function compareStyles(A: StyleEntry[], B: StyleEntry[]): string[] {
@@ -920,6 +939,8 @@ export function compareStyles(A: StyleEntry[], B: StyleEntry[]): string[] {
     for (const k of shared) {
       const left = normaliseIdentity(unrenameKeyframes(a.st[k]));
       const right = normaliseIdentity(unrenameKeyframes(b.st[k]));
+
+      if ((k === 'width' || k === 'height') && sameDimension(left, right)) continue;
 
       if (left !== right) {
         found.push(`[${k}] ${left || '(empty)'} -> ${right || '(empty)'}`);

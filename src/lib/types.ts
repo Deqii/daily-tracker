@@ -84,6 +84,14 @@ export type MilestoneEvent =
       from: Rank;
       to: Rank;
       seen: boolean;
+    }
+  | {
+      id: string;
+      type: 'titleUnlock';
+      localDate: LocalDate;
+      name: string;
+      detail: string;
+      seen: boolean;
     };
 
 export const STATS: readonly Stat[] = ['STR', 'VIT', 'INT', 'DISC', 'SOC'];

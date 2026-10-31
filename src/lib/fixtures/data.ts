@@ -15,6 +15,8 @@ import type {
 import { RANKS, STATS, TIERS } from '../types';
 import { SCHEMA_VERSION, type StorageSchema } from '../storage';
 import historySnapshot from './history-snapshot.json';
+import historyLongSnapshot from './history-long-snapshot.json';
+import historyOpenSnapshot from './history-open-snapshot.json';
 import rewardsSnapshot from './rewards-snapshot.json';
 import todaySnapshot from './today-snapshot.json';
 import todayStatesSnapshot from './today-states-snapshot.json';
@@ -858,49 +860,121 @@ type SnapshotEvent = {
   date: string;
 };
 
-const SNAPSHOT = historySnapshot as unknown as {
+type HistorySnapshot = {
   chips: { rank: string; streak: string };
   days: SnapshotDay[];
   events: SnapshotEvent[];
 };
 
+const SNAPSHOT = historySnapshot as unknown as HistorySnapshot;
+const LONG_SNAPSHOT = historyLongSnapshot as unknown as HistorySnapshot;
+const OPEN_SNAPSHOT = historyOpenSnapshot as unknown as HistorySnapshot;
+
+const RANK_CHANGE = /^Rank (up|down): ([EDCBAS]) to ([EDCBAS])$/;
+const LEVEL_UP = /^Level up: (\d+) to (\d+)$/;
+const NEW_TITLE = /^New title: (.+)$/;
+
 /**
- * The prototype walks `MASKS` from a starting Lifetime XP of 300 and ends on the
- * day before today. Its simulation ignores the balance gate, freezes and 2x, so
- * these snapshots are replayed verbatim rather than recomputed by the engine.
+ * Maps the prototype's dumped event list into the stored engine event log.
+ *
+ * The engine already records level-ups and rank changes. The prototype also
+ * shows title unlocks; the engine has no title-unlock event variant yet, so the
+ * fixture seeds the same stored `titleUnlock` entries (see DEVIATIONS.md, "Test
+ * scaffolding"), and the page reads them from `milestoneEvents` like any other
+ * event. The engine's title rule is untouched.
  */
-function buildHistory(): StorageSchema {
-  const snapshotDays = SNAPSHOT.days;
+function historyMilestones(snapshot: HistorySnapshot): MilestoneEvent[] {
+  return snapshot.events.flatMap((event, index): MilestoneEvent[] => {
+    const id = `h-${event.dayIndex}-${index}`;
+
+    if (event.kind === 'up' || event.kind === 'down') {
+      const match = RANK_CHANGE.exec(event.title);
+
+      if (match === null) throw new Error(`history event has no rank change: ${event.title}`);
+
+      return [
+        {
+          id,
+          type: event.kind === 'up' ? 'rankUp' : 'rankDown',
+          localDate: event.date,
+          from: match[2] as UserState['rank'],
+          to: match[3] as UserState['rank'],
+          seen: true,
+        },
+      ];
+    }
+
+    if (event.kind === 'lv') {
+      const match = LEVEL_UP.exec(event.title);
+
+      if (match === null) throw new Error(`history event has no level up: ${event.title}`);
+
+      return [
+        {
+          id,
+          type: 'levelUp',
+          localDate: event.date,
+          from: Number(match[1]),
+          to: Number(match[2]),
+          seen: true,
+        },
+      ];
+    }
+
+    if (event.kind === 'ms') {
+      const match = NEW_TITLE.exec(event.title);
+
+      if (match === null) throw new Error(`history event has no title name: ${event.title}`);
+
+      return [
+        {
+          id,
+          type: 'titleUnlock',
+          localDate: event.date,
+          name: match[1] ?? '',
+          detail: event.subtitle,
+          seen: true,
+        },
+      ];
+    }
+
+    throw new Error(`unknown history event kind: ${event.kind}`);
+  });
+}
+
+/**
+ * The prototype walks `MASKS` from a starting Lifetime XP and ends on today. Its
+ * simulation ignores the balance gate, freezes and 2x, so these snapshots are
+ * replayed verbatim rather than recomputed by the engine.
+ *
+ * The snapshot's last day IS today. It is stored as the open day (no end-of-day
+ * snapshot), replacing the old fixture's duplicate: this fixture used to append
+ * a second 2026-10-15 entry on top of the snapshot's own last day, which made the
+ * chart and the log show the same date twice.
+ */
+function buildHistory(snapshot: HistorySnapshot, openLast: boolean): StorageSchema {
+  const snapshotDays = snapshot.days;
   const last = snapshotDays[snapshotDays.length - 1];
 
   if (last === undefined) {
-    throw new Error('history-snapshot.json has no days');
+    throw new Error('history snapshot has no days');
   }
 
-  const days: DailyQuestDay[] = snapshotDays.map((day) => ({
-    date: day.date,
-    selectedTaskIdPerStat: {},
-    requiredCompletions: maskToRequired(day.mask),
-    actualCompletions: maskToActual(day.mask),
-    netPointsChange: day.netPointsChange,
-    freezeUsed: day.freeze,
-    closed: !day.open,
-    lifetimeXPEnd: day.lifetimeXPEnd,
-    levelEnd: day.levelEnd,
-    rankEnd: day.rankEnd as DailyQuestDay['rankEnd'],
-  }));
+  const days: DailyQuestDay[] = snapshotDays.map((day) => {
+    const open = openLast && day.index === last.index;
 
-  days.push({
-    date: FIXED_TODAY,
-    selectedTaskIdPerStat: {},
-    requiredCompletions: emptyRequired(),
-    actualCompletions: emptyCounts(),
-    netPointsChange: 0,
-    freezeUsed: false,
-    closed: false,
-    lifetimeXPEnd: null,
-    levelEnd: null,
-    rankEnd: null,
+    return {
+      date: day.date,
+      selectedTaskIdPerStat: {},
+      requiredCompletions: maskToRequired(day.mask),
+      actualCompletions: maskToActual(day.mask),
+      netPointsChange: day.netPointsChange,
+      freezeUsed: day.freeze,
+      closed: !open,
+      lifetimeXPEnd: open ? null : day.lifetimeXPEnd,
+      levelEnd: open ? null : day.levelEnd,
+      rankEnd: open ? null : (day.rankEnd as DailyQuestDay['rankEnd']),
+    };
   });
 
   const userState = baseUserState();
@@ -910,35 +984,19 @@ function buildHistory(): StorageSchema {
   // Lifetime XP, so the prototype's value is the one the header shows.
   userState.wallet = 65;
   userState.statXP = { STR: 16, VIT: 12, INT: 20, DISC: 10, SOC: 7 };
-  userState.rank = SNAPSHOT.chips.rank as UserState['rank'];
+  userState.rank = snapshot.chips.rank as UserState['rank'];
   /**
    * Streak chip, as history.html's own header renders it: `13`.
    *
-   * The snapshot's 30 simulated days run 2026-09-16 to 2026-10-15 inclusive, so
-   * its last day IS today, and `streakEnd` on it (13) is the streak at the END
-   * of today. `userState.currentStreak` is the streak entering the open day and
-   * `displayStreak` adds today's completion to it (PRD 7.4), so the stored value
-   * is one less than the end-of-day figure and the header reads 12 + 1 = 13.
+   * The snapshot's last day IS today, and `streakEnd` on it (13) is the streak at
+   * the END of today. `userState.currentStreak` is the streak entering the open
+   * day and `displayStreak` adds today's completion to it (PRD 7.4), so the
+   * stored value is one less than the end-of-day figure and the header reads
+   * 12 + 1 = 13.
    */
   userState.currentStreak = last.streakEnd - 1;
   userState.unlockedTitles = ['first-reward', 'streak-7', 'completions-100'];
   userState.equippedTitle = 'first-reward';
-
-  const milestoneEvents = SNAPSHOT.events
-    .filter((e) => e.kind === 'up' || e.kind === 'down')
-    .map((e) => {
-      const from = e.kind === 'up' ? 'E' : 'D';
-      const to = e.kind === 'up' ? 'D' : 'E';
-
-      return {
-        id: `m${e.dayIndex}`,
-        type: e.kind === 'up' ? ('rankUp' as const) : ('rankDown' as const),
-        localDate: e.date,
-        from: from as UserState['rank'],
-        to: to as UserState['rank'],
-        seen: true,
-      };
-    });
 
   return {
     schemaVersion: SCHEMA_VERSION,
@@ -948,7 +1006,7 @@ function buildHistory(): StorageSchema {
     rewards: [],
     rewardPurchases: [],
     userState,
-    milestoneEvents,
+    milestoneEvents: historyMilestones(snapshot),
     theme: 'dark',
   };
 }
@@ -1058,8 +1116,18 @@ export const FIXTURES: Record<FixtureName, Fixture> = {
     extra: [{ key: 'daily-tracker:motion', value: 'on' }],
   },
   history: {
-    schema: buildHistory(),
+    schema: buildHistory(SNAPSHOT, false),
     extra: [{ key: 'daily-tracker:motion', value: 'on' }],
+    states: {
+      long: {
+        schema: buildHistory(LONG_SNAPSHOT, false),
+        extra: [{ key: 'daily-tracker:motion', value: 'on' }],
+      },
+      open: {
+        schema: buildHistory(OPEN_SNAPSHOT, true),
+        extra: [{ key: 'daily-tracker:motion', value: 'on' }],
+      },
+    },
   },
   settings: {
     schema: buildSettings(),

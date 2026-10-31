@@ -1,0 +1,461 @@
+/*
+ * History page rules (UI Revamp Issue 5).
+ *
+ * Copied verbatim from `docs/prototype/history.html` <style>. The prototype is
+ * a standalone document, so its class names are free; the app has one global
+ * stylesheet shared by five pages. Every page rule below is scoped to the
+ * History route with `@scope (body[data-page="history"])`.
+ *
+ * Shared shell rules (tokens, header, nav, chips, panel surface, brackets, boot,
+ * scan, motion opt-outs) already live in `src/styles/ui/*.css` and are not
+ * repeated. Media queries stay outside the wrapper and repeat it, and page
+ * keyframes are renamed with a `history-` prefix because keyframe names are
+ * global; every rename is listed in `docs/prototype/DEVIATIONS.md`.
+ */
+
+@scope (body[data-page='history']) {
+  h1 {
+    font: 700 30px var(--font-display);
+  }
+  h2 {
+    font: 600 17px var(--font-display);
+  }
+  .sub {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .f {
+    all: unset;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    padding: 5px 14px;
+    border-radius: var(--r-chip);
+    color: var(--muted);
+    font-size: 13px;
+    transition: all var(--t-fast);
+  }
+  .f:hover {
+    color: var(--text);
+    border-color: var(--line-strong);
+  }
+  .f:focus-visible {
+    outline: 2px solid var(--cyan);
+  }
+  .f[aria-pressed=true] {
+    color: var(--text);
+    border-color: var(--blue);
+    background: rgba(61, 169, 255, 0.12);
+    box-shadow: 0 0 10px rgba(61, 169, 255, 0.25);
+  }
+  /* page */
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 32px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+  }
+  .sum {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .sum .panel {
+    padding: 16px 18px;
+  }
+  .sum small {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .sum b {
+    display: block;
+    font: 700 30px/1.15 var(--font-display);
+    margin-top: 2px;
+  }
+  .sum em {
+    font-style: normal;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .up {
+    color: var(--cyan);
+  }
+  .dn {
+    color: var(--danger);
+  }
+  .g1 {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 20px;
+    align-items: stretch;
+  }
+  .g2 {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  /* chart */
+  .cw {
+    position: relative;
+    margin-top: 12px;
+  }
+  #chart {
+    width: 100%;
+    display: block;
+    overflow: visible;
+    touch-action: pan-y;
+    cursor: crosshair;
+  }
+  #chart:focus-visible {
+    outline: 1px dashed var(--cyan);
+    outline-offset: 6px;
+  }
+  .ln {
+    fill: none;
+    stroke: var(--cyan);
+    stroke-width: 2.2;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px var(--blue));
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: history-draw 1.3s var(--ease) 0.15s forwards;
+  }
+  @keyframes history-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .ar {
+    opacity: 0;
+    animation: history-fade 0.9s ease 0.8s forwards;
+  }
+  @keyframes history-fade {
+    to {
+      opacity: 1;
+    }
+  }
+  .mk {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: history-mk 0.5s var(--ease) forwards;
+    animation-delay: calc(1s + var(--d) * 20ms);
+  }
+  @keyframes history-mk {
+    from {
+      opacity: 0;
+      transform: scale(0.2);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .tip {
+    position: absolute;
+    pointer-events: none;
+    background: var(--panel-solid);
+    border: 1px solid var(--line-strong);
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: 140px;
+    transform: translate(-50%, -110%);
+    box-shadow: var(--glow);
+    opacity: 0;
+    transition: opacity var(--t-fast);
+    z-index: 3;
+    white-space: nowrap;
+  }
+  .tip.on {
+    opacity: 1;
+  }
+  .tip b {
+    font: 600 14px var(--font-display);
+  }
+  .tip div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    color: var(--muted);
+  }
+  .tip div span:last-child {
+    color: var(--text);
+    font-family: var(--font-mono);
+  }
+  .leg {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 12px;
+  }
+  .leg i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 6px;
+    vertical-align: -1px;
+  }
+  /* events */
+  .evs {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 360px;
+    overflow: auto;
+  }
+  .ev {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--ec);
+    padding: 10px 12px;
+    background: var(--ins);
+    transition:
+      transform var(--t-fast),
+      background var(--t-fast);
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+  }
+  .ev:hover {
+    transform: translateX(3px);
+    background: rgba(61, 169, 255, 0.08);
+  }
+  .ev:focus-visible {
+    outline: 2px solid var(--cyan);
+  }
+  .ev.big {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--ec) 16%, transparent), transparent);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--ec) 22%, transparent);
+  }
+  .ev .g {
+    font-size: 18px;
+    color: var(--ec);
+    width: 22px;
+    text-align: center;
+    text-shadow: 0 0 10px var(--ec);
+  }
+  .ev b {
+    font-weight: 600;
+    display: block;
+  }
+  .ev small {
+    color: var(--muted);
+    font-size: 12px;
+  }
+  /* heatmap */
+  .cal {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .cal span {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+  }
+  .cal button {
+    all: unset;
+    aspect-ratio: 1;
+    border: 1px solid var(--line);
+    background: rgba(61, 169, 255, 0.06);
+    display: grid;
+    place-items: center;
+    font: 500 11px var(--font-mono);
+    color: var(--muted);
+    cursor: pointer;
+    transition: transform var(--t-fast);
+  }
+  .cal button:hover {
+    transform: scale(1.12);
+    z-index: 1;
+  }
+  .cal button:focus-visible {
+    outline: 2px solid var(--cyan);
+  }
+  .cal button[data-l="1"] {
+    background: rgba(61, 169, 255, 0.28);
+  }
+  .cal button[data-l="2"] {
+    background: rgba(61, 169, 255, 0.55);
+    color: var(--text);
+  }
+  .cal button[data-l="3"] {
+    background: var(--blue);
+    color: var(--on-accent);
+    box-shadow: 0 0 8px var(--blue);
+  }
+  .cal button[data-l="x"] {
+    background: rgba(255, 84, 104, 0.3);
+    border-color: var(--danger);
+    color: var(--text);
+  }
+  .cal button.sel {
+    outline: 2px solid var(--cyan);
+    outline-offset: 1px;
+  }
+  .cal i {
+    visibility: hidden;
+  }
+  /* log */
+  .lw {
+    max-height: 520px;
+    overflow: auto;
+    margin-top: 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  th {
+    position: sticky;
+    top: 0;
+    background: var(--panel-solid);
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 13px;
+    text-align: center;
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--line);
+    z-index: 1;
+  }
+  th:first-child,
+  td:first-child {
+    text-align: left;
+  }
+  th:last-child,
+  td:last-child {
+    text-align: right;
+  }
+  td {
+    padding: 8px 6px;
+    border-bottom: 1px solid rgba(61, 169, 255, 0.12);
+    text-align: center;
+  }
+  tr.d {
+    cursor: pointer;
+    transition: background var(--t-fast);
+  }
+  tr.d:hover {
+    background: rgba(61, 169, 255, 0.07);
+  }
+  tr.d.sel {
+    background: rgba(138, 219, 255, 0.12);
+    box-shadow: inset 3px 0 var(--cyan);
+  }
+  tr.d:focus-visible {
+    outline: 2px solid var(--cyan);
+    outline-offset: -2px;
+  }
+  td svg {
+    width: 15px;
+    stroke: var(--cyan);
+    stroke-width: 2.4;
+    fill: none;
+    vertical-align: middle;
+  }
+  td .no {
+    color: var(--danger);
+    opacity: 0.8;
+  }
+  .net {
+    font-family: var(--font-mono);
+  }
+  tr.e td {
+    background: color-mix(in srgb, var(--ec) 10%, transparent);
+    color: var(--ec);
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 1px solid color-mix(in srgb, var(--ec) 35%, transparent);
+  }
+  tr.e td:last-child {
+    text-align: right;
+  }
+  .frz {
+    font-size: 12px;
+    color: var(--cyan);
+    border: 1px solid var(--line);
+    padding: 0 6px;
+    margin-left: 6px;
+    white-space: nowrap;
+  }
+  .pend {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid var(--muted);
+    border-radius: 50%;
+    vertical-align: middle;
+  }
+}
+
+@media (max-width: 1100px) {
+  @scope (body[data-page='history']) {
+    .g1,
+    .g2 {
+      grid-template-columns: 1fr;
+    }
+    .sum {
+      grid-template-columns: 1fr 1fr;
+    }
+    .head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  @scope (body[data-page='history']) {
+    main {
+      padding: 16px;
+    }
+    td:nth-child(n+2):nth-child(-n+6),
+    th:nth-child(n+2):nth-child(-n+6) {
+      padding: 8px 2px;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  @scope (body[data-page='history']) {
+    .f {
+      min-height: 44px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @scope (body[data-page='history']) {
+    .ln {
+      stroke-dashoffset: 0;
+    }
+    .ar,
+    .mk {
+      opacity: 1;
+    }
+  }
+}
