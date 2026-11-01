@@ -29,9 +29,12 @@
       "name": "history",
       "args": "tests/visual/fidelity.spec.ts tests/visual/health.spec.ts tests/visual/history-interactions.spec.ts --grep \"history\"",
       "extra": ""
+    },
+    {
+      "name": "settings",
+      "args": "tests/visual/fidelity.spec.ts tests/visual/health.spec.ts tests/visual/settings-interactions.spec.ts --grep \"settings\"",
+      "extra": ""
     }
   ],
-  "informational": [
-    "settings"
-  ]
+  "informational": []
 }

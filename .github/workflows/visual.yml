@@ -5,12 +5,13 @@
 #   static           - lint, types, unit tests, production build and the static
 #                      guards.
 #   build            - one visual build, shared by every shard as an artifact.
-#   visual (shard)   - four independent shards of the visual suite.
+#   visual (shard)   - independent shards of the visual suite.
 #   quality          - the aggregate gate. This is the required status check.
 #
 # Informational job:
 #   visual-fidelity  - only on workflow_dispatch. Runs the fidelity and health
-#                      tests of pages that are not ported yet. Not required.
+#                      tests of pages listed as informational (none at present).
+#                      Not required.
 
 name: visual
 
@@ -189,9 +190,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      # Expected to fail until each page is ported. The patterns come from
-      # .github/ci-shards.json (`informational`).
-      - run: npx playwright test fidelity health --grep "${{ needs.plan.outputs.informational }}"
+      # Only pages still being ported are listed in `.github/ci-shards.json`
+      # (`informational`); when none are left this job has nothing to run.
+      - run: |
+          if [ -n "${{ needs.plan.outputs.informational }}" ]; then
+            npx playwright test fidelity health --grep "${{ needs.plan.outputs.informational }}"
+          else
+            echo "No unported pages."
+          fi
       - name: Upload visual artifacts
         if: always()
         uses: actions/upload-artifact@v7.0.2

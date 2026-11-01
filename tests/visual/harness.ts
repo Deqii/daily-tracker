@@ -192,8 +192,9 @@ export const CHROMIUM_ARGS = [
  *   - the Google Fonts request is replaced with the same local woff2 bytes;
  *   - animations are collapsed by `prefers-reduced-motion`, every finite one is
  *     awaited, and ten frames are committed before capture;
- *   - `#fx` (particle canvas), `.scan` (the sweep) and `#demo` (the
- *     prototype-only demo button) are display:none.
+ *   - `#fx` (particle canvas) and `.scan` (the sweep) are display:none;
+ *   - `#demo` (the prototype-only demo button) is removed from the prototype
+ *     DOM before capture, so the two trees keep the same element count.
  */
 export async function open(page: Page, url: string): Promise<void> {
   await page.clock.setFixedTime(FIXED_TIME);
@@ -206,8 +207,12 @@ export async function open(page: Page, url: string): Promise<void> {
   await page.goto(url);
   // `#demo` is the prototype-only "Demo: buka title berikutnya" button in
   // settings.html (DEVIATIONS.md note 3). It is prototype affordance, not UI, so
-  // it is hidden on both sides rather than diffed.
-  await page.addStyleTag({ content: '#fx,.scan,#demo{display:none!important}' });
+  // it is removed from the prototype's tree rather than diffed. Removing it
+  // (instead of display:none) keeps the element counts equal.
+  if (url.startsWith(PROTO)) {
+    await page.evaluate(() => document.getElementById('demo')?.remove());
+  }
+  await page.addStyleTag({ content: '#fx,.scan{display:none!important}' });
   // The app mounts after a dynamic import, so wait for its first panel before
   // reading animations; otherwise the frames below commit an empty page.
   await page
@@ -718,7 +723,7 @@ export function collect(rootSelector = 'body'): StyleEntry[] {
   const out: StyleEntry[] = [];
 
   const walk = (el: Element, parent: string): void => {
-    if (SKIP.includes(el.tagName)) return;
+    if (SKIP.includes(el.tagName) || el.id === 'demo') return;
 
     const cn = typeof el.className === 'string' ? norm(el.className) : '';
     const label = `${el.tagName.toLowerCase()}${cn ? '.' + cn.split(' ').join('.') : ''}`;
@@ -870,13 +875,15 @@ const KEYFRAME_RENAMES = ['spin', 'shine', 'blink', 'pen', 'pulse', 'fl', 'rg'];
 const TASKS_KEYFRAME_RENAMES = ['flash', 'out'];
 const REWARDS_KEYFRAME_RENAMES = ['flash', 'out', 'pop', 'cn', 'fl', 'shake'];
 const HISTORY_KEYFRAME_RENAMES = ['draw', 'fade', 'mk'];
+const SETTINGS_KEYFRAME_RENAMES = ['pulse', 'pop', 'flash'];
 
 function unrenameKeyframes(value: string): string {
   return value
     .replace(new RegExp(`\\btoday-(${KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1')
     .replace(new RegExp(`\\btasks-(${TASKS_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1')
     .replace(new RegExp(`\\brewards-(${REWARDS_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1')
-    .replace(new RegExp(`\\bhistory-(${HISTORY_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1');
+    .replace(new RegExp(`\\bhistory-(${HISTORY_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1')
+    .replace(new RegExp(`\\bsettings-(${SETTINGS_KEYFRAME_RENAMES.join('|')})\\b`, 'g'), '$1');
 }
 
 /** Style report for two trees that line up element for element. */

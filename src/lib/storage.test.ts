@@ -7,7 +7,9 @@ import {
   createDefaultUserState,
   loadState,
   readBackupRecord,
+  readPreference,
   write,
+  writePreference,
   type StorageSchema,
 } from './storage';
 import type { Task } from './types';
@@ -361,5 +363,35 @@ describe('readBackupRecord', () => {
     fake.setItem(BACKUP_KEY, '{not valid json');
 
     expect(readBackupRecord()).toBeNull();
+  });
+});
+
+describe('preferences', () => {
+  it('reads the app JSON encoding and the prototype raw value', () => {
+    const fake = stubStorage();
+    fake.setItem('app', JSON.stringify('off'));
+    fake.setItem('prototype', 'on');
+
+    expect(readPreference('app')).toBe('off');
+    expect(readPreference('prototype')).toBe('on');
+  });
+
+  it('returns null for a missing or unreadable key', () => {
+    stubStorage();
+
+    expect(readPreference('missing')).toBeNull();
+
+    vi.stubGlobal('localStorage', undefined);
+    expect(readPreference('missing')).toBeNull();
+  });
+
+  it('writes the JSON string encoding and reports failures', () => {
+    const fake = stubStorage();
+
+    expect(writePreference('sound', 'on')).toEqual({ ok: true });
+    expect(fake.getItem('sound')).toBe('"on"');
+
+    vi.stubGlobal('localStorage', undefined);
+    expect(writePreference('sound', 'off')).toEqual({ ok: false, error: 'UNAVAILABLE' });
   });
 });

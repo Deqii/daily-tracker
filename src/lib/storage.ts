@@ -43,6 +43,13 @@ export const STORAGE_KEYS: Record<keyof StorageSchema, string> = {
 /** Raw text of discarded values, kept as the latest copy per key (D22). */
 export const BACKUP_KEY = 'daily-tracker:backup';
 
+/** When the user last exported a backup, as an ISO 8601 timestamp (Settings). */
+export const LAST_EXPORT_AT_KEY = 'daily-tracker:lastExportAt';
+
+/** Local UI preferences stored outside the PRD schema (decisions Q2). */
+export const MOTION_PREFERENCE_KEY = 'daily-tracker:motion';
+export const SOUND_PREFERENCE_KEY = 'daily-tracker:sound';
+
 const STORAGE_KEY_ORDER = Object.keys(STORAGE_KEYS) as (keyof StorageSchema)[];
 
 export type StorageFailure = 'QUOTA' | 'UNAVAILABLE' | 'UNKNOWN';
@@ -222,6 +229,32 @@ export function readBackupRecord(): BackupRecord | null {
   }
 
   return record;
+}
+
+/**
+ * Reads a simple string preference stored outside the PRD schema. Accepts both
+ * the app's JSON encoding (`"off"`) and the raw value the prototypes write
+ * (`off`), so the same key has one reader. A missing or unreadable key is null.
+ */
+export function readPreference(key: string): string | null {
+  const read = readRaw(key);
+
+  if (!read.ok || read.raw === null) {
+    return null;
+  }
+
+  const parsed = parseRaw(read.raw);
+
+  if (parsed.ok && typeof parsed.value === 'string') {
+    return parsed.value;
+  }
+
+  return read.raw;
+}
+
+/** Writes a simple string preference; a failed write is reported, never thrown. */
+export function writePreference(key: string, value: string): WriteResult {
+  return writeRaw(key, JSON.stringify(value));
 }
 
 function readBackup(): BackupRecord {

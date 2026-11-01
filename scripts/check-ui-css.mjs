@@ -26,6 +26,7 @@ const PROTOTYPES = {
   tasks: join('docs', 'prototype', 'tasks.html'),
   rewards: join('docs', 'prototype', 'rewards.html'),
   history: join('docs', 'prototype', 'history.html'),
+  settings: join('docs', 'prototype', 'settings.html'),
 };
 const APP_CSS = [join('src', 'app.css'), ...uiStylesheets()];
 
@@ -47,6 +48,7 @@ const SCOPE_ROOTS = {
   tasks: '@scope (body[data-page=tasks])',
   rewards: '@scope (body[data-page=rewards])',
   history: '@scope (body[data-page=history])',
+  settings: '@scope (body[data-page=settings])',
 };
 
 /**
@@ -60,6 +62,7 @@ const KEYFRAME_RENAMES = {
   tasks: ['flash', 'out'],
   rewards: ['flash', 'out', 'pop', 'cn', 'fl', 'shake'],
   history: ['draw', 'fade', 'mk'],
+  settings: ['pulse', 'pop', 'flash'],
 };
 
 /** `today-spin` -> `spin` and `tasks-flash` -> `flash`, only for the rename lists. */
@@ -68,7 +71,8 @@ function unrenameKeyframes(text) {
     .replace(new RegExp(`\\btoday-(${KEYFRAME_RENAMES.today.join('|')})\\b`, 'g'), '$1')
     .replace(new RegExp(`\\btasks-(${KEYFRAME_RENAMES.tasks.join('|')})\\b`, 'g'), '$1')
     .replace(new RegExp(`\\brewards-(${KEYFRAME_RENAMES.rewards.join('|')})\\b`, 'g'), '$1')
-    .replace(new RegExp(`\\bhistory-(${KEYFRAME_RENAMES.history.join('|')})\\b`, 'g'), '$1');
+    .replace(new RegExp(`\\bhistory-(${KEYFRAME_RENAMES.history.join('|')})\\b`, 'g'), '$1')
+    .replace(new RegExp(`\\bsettings-(${KEYFRAME_RENAMES.settings.join('|')})\\b`, 'g'), '$1');
 }
 
 const SCOPE_ROOT_LIST = Object.values(SCOPE_ROOTS);
@@ -784,13 +788,121 @@ const RULES = [
   { prototype: 'history', context: '@media (max-width: 1100px)', selector: '.sum' },
   { prototype: 'history', context: '@media (max-width: 1100px)', selector: '.head' },
   { prototype: 'history', context: '@media (max-width: 700px)', selector: 'main' },
-  { prototype: 'history', context: '@media (max-width: 700px)', selector: 'td:nth-child(n+2):nth-child(-n+6)' },
-  { prototype: 'history', context: '@media (max-width: 700px)', selector: 'th:nth-child(n+2):nth-child(-n+6)' },
+  {
+    prototype: 'history',
+    context: '@media (max-width: 700px)',
+    selector: 'td:nth-child(n+2):nth-child(-n+6)',
+  },
+  {
+    prototype: 'history',
+    context: '@media (max-width: 700px)',
+    selector: 'th:nth-child(n+2):nth-child(-n+6)',
+  },
   { prototype: 'history', context: '@media (max-width: 640px)', selector: '.f' },
   { prototype: 'history', context: '@media (prefers-reduced-motion: reduce)', selector: '.ln' },
   { prototype: 'history', context: '@media (prefers-reduced-motion: reduce)', selector: '.ar' },
   { prototype: 'history', context: '@media (prefers-reduced-motion: reduce)', selector: '.mk' },
 
+  // settings.css (settings.html). Shell rules shared with the other pages are
+  // checked above; these are the page's own selectors, read through its `@scope`
+  // wrapper and with the `settings-` keyframe prefix removed. The 700px `.chip`
+  // block is a deliberate repeat of the shell rule: this page's `.rk` card rule
+  // also targets the header rank chip, so the compact mobile chip must win by
+  // source order exactly as it does in the prototype.
+  { prototype: 'settings', context: '', selector: 'h1' },
+  { prototype: 'settings', context: '', selector: 'h2' },
+  { prototype: 'settings', context: '', selector: '.sub' },
+  { prototype: 'settings', context: '', selector: '.row' },
+  { prototype: 'settings', context: '', selector: '.btn' },
+  { prototype: 'settings', context: '', selector: '.btn:hover' },
+  { prototype: 'settings', context: '', selector: '.btn:active' },
+  { prototype: 'settings', context: '', selector: '.btn:focus-visible' },
+  { prototype: 'settings', context: '', selector: '.btn.line' },
+  { prototype: 'settings', context: '', selector: '.btn.line:hover' },
+  { prototype: 'settings', context: '', selector: '.btn.ghost' },
+  { prototype: 'settings', context: '', selector: '.btn.ghost:hover' },
+  { prototype: 'settings', context: '', selector: '.btn.danger' },
+  { prototype: 'settings', context: '', selector: 'main' },
+  { prototype: 'settings', context: '', selector: '.g2' },
+  { prototype: 'settings', context: '', selector: '.set' },
+  { prototype: 'settings', context: '', selector: '.set:first-of-type' },
+  { prototype: 'settings', context: '', selector: '.set b' },
+  { prototype: 'settings', context: '', selector: '.seg' },
+  { prototype: 'settings', context: '', selector: '.seg button' },
+  { prototype: 'settings', context: '', selector: '.seg button:hover' },
+  { prototype: 'settings', context: '', selector: '.seg button:focus-visible' },
+  { prototype: 'settings', context: '', selector: '.seg button[aria-checked=true]' },
+  { prototype: 'settings', context: '', selector: '.tg' },
+  { prototype: 'settings', context: '', selector: '.tg::after' },
+  { prototype: 'settings', context: '', selector: '.tg[aria-checked=true]' },
+  { prototype: 'settings', context: '', selector: '.tg[aria-checked=true]::after' },
+  { prototype: 'settings', context: '', selector: '.tg:focus-visible' },
+  { prototype: 'settings', context: '', selector: '.bk' },
+  { prototype: 'settings', context: '', selector: '.bk.ok' },
+  { prototype: 'settings', context: '', selector: '.bk b' },
+  { prototype: 'settings', context: '', selector: '.bk .dot' },
+  { prototype: 'settings', context: '', selector: '.bk.ok .dot' },
+  { prototype: 'settings', context: '@keyframes pulse', selector: '50%' },
+  { prototype: 'settings', context: '', selector: '.btns' },
+  { prototype: 'settings', context: '', selector: '.msg' },
+  { prototype: 'settings', context: '', selector: '.msg.bad' },
+  { prototype: 'settings', context: '', selector: '.msg .btns' },
+  { prototype: 'settings', context: '', selector: '.note' },
+  { prototype: 'settings', context: '', selector: '.go' },
+  { prototype: 'settings', context: '', selector: '.box' },
+  { prototype: 'settings', context: '', selector: '.box h3' },
+  { prototype: 'settings', context: '', selector: '.bar' },
+  { prototype: 'settings', context: '', selector: '.bar i' },
+  { prototype: 'settings', context: '', selector: '.gate' },
+  { prototype: 'settings', context: '', selector: '.gr' },
+  { prototype: 'settings', context: '', selector: '.gr .bar' },
+  { prototype: 'settings', context: '', selector: '.gr .bar i' },
+  { prototype: 'settings', context: '', selector: '.gr.weak span:first-child' },
+  { prototype: 'settings', context: '', selector: '.gr b' },
+  { prototype: 'settings', context: '', selector: '.thr' },
+  { prototype: 'settings', context: '', selector: 'span.ok' },
+  { prototype: 'settings', context: '', selector: 'span.bad' },
+  { prototype: 'settings', context: '', selector: '.ranks' },
+  { prototype: 'settings', context: '', selector: '.rk' },
+  { prototype: 'settings', context: '', selector: '.rk:hover' },
+  { prototype: 'settings', context: '', selector: '.rk .L' },
+  { prototype: 'settings', context: '', selector: '.rk .rg' },
+  { prototype: 'settings', context: '', selector: '.rk dl' },
+  { prototype: 'settings', context: '', selector: '.rk dt' },
+  { prototype: 'settings', context: '', selector: '.rk dd' },
+  { prototype: 'settings', context: '', selector: '.rk .tag' },
+  { prototype: 'settings', context: '', selector: '.rk.cur' },
+  { prototype: 'settings', context: '', selector: '.rk.cur .tag' },
+  { prototype: 'settings', context: '', selector: '.rk.nxt' },
+  { prototype: 'settings', context: '', selector: '.pv' },
+  { prototype: 'settings', context: '', selector: '.tchip' },
+  { prototype: 'settings', context: '', selector: '.tchip.pop' },
+  { prototype: 'settings', context: '@keyframes pop', selector: '40%' },
+  { prototype: 'settings', context: '', selector: '.tg3' },
+  { prototype: 'settings', context: '', selector: '.t' },
+  { prototype: 'settings', context: '', selector: '.t.un' },
+  { prototype: 'settings', context: '', selector: '.t.un:hover' },
+  { prototype: 'settings', context: '', selector: '.t.eq' },
+  { prototype: 'settings', context: '', selector: '.t.lk' },
+  { prototype: 'settings', context: '', selector: '.t.flash' },
+  { prototype: 'settings', context: '@keyframes flash', selector: 'from' },
+  { prototype: 'settings', context: '', selector: '.t b' },
+  { prototype: 'settings', context: '', selector: '.t .c' },
+  { prototype: 'settings', context: '', selector: '.t .ft' },
+  { prototype: 'settings', context: '', selector: '.t .bar' },
+  { prototype: 'settings', context: '', selector: '.t .pp' },
+  { prototype: 'settings', context: '', selector: '.t .ic' },
+  { prototype: 'settings', context: '', selector: '.toast' },
+  { prototype: 'settings', context: '', selector: '.toast.show' },
+  { prototype: 'settings', context: '@media(max-width:1100px)', selector: '.g2' },
+  { prototype: 'settings', context: '@media(max-width:1100px)', selector: '.go' },
+  { prototype: 'settings', context: '@media(max-width:1100px)', selector: '.ranks' },
+  { prototype: 'settings', context: '@media(max-width:700px)', selector: 'main' },
+  { prototype: 'settings', context: '@media(max-width:700px)', selector: '.ranks' },
+  { prototype: 'settings', context: '@media(max-width:640px)', selector: '.btn' },
+  { prototype: 'settings', context: '@media(max-width:640px)', selector: '.seg button' },
+  { prototype: 'settings', context: '@media(max-width:640px)', selector: '.f' },
+  { prototype: 'settings', context: '@media(max-width:640px)', selector: '.set' },
 ];
 
 /* ------------------------------------------------------------------ indexing */
@@ -809,14 +921,12 @@ function indexAll(records, onlyPage = null) {
 
   for (const record of records) {
     const page = pageOfContext(record.context);
-    const prefixedKeyframes = /(?:^| \/ )@keyframes (today|tasks|rewards|history)-/.exec(record.context);
+    const prefixedKeyframes = /(?:^| \/ )@keyframes (today|tasks|rewards|history|settings)-/.exec(
+      record.context
+    );
 
     if (page !== null && onlyPage !== null && page !== onlyPage) continue;
-    if (
-      onlyPage !== null &&
-      prefixedKeyframes !== null &&
-      prefixedKeyframes[1] !== onlyPage
-    ) {
+    if (onlyPage !== null && prefixedKeyframes !== null && prefixedKeyframes[1] !== onlyPage) {
       continue;
     }
 
