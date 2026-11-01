@@ -1044,7 +1044,8 @@ function buildSettings(): StorageSchema {
   userState.currentStreak = 5;
   userState.equippedTitle = 'first-reward';
   userState.unlockedTitles = ['first-reward'];
-  userState.totalCompletions = 1;
+  // Title gallery progress, as settings.html's `completions-100` card renders it.
+  userState.totalCompletions = 47;
 
   return {
     schemaVersion: SCHEMA_VERSION,
@@ -1133,7 +1134,7 @@ export const FIXTURES: Record<FixtureName, Fixture> = {
     schema: buildSettings(),
     extra: [
       { key: 'daily-tracker:motion', value: 'on' },
-      // settings.html shows "Backup terakhir: 9 hari lalu"; the app's backup-age
+      // settings.html shows "Last backup: 9 days ago"; the app's backup-age
       // banner is Issue 6 work, so the key is seeded here ahead of its reader.
       { key: 'daily-tracker:lastExportAt', value: '2026-10-06T09:00:00+07:00' },
     ],

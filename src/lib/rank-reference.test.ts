@@ -31,8 +31,8 @@ describe('rankMaxPoints', () => {
     expect(rankMaxPoints(15)).toBe('15');
   });
 
-  it('renders an uncapped rank as unlimited', () => {
-    expect(rankMaxPoints(null)).toBe('unlimited');
+  it('renders an uncapped rank as No cap', () => {
+    expect(rankMaxPoints(null)).toBe('No cap');
   });
 });
 
@@ -83,7 +83,7 @@ describe('rankReferenceRows', () => {
         rank: 'S',
         levelRange: '51+',
         freezesPerWeek: 3,
-        maxPointsPerTask: 'unlimited',
+        maxPointsPerTask: 'No cap',
         multiplier: '×1.3',
         penalty: 45,
       },

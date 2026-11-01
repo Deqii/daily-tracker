@@ -72,6 +72,8 @@ if (mode === 'page') {
     files.push('tests/visual/rewards-interactions.spec.ts');
   } else if (page === 'history') {
     files.push('tests/visual/history-interactions.spec.ts');
+  } else if (page === 'settings') {
+    files.push('tests/visual/settings-interactions.spec.ts');
   }
 
   run([...files, '--grep', grep]);

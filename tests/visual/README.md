@@ -50,11 +50,11 @@ it on port 4173; it serves `docs/prototype/` (plus `tests/visual/fonts/` at
 `/__fonts__/`) on port 4174. Both servers start automatically.
 
 `test:visual:page` takes the page name as its argument and runs that page's
-fidelity, health, interaction and state tests (`today` and `tasks` have the
-interaction/state files; the other three pages only have fidelity and health
-until they are ported). `test:visual:quick` runs every ported page at 1280x800
-in the dark theme, including shell and both pages' interactions and states, and
-skips the self-test.
+fidelity, health, interaction and state tests (`today`, `tasks`, `rewards`,
+`history` and `settings` have interaction files; `today` also has state files).
+`test:visual:quick` runs every ported page at 1280x800
+in the dark theme, including shell and every ported page's interactions and
+states, and skips the self-test.
 
 ## CI layout
 
@@ -67,7 +67,7 @@ retried.
 | `plan`             | Reads `.github/ci-shards.json` and outputs the shard matrix and the informational grep patterns.                                          | yes      |
 | `static`           | `npm ci`, lint, types, unit tests, production build + `check:no-fixtures`, `check:ui-css`, `check:prototype-shared`, `check:ci-coverage`. | yes      |
 | `build`            | One `npm run build:visual`, uploaded as the `dist-visual` artifact (1 day).                                                               | yes      |
-| `visual (<shard>)` | Matrix of the four shards below. Downloads `dist-visual`, sets `PW_SKIP_BUILD=1`, runs the shard's Playwright tests.                      | yes      |
+| `visual (<shard>)` | Matrix of the seven shards below. Downloads `dist-visual`, sets `PW_SKIP_BUILD=1`, runs the shard's Playwright tests.                     | yes      |
 | `quality`          | Aggregate gate. `needs:` plan, static, build and visual and fails unless every one succeeded. This is the protected check.                | yes      |
 | `visual-fidelity`  | The unported pages' fidelity and health tests. Runs only on `workflow_dispatch`; not needed by `quality`.                                 | no       |
 
@@ -79,6 +79,9 @@ retried.
 | `today`        |    27 | Today's fidelity + health, `today-interactions.spec.ts`, `today-states-interactions.spec.ts` |                  120 s |                93 s |
 | `today-states` |    60 | `today-states.spec.ts`                                                                       |                  269 s |               171 s |
 | `tasks`        |    24 | Tasks' fidelity + health (including the 390 overflow check), `tasks-interactions.spec.ts`    |                  153 s |               122 s |
+| `rewards`      |    27 | Rewards' fidelity + health, `rewards-interactions.spec.ts`                                   |                      - |                   - |
+| `history`      |    22 | History's fidelity + health, `history-interactions.spec.ts`                                  |                      - |                   - |
+| `settings`     |    35 | Settings' fidelity + health, `settings-interactions.spec.ts`                                 |                      - |                   - |
 
 The serial times are the matching steps of the last green base run; the CI times
 are from the first green run of the split workflow (2026-10-27), with

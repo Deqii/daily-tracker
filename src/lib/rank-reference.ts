@@ -26,9 +26,9 @@ export function rankMultiplier(xpMultiplier: number): string {
   return `×${value}`;
 }
 
-/** The rank table's max points per task, or `unlimited` for Rank S (PRD §2.1, decisions D2). */
+/** The rank table's max points per task, or `No cap` for Rank S (PRD §2.1, decisions D2). */
 export function rankMaxPoints(maxPointsPerTask: number | null): string {
-  return maxPointsPerTask === null ? 'unlimited' : String(maxPointsPerTask);
+  return maxPointsPerTask === null ? 'No cap' : String(maxPointsPerTask);
 }
 
 /**
