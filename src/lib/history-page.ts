@@ -227,7 +227,8 @@ export function historySummary(view: readonly HistoryDay[], streak: number): His
   const first = view[0];
   const last = view[view.length - 1];
   const lifetimeXP = last?.xp ?? 0;
-  const delta = first === undefined || last === undefined ? 0 : last.xp - (first.xp - first.netPoints);
+  const delta =
+    first === undefined || last === undefined ? 0 : last.xp - (first.xp - first.netPoints);
   const perfectDays = view.filter((day) => day.completedStats === 5).length;
 
   let mostMissed: Stat | null = null;

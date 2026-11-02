@@ -112,9 +112,7 @@ describe('rewards fixture values', () => {
   const cards = rewardCards(REWARDS, PURCHASES, 65, average);
 
   it('summarises the catalog and affordability', () => {
-    expect(rewardsSummary(cards.length, affordableCount(cards))).toBe(
-      '5 items · 2 affordable now'
-    );
+    expect(rewardsSummary(cards.length, affordableCount(cards))).toBe('5 items · 2 affordable now');
     expect(affordableLine(affordableCount(cards), cards.length)).toBe('2 of 5');
     expect(averageIncomeLine(average)).toBe('+13 / day');
     expect(totalSpent(PURCHASES).toLocaleString('en-US')).toBe('2,370');

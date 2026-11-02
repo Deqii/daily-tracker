@@ -148,7 +148,11 @@ const scenarios: readonly Scenario[] = [
   },
 ];
 
-async function render(browser: Parameters<typeof openPrototype>[0], theme: Theme, scenario: Scenario) {
+async function render(
+  browser: Parameters<typeof openPrototype>[0],
+  theme: Theme,
+  scenario: Scenario
+) {
   const protoPage = await openPrototype(browser, HISTORY, VIEWPORT, theme);
   const appPage = await openApp(browser, HISTORY, VIEWPORT, theme);
 

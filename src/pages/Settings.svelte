@@ -450,6 +450,7 @@
             <div
               class="bar"
               role="progressbar"
+              aria-label={`${card.name} progress`}
               aria-valuemin="0"
               aria-valuemax={card.progress.max}
               aria-valuenow={card.progress.current}

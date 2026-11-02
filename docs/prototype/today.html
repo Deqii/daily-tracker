@@ -207,7 +207,7 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
     <div class="title" id="title">Hadiah pertama</div>
     <div><div class="row sub" style="margin-bottom:6px"><span id="xpTxt">9 / 70 XP</span><span id="xpNext">to Level 4</span></div><div class="xpbar"><i id="xpFill" style="width:0"></i></div></div>
     <div><div class="row sub" style="margin-bottom:6px"><span>Streak</span><span class="shield"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1l5.5 2v5c0 3.5-2.4 6-5.5 7C3.9 14 1.5 11.500 1.500 8V3z"/></svg><span id="frz">1 freeze left this week</span></span></div>
-      <div class="pips" aria-label="Streak 5 days"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on today"></i><i></i><i></i></div></div>
+      <div class="pips" role="img" aria-label="Streak 5 days"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on today"></i><i></i><i></i></div></div>
   </section>
 
   <section class="panel radar-wrap boot" style="--i:1" aria-label="Stat">
@@ -229,7 +229,7 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
     <section class="panel boot" style="--i:4"><div class="row"><h2>Rewards</h2><span class="sub price">Wallet <span id="wal2" style="color:var(--text)">65</span><i class="coin"></i></span></div><div class="rewards" id="rewards"></div></section>
   </div>
 </main>
-<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span><button id="undo">Undo</button></div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span></div>
 
 <script>
 const STATS=[{k:'STR',n:'Str',c:'--stat-str'},{k:'VIT',n:'Vit',c:'--stat-vit'},{k:'INT',n:'Int',c:'--stat-int'},{k:'DISC',n:'Disc',c:'--stat-disc'},{k:'SOC',n:'Soc',c:'--stat-soc'}];
@@ -299,7 +299,6 @@ $('quests').addEventListener('click',e=>{
   if(q.tiers){if(q.done<q.need){openTier=openTier===i?null:i;quests();document.querySelector(`.qrow[data-i="${i}"]`)?.focus()}return}
   if(q.done<q.need)apply(i,1,e)});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&openTier!=null){const i=openTier;openTier=null;quests();document.querySelector(`.qrow[data-i="${i}"]`)?.focus()}});
-$('undo').onclick=()=>{if(last!=null&&Q[last].done>0){apply(last,-1);last=null}hide()};
 function fx(e,k,pts){const r=e.currentTarget?.getBoundingClientRect?.()||{left:e.clientX,top:e.clientY,width:0};const x=e.clientX||r.left+30,y=e.clientY||r.top;
   const c=css(STATS.find(s=>s.k===k).c);
   const a=document.createElement('div');a.className='ring';a.style.cssText=`left:${x}px;top:${y}px;--c:${c}`;

@@ -78,9 +78,13 @@ function card(page: Page, title: string) {
 }
 
 async function settleAfterAction(page: Page, label: string): Promise<void> {
-  await page.waitForFunction(() => document.querySelectorAll('.cn,.float').length === 0, undefined, {
-    timeout: 10000,
-  });
+  await page.waitForFunction(
+    () => document.querySelectorAll('.cn,.float').length === 0,
+    undefined,
+    {
+      timeout: 10000,
+    }
+  );
   await settle(page, label);
 }
 
@@ -214,11 +218,9 @@ const scenarios: readonly Scenario[] = [
         timeout: 10000,
       });
       await page.locator('.confirm [data-cd]').click();
-      await page.waitForFunction(
-        () => document.querySelectorAll('.card').length === 4,
-        undefined,
-        { timeout: 10000 }
-      );
+      await page.waitForFunction(() => document.querySelectorAll('.card').length === 4, undefined, {
+        timeout: 10000,
+      });
     },
     async assertApp(page) {
       await expect(page.locator('.card .ttl', { hasText: 'Beli buku baru' })).toHaveCount(0);

@@ -10,15 +10,12 @@
    * test compares would not.
    *
    * The toast names what just happened (`<task> completed`, or `<reward> bought
-   * (−60)` for a purchase). The "Undo" button is the prototype's and
-   * is rendered verbatim; whether it can act on anything is open question Q9 in
-   * `docs/prototype/DEVIATIONS.md`, because the engine has no way to revert a
-   * completion and adding one would be new game behaviour. The button is
-   * therefore inert, which is the smallest difference from the prototype.
+   * (−60)` for a purchase). Q9 was resolved on 2026-11-01 by removing the
+   * prototype's Undo control from both sides: the engine has no way to revert a
+   * completion, and adding one would be new game behaviour.
    */
 </script>
 
 <div class="toast" class:show={$toastVisible} role="status" aria-live="polite">
   <span>{$toastText}</span>
-  <button>Undo</button>
 </div>

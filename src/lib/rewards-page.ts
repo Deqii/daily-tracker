@@ -71,13 +71,7 @@ export function purchaseHistory(
   today: LocalDate
 ): PurchaseHistoryRow[] {
   return [...purchases]
-    .sort((a, b) =>
-      a.purchasedAt === b.purchasedAt
-        ? 0
-        : a.purchasedAt < b.purchasedAt
-          ? 1
-          : -1
-    )
+    .sort((a, b) => (a.purchasedAt === b.purchasedAt ? 0 : a.purchasedAt < b.purchasedAt ? 1 : -1))
     .map((purchase) => ({
       purchase,
       label: relativePurchaseLabel(purchase.localDate, today),
@@ -114,8 +108,7 @@ export function rewardCards(
   return buildRewardList(rewards, purchases, wallet).map((row) => {
     const progress = row.locked ? Math.min(1, wallet / row.reward.cost) : 1;
     const missing = row.reward.cost - wallet;
-    const daysToGo =
-      row.locked && average > 0 ? Math.max(0, Math.ceil(missing / average)) : 0;
+    const daysToGo = row.locked && average > 0 ? Math.max(0, Math.ceil(missing / average)) : 0;
 
     return { ...row, progress, daysToGo };
   });

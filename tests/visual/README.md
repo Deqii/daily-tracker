@@ -1,7 +1,7 @@
 # Visual fidelity harness (UI Revamp)
 
 Compares each `docs/prototype/*.html` page with the Svelte app at 1280x800 and
-390x844, in the dark and the light theme. Eight independent specs:
+390x844, in the dark and the light theme. Eleven independent specs:
 
 | Spec                                | Asserts                                                                               |
 | ----------------------------------- | ------------------------------------------------------------------------------------- |
@@ -13,6 +13,9 @@ Compares each `docs/prototype/*.html` page with the Svelte app at 1280x800 and
 | `today-states.spec.ts`              | every reusable Today state (`?state=`) at 1280x800 dark, 390x844 dark, 1280x800 light |
 | `today-states-interactions.spec.ts` | the states' mechanics and keyboard/ARIA paths                                         |
 | `tasks-interactions.spec.ts`        | the Tasks page's drawers, validation, filters, add and delete interactions            |
+| `responsive.spec.ts`                | every page from 320 to 1920 wide: no overflow, visible nav, 44px controls below 640   |
+| `motion.spec.ts`                    | reduced motion and `data-motion="off"` stop every animation and hide `#fx`            |
+| `keyboard.spec.ts`                  | tab order, visible focus, drawer/overlay focus traps, no pointer-only controls        |
 
 They are separate on purpose. Health describes whether the app works, the diffs
 describe whether it matches, the self-test describes whether the diffs can be
@@ -30,6 +33,9 @@ npm run test:visual -- today-interactions # the Today interactions (3 scenarios 
 npm run test:visual -- today-states.spec.ts # the Today state diffs (60 tests)
 npm run test:visual -- today-states-interactions # the state mechanics (11 tests)
 npm run test:visual -- tasks-interactions # the Tasks interactions (6 scenarios x 2 themes)
+npm run test:visual -- responsive         # every page at seven widths, both themes
+npm run test:visual -- motion             # reduced motion and data-motion="off"
+npm run test:visual -- keyboard           # tab order, focus traps, pointer-only controls
 npm run test:visual:page -- today        # one page: fidelity, health, interactions, states
 npm run test:visual:quick                # ported pages at 1280x800 dark, no self-test
 npm run test:visual -- --grep "today"    # one page
@@ -42,6 +48,7 @@ npm run test:visual:fonts                # re-copy woff2 + manifest
 npm run test:visual:history-fixture      # re-dump history.html's { D, EV }
 npm run test:visual:prototypes           # run the prototype server alone
 npm run check:ui-css                     # the ported CSS is still the prototypes' CSS
+npm run check:contrast                   # WCAG contrast report for every token pair
 npm run check:no-fixtures [dist]         # prove no build ships the fixtures
 ```
 
@@ -62,14 +69,13 @@ The required gate is split so that the slow visual suite runs in parallel
 shards. Every shard still runs the same tests as before; nothing is skipped or
 retried.
 
-| Job                | What it does                                                                                                                              | Required |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| `plan`             | Reads `.github/ci-shards.json` and outputs the shard matrix and the informational grep patterns.                                          | yes      |
-| `static`           | `npm ci`, lint, types, unit tests, production build + `check:no-fixtures`, `check:ui-css`, `check:prototype-shared`, `check:ci-coverage`. | yes      |
-| `build`            | One `npm run build:visual`, uploaded as the `dist-visual` artifact (1 day).                                                               | yes      |
-| `visual (<shard>)` | Matrix of the seven shards below. Downloads `dist-visual`, sets `PW_SKIP_BUILD=1`, runs the shard's Playwright tests.                     | yes      |
-| `quality`          | Aggregate gate. `needs:` plan, static, build and visual and fails unless every one succeeded. This is the protected check.                | yes      |
-| `visual-fidelity`  | The unported pages' fidelity and health tests. Runs only on `workflow_dispatch`; not needed by `quality`.                                 | no       |
+| Job                | What it does                                                                                                                                                | Required |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `plan`             | Reads `.github/ci-shards.json` and outputs the shard matrix.                                                                                                | yes      |
+| `static`           | `npm ci`, lint, types, unit tests, production build + `check:no-fixtures`, `check:ui-css`, `check:prototype-shared`, `check:contrast`, `check:ci-coverage`. | yes      |
+| `build`            | One `npm run build:visual`, uploaded as the `dist-visual` artifact (1 day).                                                                                 | yes      |
+| `visual (<shard>)` | Matrix of the eight shards below. Downloads `dist-visual`, sets `PW_SKIP_BUILD=1`, runs the shard's Playwright tests.                                       | yes      |
+| `quality`          | Aggregate gate. `needs:` plan, static, build and visual and fails unless every one succeeded. This is the protected check.                                  | yes      |
 
 ### Shards
 
@@ -82,6 +88,7 @@ retried.
 | `rewards`      |    27 | Rewards' fidelity + health, `rewards-interactions.spec.ts`                                   |                      - |                   - |
 | `history`      |    22 | History's fidelity + health, `history-interactions.spec.ts`                                  |                      - |                   - |
 | `settings`     |    35 | Settings' fidelity + health, `settings-interactions.spec.ts`                                 |                      - |                   - |
+| `crosspage`    |    33 | `responsive.spec.ts`, `motion.spec.ts`, `keyboard.spec.ts`                                   |                      - |                   - |
 
 The serial times are the matching steps of the last green base run; the CI times
 are from the first green run of the split workflow (2026-10-27), with
@@ -92,11 +99,10 @@ are from the first green run of the split workflow (2026-10-27), with
 1. Add the page's spec files to a shard's `args` in `.github/ci-shards.json`.
    Keep `args` as a string: it is passed straight to `npx playwright test`.
    Put scripts such as `check:fixtures` in `extra`.
-2. If the page is still being ported, add its grep pattern to `informational`
-   instead: those tests are run by `visual-fidelity` and are not required.
-3. Run `npm run check:ci-coverage`. It fails if a test is in no shard and not
-   informational, or if an informational pattern matches nothing, and prints the
-   number of tests per shard.
+2. Run `npm run check:ci-coverage`. It fails if a test is in no shard and not
+   informational, and prints the number of tests per shard. The `informational`
+   list stays supported but is empty: since Issue 7 the workflow has no
+   non-required visual job, so every page must be in a shard.
 
 `check:ci-coverage` runs `npx playwright test --list` once for the whole suite
 and once per shard (node built-ins only, no browser needed), so it also catches a

@@ -121,7 +121,12 @@ describe('chart scale and ticks', () => {
   it('chooses the prototype step, floor and four intervals', () => {
     const values = lastSeven.map((day) => day.xp);
 
-    expect(chartScale(values)).toEqual({ step: 50, lo: 400, hi: 600, ticks: [400, 450, 500, 550, 600] });
+    expect(chartScale(values)).toEqual({
+      step: 50,
+      lo: 400,
+      hi: 600,
+      ticks: [400, 450, 500, 550, 600],
+    });
   });
 
   it('keeps the thirty-day threshold in range', () => {

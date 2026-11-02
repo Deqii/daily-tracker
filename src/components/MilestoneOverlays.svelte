@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import { getRankConfig } from '../engine/rank';
+  import { trapTab } from '../lib/focus';
   import { app } from '../stores/app';
 
   /**
@@ -54,6 +55,13 @@
   function handleKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       dismiss();
+      return;
+    }
+
+    if (event.key === 'Tab') {
+      const dialog = document.querySelector<HTMLElement>('.ov');
+
+      if (dialog !== null) trapTab(event, dialog);
     }
   }
 </script>
