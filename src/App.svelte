@@ -26,7 +26,9 @@
 <AppShell />
 
 <main>
-  <svelte:component this={routes[$currentRoute]} />
+  {#key $currentRoute}
+    <svelte:component this={routes[$currentRoute]} />
+  {/key}
 </main>
 
 {#if $currentRoute === 'today'}

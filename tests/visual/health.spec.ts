@@ -74,6 +74,62 @@ for (const vp of VIEWPORTS) {
   }
 }
 
+/**
+ * Route changes must not leave `<main>` empty.
+ *
+ * The portal action moves the drawer, scrim and toast to `<body>` while the
+ * page is still inside the dynamic component block. Svelte 5 then fails to tear
+ * that block down on the next route change, silently leaving the old page's
+ * nodes in `<body>` and an empty `<main>`. This is the production blank page:
+ * the hash and `data-page` change, but nothing renders until a reload.
+ *
+ * These pairs cover every source route that reproduced it (tasks, rewards,
+ * settings). The 2s bound is deliberately tight: a working swap is synchronous
+ * after the click.
+ */
+const ROUTE_CHANGES = [
+  { from: 'tasks', to: 'rewards' },
+  { from: 'rewards', to: 'history' },
+  { from: 'settings', to: 'today' },
+] as const;
+
+test.describe('health route change @ 1280', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  for (const change of ROUTE_CHANGES) {
+    const from = PAGES.find((p) => p.route === change.from);
+    const to = PAGES.find((p) => p.route === change.to);
+
+    if (from === undefined || to === undefined) {
+      throw new Error(`unknown route change ${change.from} -> ${change.to}`);
+    }
+
+    test(`renders ${to.name} after leaving ${from.name}`, async ({ browser }) => {
+      const context = await newIsolatedContext(browser, { width: 1280, height: 800 });
+      const page = await context.newPage();
+      const errors = watchForErrors(page);
+
+      await open(page, appUrl(from));
+      await page.locator(`header nav a[href="#/${to.route}"]`).click();
+
+      await page.waitForFunction(
+        (heading) => {
+          const main = document.querySelector('main');
+          const h = main?.querySelector('h1, h2');
+          return (main?.textContent?.trim().length ?? 0) > 0 && h?.textContent?.trim() === heading;
+        },
+        to.heading,
+        { timeout: 2000 }
+      );
+
+      expect(await readPageHeading(page), `expected ${to.name} after leaving ${from.name}`).toBe(
+        to.heading
+      );
+      expect(errors, `the ${to.name} route reported errors:\n${errors.join('\n')}`).toEqual([]);
+    });
+  }
+});
+
 const tasksPage = PAGES.find((p) => p.name === 'tasks');
 
 if (tasksPage === undefined) throw new Error('the tasks page is missing from PAGES');
