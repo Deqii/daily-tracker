@@ -249,7 +249,7 @@ function calendar(){const v=view(),off=(v[0].date.getDay()+6)%7;
 const chk='<svg viewBox="0 0 14 14"><path d="M2 7.500l3.200 3L12 3.500"/></svg>';
 function log(){let h='';[...view()].reverse().forEach(d=>{
   d.ev.forEach(e=>h+=`<tr class="e" style="--ec:var(${EC[e.k]})"><td colspan="6">${EG[e.k]} ${e.t}</td><td></td></tr>`);
-  h+=`<tr class="d" tabindex="0" data-i="${d.i}"><td>${fmt(d.date)}${d.freeze?' <span class="frz">Freeze used</span>':''}</td>${[...d.m].map(x=>`<td>${x==='1'?chk:(d.open?'<span class="pend" aria-label="pending"></span>':'<span class="no" aria-label="missed">—</span>')}</td>`).join('')}<td class="net ${d.net>=0?'up':'dn'}">${d.net>=0?'+':''}${d.net}</td></tr>`});
+  h+=`<tr class="d" tabindex="0" data-i="${d.i}"><td>${fmt(d.date)}${d.freeze?' <span class="frz">Freeze used</span>':''}</td>${[...d.m].map(x=>`<td>${x==='1'?chk:(d.open?'<span class="pend" role="img" aria-label="pending"></span>':'<span class="no" role="img" aria-label="missed">—</span>')}</td>`).join('')}<td class="net ${d.net>=0?'up':'dn'}">${d.net>=0?'+':''}${d.net}</td></tr>`});
   document.querySelector('#log tbody').innerHTML=h}
 function pick(i){const k=lay.v.indexOf(D[i]);if(k>=0){cursor(k);document.querySelector(`tr.d[data-i="${i}"]`)?.scrollIntoView({block:'nearest',behavior:reduce?'auto':'smooth'})}}
 $('evs').onclick=e=>{const b=e.target.closest('[data-i]');b&&pick(+b.dataset.i)};

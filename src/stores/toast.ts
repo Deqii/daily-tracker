@@ -10,9 +10,8 @@ import { TOAST_MS } from '../lib/tween';
  * text and whether it is showing - as two stores, so hiding does not empty the
  * element and the hidden toast still measures the same as the prototype's.
  *
- * Nothing here reverts anything: see open question Q9 in
- * `docs/prototype/DEVIATIONS.md` for the "Batalkan" button, which the engine
- * cannot act on.
+ * Nothing here reverts anything. Q9 was resolved on 2026-11-01: the prototype's
+ * Undo control was removed from both sides because the engine has no reversal.
  */
 
 /** What the toast says. It stays after the toast hides, as in the prototype. */

@@ -562,9 +562,9 @@
                     {#if completed}
                       <svg viewBox="0 0 14 14"><path d="M2 7.500l3.200 3L12 3.500" /></svg>
                     {:else if row.day.open}
-                      <span class="pend" aria-label="pending"></span>
+                      <span class="pend" role="img" aria-label="pending"></span>
                     {:else}
-                      <span class="no" aria-label="missed">—</span>
+                      <span class="no" role="img" aria-label="missed">—</span>
                     {/if}
                   </td>
                 {/each}

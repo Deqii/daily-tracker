@@ -21,6 +21,7 @@
     validateRewardForm,
     type RewardFormDraft,
   } from '../lib/reward-form';
+  import { trapTab } from '../lib/focus';
   import { motionIsReduced, tween } from '../lib/tween';
   import type { Reward } from '../lib/types';
   import { app } from '../stores/app';
@@ -268,6 +269,15 @@
 
   onMount(() => {
     const onKeydown = (event: KeyboardEvent): void => {
+      if (drawerOpen && event.key === 'Tab') {
+        const drawer = document.getElementById('drawer');
+
+        if (drawer !== null) {
+          trapTab(event, drawer);
+          return;
+        }
+      }
+
       if (event.key !== 'Escape') return;
 
       closeDrawer();

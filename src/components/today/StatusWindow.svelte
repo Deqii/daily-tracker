@@ -95,7 +95,7 @@
         ><span id="frz">{freezesRemainingText($freezesLeft)}</span></span
       >
     </div>
-    <div class="pips" aria-label={`Streak ${$streak} days`}>
+    <div class="pips" role="img" aria-label={`Streak ${$streak} days`}>
       {#each Array.from({ length: PIP_COUNT }, (_, index) => index) as index (index)}
         <i class={pipClass(index)}></i>
       {/each}

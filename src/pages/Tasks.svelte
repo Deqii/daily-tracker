@@ -17,6 +17,7 @@
     variantXp,
     type DrawerDraft,
   } from '../lib/tasks-page';
+  import { trapTab } from '../lib/focus';
   import { motionIsReduced } from '../lib/tween';
   import type { Task, Tier } from '../lib/types';
   import { app } from '../stores/app';
@@ -190,6 +191,15 @@
 
   onMount(() => {
     const onKeydown = (event: KeyboardEvent): void => {
+      if (drawerOpen && event.key === 'Tab') {
+        const drawer = document.getElementById('drawer');
+
+        if (drawer !== null) {
+          trapTab(event, drawer);
+          return;
+        }
+      }
+
       if (event.key !== 'Escape') return;
 
       if (drawerOpen) closeDrawer();

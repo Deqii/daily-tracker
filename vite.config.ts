@@ -1,9 +1,8 @@
 import { defineConfig } from 'vitest/config';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(({ mode }) => ({
-  plugins: [svelte(), tailwindcss()],
+  plugins: [svelte()],
   build: {
     // The visual build carries the `?fixture=` seeder, so it must never land in
     // the directory `npm run build` owns and `check:no-fixtures` scans.

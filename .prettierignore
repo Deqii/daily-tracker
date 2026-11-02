@@ -17,3 +17,18 @@ tests/visual/fonts/manifest.json
 # so Prettier must not reformat them - a `npm run format` in between would turn
 # the drift check into a tautology. Never hand-edit them; re-dump instead.
 src/lib/fixtures/*-snapshot.json
+# Human-owned docs: never reformatted by an agent, even when they contain a
+# table Prettier would reflow (Issue 7).
+docs/agent-prompts/
+docs/prototype/DEVIATIONS.md
+
+# Ported stylesheets are checked verbatim against the prototypes by
+# check:ui-css. Prettier rewrites attribute selectors and media-query
+# selectors, which would turn the port check into a failure.
+src/styles/ui/*.css
+
+# Ported page markup stays byte-for-byte close to the prototypes' DOM.
+# Prettier reflows Svelte tags and can change the whitespace text nodes that the
+# pixel comparison sees, so these two pre-existing ports are not reformatted.
+src/pages/History.svelte
+src/pages/Rewards.svelte

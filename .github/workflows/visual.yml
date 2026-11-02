@@ -8,10 +8,8 @@
 #   visual (shard)   - independent shards of the visual suite.
 #   quality          - the aggregate gate. This is the required status check.
 #
-# Informational job:
-#   visual-fidelity  - only on workflow_dispatch. Runs the fidelity and health
-#                      tests of pages listed as informational (none at present).
-#                      Not required.
+# Every job above is required through `quality`; there is no continue-on-error
+# path left in this workflow.
 
 name: visual
 
@@ -35,7 +33,6 @@ jobs:
     timeout-minutes: 10
     outputs:
       shards: ${{ steps.matrix.outputs.shards }}
-      informational: ${{ steps.matrix.outputs.informational }}
     steps:
       - uses: actions/checkout@v6.1.0
       - id: matrix
@@ -44,9 +41,7 @@ jobs:
           const { readFileSync, appendFileSync } = require('node:fs');
           const config = JSON.parse(readFileSync('.github/ci-shards.json', 'utf8'));
           const shards = config.shards.map(({ name, args, extra }) => ({ name, args, extra }));
-          const informational = config.informational.join('|');
           appendFileSync(process.env.GITHUB_OUTPUT, `shards=${JSON.stringify(shards)}\n`);
-          appendFileSync(process.env.GITHUB_OUTPUT, `informational=${informational}\n`);
           NODE
 
   static:
@@ -70,6 +65,10 @@ jobs:
       - run: npm run check:ui-css
       # The five prototypes keep their own token blocks and shell rules.
       - run: npm run check:prototype-shared
+      # WCAG report for the token pairs the pages use. Failing pairs print for
+      # the review but do not gate the build: the tokens come from the
+      # prototypes and are never changed by an agent.
+      - run: npm run check:contrast
       # Every visual test must be in a shard unless it is explicitly
       # informational. The shards run in the visual job below.
       - run: npm run check:ci-coverage
@@ -174,37 +173,3 @@ jobs:
             fi
           done
           exit "$failed"
-
-  visual-fidelity:
-    name: visual-fidelity (informational)
-    if: github.event_name == 'workflow_dispatch'
-    needs: plan
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v6.1.0
-      - uses: actions/setup-node@v6.5.0
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      # Only pages still being ported are listed in `.github/ci-shards.json`
-      # (`informational`); when none are left this job has nothing to run.
-      - run: |
-          if [ -n "${{ needs.plan.outputs.informational }}" ]; then
-            npx playwright test fidelity health --grep "${{ needs.plan.outputs.informational }}"
-          else
-            echo "No unported pages."
-          fi
-      - name: Upload visual artifacts
-        if: always()
-        uses: actions/upload-artifact@v7.0.2
-        with:
-          name: visual-fidelity-${{ github.run_number }}
-          path: |
-            test-results/
-            playwright-report/
-          retention-days: 7
-          if-no-files-found: ignore

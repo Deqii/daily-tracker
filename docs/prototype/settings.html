@@ -241,7 +241,7 @@ function titles(){
   $('titles').innerHTML=TT.map(t=>{const u=un.has(t.id),e=eq===t.id,pct=Math.min(100,t.p[0]/t.p[1]*100);
    return `<article class="t ${u?'un':'lk'} ${e?'eq':''} ${flashId===t.id?'flash':''}"><b>${t.n}</b><span class="c">${t.c}</span>
    <div class="ft">${u?`<span class="sub">${e?'Equipped':'Unlocked'}</span><button class="btn ${e?'line':''}" data-t="${t.id}" aria-pressed="${e}" style="padding:5px 14px">${e?'Unequip':'Equip'}</button>`:
-   `<span class="ic">${lock}Locked</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${t.p[1]}" aria-valuenow="${t.p[0]}"><i style="width:${pct}%"></i></div><span class="pp">${t.p[0]}/${t.p[1]}</span>`}</div></article>`}).join('');
+   `<span class="ic">${lock}Locked</span><div class="bar" role="progressbar" aria-label="${t.n} progress" aria-valuemin="0" aria-valuemax="${t.p[1]}" aria-valuenow="${t.p[0]}"><i style="width:${pct}%"></i></div><span class="pp">${t.p[0]}/${t.p[1]}</span>`}</div></article>`}).join('');
   flashId=null}
 $('titles').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;const id=b.dataset.t;
   if(eq===id){eq=null;toast('Title unequipped')}else{eq=id;toast(`Title equipped: ${TT.find(t=>t.id===id).n}`);blip();flashId=id}

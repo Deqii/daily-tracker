@@ -239,6 +239,28 @@ each needs an answer before the page named ships.
 | Q16 | History  | `history.html` shows title-unlock rows as milestone events, but the engine's `MilestoneEvent` union only emitted level-up and rank changes before Issue 5. | Open. Issue 5 added a `titleUnlock` variant to the stored event type and seeded it in the fixture so the page can render the prototype's rows; the engine still does not emit it at runtime. Decide whether title unlocks should become engine events (and then appear on Today's overlays too) or whether History should derive milestones only from existing events. |
 | Q17 | Settings | The page subtitle "Murni kosmetik. Satu title bisa dipasang pada satu waktu dan tampil di halaman Today." is Indonesian, while Audit decision 1 says all interface copy is English. The prototype was not updated with the audit batch. | Open. Issue 6 keeps the sentence verbatim because the Fidelity Contract makes the prototype the source of truth for copy and the pixel diff would otherwise fail. Decide whether the prototype should be corrected to English or the audit decision relaxed for this line. |
 
+### Q9 resolution (2026-11-01, approved by the human)
+
+Q9 is resolved by removing the completion toast's Undo control from both the
+prototype and the app. The engine has no reversal operation, the PRD defines no
+XP or stat clawback, and adding one would be new game behaviour. The prototype
+change is the removal of `<button id="undo">Undo</button>` from the toast and
+its click handler; the app renders the same toast without the button. This entry
+records the decision without editing the open-questions table above.
+
+### Issue 7 accessibility attributes (2026-11-02)
+
+Lighthouse flagged three prototype ARIA patterns. Only attributes changed; no
+tag, class, text, style or behaviour changed, and both the prototype and the app
+received the same change so the pixel and computed-style diffs stay honest.
+
+- Today: `.pips` carries `aria-label` but no role. Added `role="img"`.
+- History: `.pend` and `.no` carry `aria-label` but no role. Added `role="img"`.
+- Settings: each locked title's `.bar` is `role="progressbar"` with no
+  accessible name. Added `aria-label="<title> progress"`.
+
+Scope: Issue 155 (Lighthouse Accessibility gate). No PRD mechanics are involved.
+
 Q8 and Q9 were found while building the Today page (Issue 2, 2026-10-18). Q10-Q12
 were found while auditing batch 2 (2026-10-20); Q10-Q12 remain open.
 Q13-Q15 were found while building the Tasks page (Issue 3, 2026-10-23) and
@@ -267,6 +289,8 @@ counts in the original screenshots.
 | 2026-10-18 | all five                     | Shared rules normalised across prototypes (body transition, one `.coin`, one `.panel` rule with default padding 22 and component overrides, one bracket selector list, combined nav hover rule, `.scan` via `--scan`); `color-scheme` added to the token blocks; Today pips label renamed "Streak" and pips defined (note 4).                                      |
 | 2026-10-19 | all five                     | Audit batch 1: English copy, two-row mobile navigation up to 1023px, inline delete confirmation (tasks, rewards), no purchase undo, empty states, validation and import copy, radar aria-label with the five values.                                                                                                                                               |
 | 2026-10-20 | all five                     | Audit batch 2: rank accent via `data-rank` (token block, bracket/accent rules, Rank chip); level-up/rank-up overlays and rank-down, storage, recovery notices; Today tier picker, freeze variants, rank-up-blocked line, title omission and empty state; History ranges/labels; responsive 640px brackets and 44px controls; `state` query states for the harness. |
+| 2026-11-01 | `today.html`                 | Q9: removed the completion toast's inert Undo control (button and its click handler). The PRD and engine define no completion reversal. |
+| 2026-11-02 | Today, History, Settings     | Issue 7 accessibility attributes: `role="img"` on the Streak pips and History pending/missed marks; `aria-label` on locked-title progress bars. |
 
 Fixtures derived from these values (the `today` heat strip and the `rewards`
 purchase log) were regenerated from the corrected prototypes in PR #158
