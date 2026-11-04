@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { selectDailyTasks } from '../engine/daily';
 import type { AppState } from '../engine/state';
 import {
   SCHEMA_VERSION,
@@ -912,6 +913,262 @@ describe('createAppStore', () => {
     const day = openDayOf(read<AppState>(store));
 
     expect(day.selectedTaskIdPerStat.STR).toBeUndefined();
+
+    store.teardown();
+  });
+
+  it('shows an anchor added on a first-run empty day immediately', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake);
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    expect(read(store.questRows)).toEqual([]);
+
+    const form: TaskFormDraft = {
+      ...emptyTaskFormDraft(),
+      familyName: 'Push up routine',
+      stat: 'STR',
+      isAnchor: true,
+      variants: [
+        { tier: 'easy', description: '10 reps', points: '5' },
+        { tier: 'medium', description: '', points: '' },
+        { tier: 'hard', description: '', points: '' },
+      ],
+    };
+
+    store.saveTask(form, null);
+
+    const state = read<AppState>(store);
+    const day = openDayOf(state);
+    const rows = read(store.questRows);
+
+    expect(day.requiredCompletions).toEqual({ STR: 1, VIT: 0, INT: 0, DISC: 0, SOC: 0 });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ stat: 'STR', required: 1 });
+    expect(rows[0]?.rows[0]?.task.familyName).toBe('Push up routine');
+
+    const persisted = JSON.parse(
+      fake.getItem(STORAGE_KEYS.dailyQuestLog) ?? '[]'
+    ) as DailyQuestDay[];
+    expect(persisted[0]?.requiredCompletions.STR).toBe(1);
+
+    store.teardown();
+  });
+
+  it('fills a missing rotating pick when a stat gains its first rotating task', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, { tasks: [anchorTask()] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    expect(openDayOf(read<AppState>(store)).selectedTaskIdPerStat.STR).toBeUndefined();
+
+    const form: TaskFormDraft = {
+      ...emptyTaskFormDraft(),
+      familyName: 'Dead hang',
+      stat: 'STR',
+      isAnchor: false,
+      variants: [{ tier: 'easy', description: '20 seconds', points: '5' }],
+    };
+
+    const id = store.saveTask(form, null);
+    const day = openDayOf(read<AppState>(store));
+
+    expect(day.selectedTaskIdPerStat.STR).toBe(id);
+
+    store.teardown();
+  });
+
+  it('keeps a valid rotating pick when another rotating task is added', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [rotatingTask('task0001', 'Task A', 'STR'), rotatingTask('task0002', 'Task B', 'STR')],
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const picked = openDayOf(read<AppState>(store)).selectedTaskIdPerStat.STR;
+    expect(picked).toBeDefined();
+
+    const form: TaskFormDraft = {
+      ...emptyTaskFormDraft(),
+      familyName: 'Dead hang',
+      stat: 'STR',
+      isAnchor: false,
+      variants: [{ tier: 'easy', description: '20 seconds', points: '5' }],
+    };
+
+    store.saveTask(form, null);
+
+    expect(openDayOf(read<AppState>(store)).selectedTaskIdPerStat.STR).toBe(picked);
+
+    store.teardown();
+  });
+
+  it('re-picks the old stat and activates the new stat when a picked task changes stat', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [
+        rotatingTask('task0001', 'Task A', 'STR'),
+        rotatingTask('task0002', 'Task B', 'STR'),
+        rotatingTask('task0003', 'Task C', 'VIT'),
+      ],
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const picked = openDayOf(read<AppState>(store)).selectedTaskIdPerStat.STR;
+    expect(picked).toBeDefined();
+    if (picked === undefined) {
+      return;
+    }
+
+    const form: TaskFormDraft = {
+      ...emptyTaskFormDraft(),
+      familyName: 'Moved task',
+      stat: 'VIT',
+      isAnchor: false,
+      variants: [{ tier: 'easy', description: '20 seconds', points: '5' }],
+    };
+
+    store.saveTask(form, picked);
+
+    const state = read<AppState>(store);
+    const day = openDayOf(state);
+    const picks = selectDailyTasks(state.tasks, TODAY);
+
+    expect(state.tasks.find((task) => task.id === picked)?.stat).toBe('VIT');
+    expect(day.selectedTaskIdPerStat).toEqual({ STR: picks.STR, VIT: picks.VIT });
+    expect(day.requiredCompletions.VIT).toBe(1);
+
+    store.teardown();
+  });
+
+  it('keeps a second anchor in a satisfied stat without raising its requirement', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, { tasks: [anchorTask()] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    expect(store.completeTask('task0001', null).ok).toBe(true);
+
+    const form: TaskFormDraft = {
+      ...emptyTaskFormDraft(),
+      familyName: 'Evening plank',
+      stat: 'STR',
+      isAnchor: true,
+      variants: [{ tier: 'easy', description: '30 seconds', points: '5' }],
+    };
+
+    store.saveTask(form, null);
+
+    const state = read<AppState>(store);
+    const day = openDayOf(state);
+    const rows = read(store.questRows);
+
+    expect(day.requiredCompletions.STR).toBe(1);
+    expect(day.actualCompletions.STR).toBe(1);
+    expect(rows[0]?.rows).toHaveLength(2);
+
+    store.teardown();
+  });
+
+  it('keeps completions and net points when the last task in a stat is deleted', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, { tasks: [anchorTask()] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    expect(store.completeTask('task0001', null).ok).toBe(true);
+
+    const completed = read<AppState>(store);
+
+    expect(completed.dailyQuestLog[0]?.actualCompletions.STR).toBe(1);
+    expect(completed.dailyQuestLog[0]?.netPointsChange).toBe(3);
+    expect(completed.completions).toHaveLength(1);
+
+    store.deleteTask('task0001');
+
+    const state = read<AppState>(store);
+    const day = openDayOf(state);
+
+    expect(day.requiredCompletions.STR).toBe(0);
+    expect(day.actualCompletions.STR).toBe(1);
+    expect(day.selectedTaskIdPerStat.STR).toBeUndefined();
+    expect(day.netPointsChange).toBe(3);
+    expect(state.completions).toHaveLength(1);
+
+    store.teardown();
+  });
+
+  it('does not sync the old open day when the clock has crossed midnight', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 23, 59, 59));
+    const fake = stubStorage();
+    seed(fake, { tasks: [anchorTask()] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    vi.setSystemTime(new Date(2026, 9, 12, 0, 0, 1));
+
+    const form: TaskFormDraft = {
+      ...emptyTaskFormDraft(),
+      familyName: 'Morning walk',
+      stat: 'VIT',
+      isAnchor: true,
+      variants: [{ tier: 'easy', description: '10 minutes', points: '5' }],
+    };
+
+    store.saveTask(form, null);
+
+    const beforeRollover = read<AppState>(store);
+    const oldDay = beforeRollover.dailyQuestLog.find((day) => day.date === '2026-10-11');
+
+    expect(beforeRollover.userState.lastRolloverDate).toBe('2026-10-11');
+    expect(oldDay?.requiredCompletions.VIT).toBe(0);
+    expect(beforeRollover.tasks).toHaveLength(2);
+
+    store.rollover();
+
+    const afterRollover = read<AppState>(store);
+    const newDay = afterRollover.dailyQuestLog.find((day) => day.date === '2026-10-12');
+
+    expect(afterRollover.userState.lastRolloverDate).toBe('2026-10-12');
+    expect(newDay?.requiredCompletions.VIT).toBe(1);
+
+    store.teardown();
+  });
+
+  it('does not touch a closed day when a task is saved', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    const closed: DailyQuestDay = {
+      date: '2026-10-10',
+      selectedTaskIdPerStat: { STR: 'old' },
+      requiredCompletions: { STR: 1, VIT: 0, INT: 0, DISC: 0, SOC: 0 },
+      actualCompletions: { STR: 1, VIT: 0, INT: 0, DISC: 0, SOC: 0 },
+      netPointsChange: 3,
+      freezeUsed: false,
+      closed: true,
+      lifetimeXPEnd: 95,
+      levelEnd: 3,
+      rankEnd: 'E',
+    };
+    seed(fake, { dailyQuestLog: [closed] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const form: TaskFormDraft = {
+      ...emptyTaskFormDraft(),
+      familyName: 'Push up routine',
+      stat: 'STR',
+      isAnchor: true,
+      variants: [{ tier: 'easy', description: '10 reps', points: '5' }],
+    };
+
+    store.saveTask(form, null);
+
+    const state = read<AppState>(store);
+
+    expect(state.dailyQuestLog.find((day) => day.date === '2026-10-10')).toEqual(closed);
 
     store.teardown();
   });
