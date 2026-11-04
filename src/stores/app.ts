@@ -1,6 +1,5 @@
 import { derived, writable, type Readable } from 'svelte/store';
 import { passesBalanceGate } from '../engine/balance';
-import { selectDailyTasks } from '../engine/daily';
 import {
   completeTask as engineCompleteTask,
   type CompleteTaskResult,
@@ -11,6 +10,7 @@ import { purchaseReward as enginePurchaseReward, type PurchaseResult } from '../
 import { getRankConfig, rank as levelRankOf, resolveRank } from '../engine/rank';
 import { runRollover as engineRunRollover } from '../engine/run-rollover';
 import type { AppState } from '../engine/state';
+import { syncOpenDay } from '../engine/sync-open-day';
 import { displayStreak } from '../engine/streak';
 import { equipTitle as engineEquipTitle, TITLES, type TitleId } from '../engine/titles';
 import { toLocalDate, toTimestamp } from '../lib/date';
@@ -443,7 +443,7 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
         existing === undefined
           ? [...current.tasks, task]
           : current.tasks.map((entry) => (entry.id === task.id ? task : entry));
-      const next: AppState = { ...current, tasks };
+      const next = syncOpenDay({ ...current, tasks }, today());
 
       commit(next);
       persist(next);
@@ -458,25 +458,7 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
       }
 
       const tasks = current.tasks.filter((entry) => entry.id !== taskId);
-      const openDay = openDayOf(current);
-      let dailyQuestLog = current.dailyQuestLog;
-
-      if (openDay !== undefined && openDay.selectedTaskIdPerStat[task.stat] === taskId) {
-        const selectedTaskIdPerStat = { ...openDay.selectedTaskIdPerStat };
-        const replacement = selectDailyTasks(tasks, openDay.date)[task.stat];
-
-        if (replacement === undefined) {
-          delete selectedTaskIdPerStat[task.stat];
-        } else {
-          selectedTaskIdPerStat[task.stat] = replacement;
-        }
-
-        dailyQuestLog = dailyQuestLog.map((day) =>
-          day.date === openDay.date ? { ...day, selectedTaskIdPerStat } : day
-        );
-      }
-
-      const next: AppState = { ...current, tasks, dailyQuestLog };
+      const next = syncOpenDay({ ...current, tasks }, today());
 
       commit(next);
       persist(next);
