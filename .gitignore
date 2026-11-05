@@ -5,6 +5,7 @@ dist-visual
 *.local
 .DS_Store
 .vite
+.vitest
 
 # Playwright
 /test-results
