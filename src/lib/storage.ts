@@ -257,6 +257,35 @@ export function writePreference(key: string, value: string): WriteResult {
   return writeRaw(key, JSON.stringify(value));
 }
 
+/** Writes a JSON value outside the PRD schema; a failed write is reported, never thrown. */
+export function writeJsonPreference(key: string, value: unknown): WriteResult {
+  let raw: string;
+
+  try {
+    raw = JSON.stringify(value);
+  } catch {
+    return { ok: false, error: 'UNKNOWN' };
+  }
+
+  return writeRaw(key, raw);
+}
+
+/** Removes a preference key; a failed removal is reported, never thrown. */
+export function clearPreference(key: string): WriteResult {
+  const storage = getStorage();
+
+  if (storage === null) {
+    return { ok: false, error: 'UNAVAILABLE' };
+  }
+
+  try {
+    storage.removeItem(key);
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'UNKNOWN' };
+  }
+}
+
 function readBackup(): BackupRecord {
   return readBackupRecord() ?? {};
 }
