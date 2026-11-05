@@ -145,8 +145,7 @@ Both `visual.yml` and `ci.yml` use `concurrency` keyed by workflow and ref with
 ## Test tiers
 
 Use the smallest tier that can catch a regression; do not run the full suite
-when a narrower tier is enough (the rules are in `docs/agent-prompts/common.md`
-section 8):
+when a narrower tier is enough (see the tiers below):
 
 - **Tier 0, after every edit (seconds):** `npm run check`, the unit tests of the
   files you touched (`npx vitest run <path>`), and the one Playwright test that

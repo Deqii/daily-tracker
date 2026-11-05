@@ -54,12 +54,12 @@ All screenshots use the built-in demo data (Rank E, Level 3), not real user data
 | A    | 36-50  | 3                | 90                  | x1.15            | 30                      |
 | S    | 51+    | 3                | no cap              | x1.3             | 45                      |
 
-This is a summary. The full rules live in [`docs/PRD.md`](docs/PRD.md).
+This is a summary of the in-game rules.
 
 ## Tech stack
 
 - Svelte and TypeScript, built with Vite. Hash routes (`#/today`, `#/tasks`, `#/rewards`, `#/history`, `#/settings`).
-- A framework-free rules engine in `src/lib/engine` (points, ranks, gate, streaks, penalties), tested with Vitest.
+- A framework-free rules engine in `src/engine` (points, ranks, gate, streaks, penalties), tested with Vitest.
 - Plain CSS ported from HTML prototypes: design tokens, per-page styles scoped with `@scope`, dark and light themes.
 - Chakra Petch, Manrope and JetBrains Mono through `@fontsource`.
 - Playwright for the visual fidelity suite.
@@ -98,7 +98,6 @@ npm run preview
 | `npm run check:ui-css`                  | Fails if ported CSS differs from the prototypes               |
 | `npm run check:prototype-shared`        | Fails if shared rules differ between prototypes               |
 | `npm run check:ci-coverage`             | Fails if a visual test is not run by any CI shard             |
-| `npm run screenshots`                   | Regenerate the README images in `docs/screenshots`            |
 
 ## How the interface is verified
 
@@ -115,29 +114,19 @@ The interface was designed as five standalone HTML prototypes in [`docs/prototyp
 src/
   components/    shared UI such as the app shell
   pages/         Today, Tasks, Rewards, History and Settings
-  lib/engine/    rules engine (no UI code)
+  engine/        rules engine (no UI code)
+  lib/           storage, date helpers and page logic
   lib/fixtures/  demo data for visual tests (visual build only)
+  stores/        Svelte stores persisted to localStorage
   styles/ui/     global and per-page CSS ported from the prototypes
 docs/
   prototype/     HTML prototypes and the deviations log
   screenshots/   README images
 tests/visual/    Playwright fidelity suite and harness
-scripts/         checks, fixture generators and the screenshot script
+scripts/         checks, fixture generators and the visual test helpers
 ```
-
-## Updating the screenshots
-
-The README images are generated from the built-in demo data so that they are reproducible:
-
-```bash
-npx playwright install chromium   # once
-npm run screenshots
-```
-
-The script builds the visual bundle, serves it locally and writes 15 PNG files to `docs/screenshots` (five pages, dark, light and mobile). Commit the changed images together with the UI change.
 
 ## Documentation
 
-- [`docs/PRD.md`](docs/PRD.md): product rules and requirements.
 - [`docs/prototype/`](docs/prototype): the visual specification and [`DEVIATIONS.md`](docs/prototype/DEVIATIONS.md).
 - [`tests/visual/README.md`](tests/visual/README.md): how the fidelity suite works and how to read a failure.
