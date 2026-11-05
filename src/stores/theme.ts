@@ -4,8 +4,6 @@ import { loadState, write } from '../lib/storage';
 
 export type Theme = 'dark' | 'light';
 
-export const DEFAULT_THEME: Theme = 'dark';
-
 const THEME_ATTRIBUTE = 'data-theme';
 
 function readStoredTheme(today: string): Theme {
