@@ -186,6 +186,28 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}#fx,.scan{display:none}}
 [data-motion=off] *,[data-motion=off] *::before,[data-motion=off] *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
 [data-motion=off] #fx,[data-motion=off] .scan{display:none}
+/* Penalty overlay: reuses .ov / .ovp / .obtn */
+.ovp.pen { width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); overflow-y: auto; }
+.ovp.pen::before { animation: none; --arm: var(--a0); filter: none; } /* no brk-breathe here */
+.pen-sub { margin: 0 0 12px; opacity: .8; }
+.pen-day { padding: 10px 0; border-top: 1px solid var(--line, rgba(255,255,255,.12)); }
+.pen-day h3 { display: flex; justify-content: space-between; margin: 0 0 6px; font-size: 14px; }
+.pen-day h3 span { opacity: .7; font-weight: 400; }
+.pen-miss { list-style: none; margin: 0 0 6px; padding: 0; display: grid; gap: 2px; }
+.pen-ded { margin: 0; color: var(--danger, #e5484d); }
+.pen-note { margin: 4px 0 0; font-size: 12px; opacity: .75; }
+.pen-totals { margin: 12px 0; display: grid; gap: 6px; }
+.pen-totals div { display: flex; justify-content: space-between; }
+.pen-bal { display: inline-block; min-width: 4ch; text-align: right; font-variant-numeric: tabular-nums; }
+.pen-next { margin: 0 0 14px; }
+
+/* One-shot exit: transform and opacity only */
+.ov.closing  { animation: ov-pen-out 180ms ease forwards; }
+.ovp.closing { animation: ovp-pen-out 180ms ease forwards; }
+@keyframes ov-pen-out  { to { opacity: 0; } }
+@keyframes ovp-pen-out { to { opacity: 0; transform: translateY(8px) scale(.98); } }
+@media (prefers-reduced-motion: reduce) { .ov.closing, .ovp.closing { animation: none; } }
+html[data-motion="off"] .ov.closing, html[data-motion="off"] .ovp.closing { animation: none; }
 </style>
 </head>
 <body>
@@ -228,6 +250,17 @@ h2{font:600 17px var(--font-display);letter-spacing:.02em}
     <section class="panel boot" style="--i:3"><h2>Last 14 days</h2><div class="heat" id="heat"></div><p class="sub" style="margin-top:10px">Red = days with missed stats.</p></section>
     <section class="panel boot" style="--i:4"><div class="row"><h2>Rewards</h2><span class="sub price">Wallet <span id="wal2" style="color:var(--text)">65</span><i class="coin"></i></span></div><div class="rewards" id="rewards"></div></section>
   </div>
+
+  <div class="ov" id="pen-ov" hidden>
+  <div class="ovp pen" role="dialog" aria-modal="true" aria-labelledby="pen-title" aria-describedby="pen-sub">
+    <h2 id="pen-title">Penalty applied</h2>
+    <p class="pen-sub" id="pen-sub">Missed quests were closed and the penalty was deducted.</p>
+    <div id="pen-days"></div>
+    <dl class="pen-totals" id="pen-totals"></dl>
+    <p class="pen-next" id="pen-next"></p>
+    <button class="obtn" id="pen-continue" type="button">Continue</button>
+  </div>
+</div>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"><span id="toastTxt"></span></div>
 
@@ -354,6 +387,89 @@ $('frz').textContent=FREEZES>1?`${FREEZES} freezes left this week`:FREEZES===1?'
  if(STATE==='rankdown'){document.querySelector('main').insertAdjacentHTML('afterbegin','<div class="notice" role="status"><span>Rank dropped to E</span><button class="lnk" id="ndis">Dismiss</button></div>');$('ndis').onclick=()=>document.querySelector('.notice').remove()}
  if(STATE==='storage')document.querySelector('header').insertAdjacentHTML('beforebegin','<div class="banner" role="alert"><span>Your data could not be saved. Export it now so you don\u2019t lose progress.</span>'+A+'</div>');
  if(STATE==='recovery'){document.querySelector('header').insertAdjacentHTML('beforebegin','<div class="banner recovery" role="status"><span>Some saved data could not be used, so it was reset. A copy was kept.</span><span>'+A+'<button class="lnk" id="rdis">Dismiss</button></span></div>');$('rdis').onclick=()=>document.querySelector('.banner').remove()}})();
+
+/* Fixture: 2 closed days, 2x under-completion, floor on Wallet, no level/rank change.
+Expose it the same way the other states expose theirs (scripts/dump-fixtures.mjs reads it). */ 
+const PENALTY_NOTICE = {
+  version: 1,
+  forDate: '2026-11-04',
+  days: [
+    { date: '2026-11-02', rankAtStart: 'E', nominalDeduction: 10, xpDeducted: 10, walletDeducted: 10, freezeUsed: false,
+      missed: [{ stat: 'INT', actual: 0, required: 1 }, { stat: 'SOC', actual: 0, required: 1 }] },
+    { date: '2026-11-03', rankAtStart: 'E', nominalDeduction: 10, xpDeducted: 10, walletDeducted: 6, freezeUsed: false,
+      missed: [{ stat: 'INT', actual: 0, required: 2 }, { stat: 'SOC', actual: 1, required: 2 }] },
+  ],
+  balancesBefore: { xp: 52, wallet: 16 },
+  balancesAfter: { xp: 32, wallet: 0 },
+  levelBefore: 2, levelAfter: 2, rankBefore: 'E', rankAfter: 'E',
+  penaltyStats: ['INT', 'SOC'],
+  rankDowns: [],
+};
+
+const STAT_NAME = { STR: 'Strength', VIT: 'Vitality', INT: 'Intellect', DISC: 'Discipline', SOC: 'Social' };
+const penReduced = () =>
+  matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off';
+const list = (a) => (a.length < 2 ? a[0] : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]);
+const fmtDay = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+
+function countDown(el, from, to, ms) {
+  if (penReduced() || from === to) { el.textContent = String(to); return; }
+  const t0 = performance.now();
+  (function step(t) {
+    const p = Math.min(1, (t - t0) / ms);
+    el.textContent = String(Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3))));
+    if (p < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+function openPenalty(n) {
+  const prev = document.activeElement;
+  document.getElementById('pen-days').innerHTML = n.days.map((d) => {
+    const nothing = d.xpDeducted === 0 && d.walletDeducted === 0;
+    const floored = !nothing && (d.xpDeducted < d.nominalDeduction || d.walletDeducted < d.nominalDeduction);
+    return `<section class="pen-day"><h3>${fmtDay(d.date)} <span>Rank ${d.rankAtStart}</span></h3>
+      <ul class="pen-miss">${d.missed.map((m) => `<li>${STAT_NAME[m.stat]} <b>${m.actual} / ${m.required}</b></li>`).join('')}</ul>
+      <p class="pen-ded">${nothing ? 'Nothing deducted: balances were already 0.'
+        : `Penalty −${d.nominalDeduction} · deducted −${d.xpDeducted} XP · −${d.walletDeducted} coins`}</p>
+      ${floored ? '<p class="pen-note">Balances cannot go below 0, so less was deducted than the penalty.</p>' : ''}
+      ${d.freezeUsed ? '<p class="pen-note">Freeze used. The streak was protected; the full penalty was still deducted.</p>' : ''}</section>`;
+  }).join('');
+
+  const row = (label, b, a, id) =>
+    `<div><dt>${label}</dt><dd><span class="pen-bal" ${id ? `id="${id}" aria-hidden="true"` : ''}>${b}</span> → ${a}</dd></div>`;
+  document.getElementById('pen-totals').innerHTML =
+    row('Lifetime XP', n.balancesBefore.xp, n.balancesAfter.xp, 'pen-xp') +
+    row('Wallet', n.balancesBefore.wallet, n.balancesAfter.wallet, 'pen-wallet') +
+    (n.levelBefore !== n.levelAfter ? row('Level', n.levelBefore, n.levelAfter) : '') +
+    (n.rankBefore !== n.rankAfter ? row('Rank', n.rankBefore, n.rankAfter) : '');
+
+  const names = n.penaltyStats.map((s) => STAT_NAME[s]);
+  document.getElementById('pen-next').textContent = names.length
+    ? `Today: ${list(names)} ${names.length > 1 ? 'need' : 'needs'} 2 completions ${names.length > 1 ? 'each' : ''}. The same task can be completed twice.`.replace(' .', '.')
+    : '';
+
+  const ov = document.getElementById('pen-ov'), panel = ov.querySelector('.ovp');
+  ov.classList.remove('closing'); panel.classList.remove('closing'); ov.hidden = false;
+  const btn = document.getElementById('pen-continue');
+  btn.focus();
+  countDown(document.getElementById('pen-xp'), n.balancesBefore.xp, n.balancesAfter.xp, 900);
+  countDown(document.getElementById('pen-wallet'), n.balancesBefore.wallet, n.balancesAfter.wallet, 900);
+
+  const close = () => {
+    document.removeEventListener('keydown', onKey);
+    const done = () => { ov.hidden = true; ov.classList.remove('closing'); panel.classList.remove('closing'); prev && prev.focus && prev.focus(); };
+    if (penReduced()) return done();
+    ov.classList.add('closing'); panel.classList.add('closing'); setTimeout(done, 180);
+  };
+  const onKey = (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); close(); }          // Escape = Continue
+    if (e.key === 'Tab') { e.preventDefault(); btn.focus(); }         // single focusable element
+  };
+  document.addEventListener('keydown', onKey);
+  btn.onclick = close;
+}
+
+if (new URLSearchParams(location.search).get('state') === 'penalty') openPenalty(PENALTY_NOTICE);
 </script>
 </body>
 </html>

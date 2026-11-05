@@ -150,6 +150,7 @@ export async function buildTodayStates(page) {
     'levelup',
     'rankup',
     'rankdown',
+    'penalty',
     'storage',
     'recovery',
   ];
@@ -165,7 +166,7 @@ export async function buildTodayStates(page) {
     /* eslint-disable no-undef */
     states[name] = await page.evaluate(() => {
       const text = (selector) => document.querySelector(selector)?.textContent ?? null;
-      const overlay = document.querySelector('.ov');
+      const overlay = document.querySelector('.ov:not([hidden])');
       const banner = document.querySelector('.banner');
 
       return {
@@ -195,15 +196,17 @@ export async function buildTodayStates(page) {
             ? null
             : {
                 role: overlay.getAttribute('role'),
-                label: text('.ovp small'),
-                big: text('.ovp .big'),
-                text: text('.ovp p'),
+                label: overlay.querySelector('.ovp small')?.textContent ?? null,
+                big: overlay.querySelector('.ovp .big')?.textContent ?? null,
+                text: overlay.querySelector('.ovp p')?.textContent ?? null,
                 details: [...overlay.querySelectorAll('dt')].map((dt, i) => [
                   dt.textContent,
                   overlay.querySelectorAll('dd')[i]?.textContent ?? null,
                 ]),
               },
         notice: text('.notice'),
+        penaltyNotice:
+          new URLSearchParams(location.search).get('state') === 'penalty' ? PENALTY_NOTICE : null,
         banner:
           banner === null
             ? null

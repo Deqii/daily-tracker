@@ -115,22 +115,22 @@ test.describe('overlays and notices', () => {
   }) => {
     const page = await openState(browser, 'levelup');
 
-    await expect(page.locator('.ov')).toBeVisible();
-    await expect(page.locator('.ovp small')).toHaveText('Level up');
-    await expect(page.locator('.ovp .big')).toHaveText('4');
-    await expect(page.locator('.ovp p')).toHaveText('Level 3 to 4');
+    await expect(page.locator('.ov:not([hidden])')).toBeVisible();
+    await expect(page.locator('.ov:not([hidden]) .ovp small')).toHaveText('Level up');
+    await expect(page.locator('.ov:not([hidden]) .ovp .big')).toHaveText('4');
+    await expect(page.locator('.ov:not([hidden]) .ovp p')).toHaveText('Level 3 to 4');
     await expect(page.locator('#ovc')).toBeFocused();
 
     await page.keyboard.press('Escape');
-    await expect(page.locator('.ov')).toHaveCount(0);
+    await expect(page.locator('.ov:not([hidden])')).toHaveCount(0);
   });
 
   test('shows the new rank table on a rank up', async ({ browser }) => {
     const page = await openState(browser, 'rankup');
-    const details = page.locator('.ovp dl');
+    const details = page.locator('.ov:not([hidden]) .ovp dl');
 
-    await expect(page.locator('.ovp small')).toHaveText('Rank up');
-    await expect(page.locator('.ovp p')).toHaveText('Rank D');
+    await expect(page.locator('.ov:not([hidden]) .ovp small')).toHaveText('Rank up');
+    await expect(page.locator('.ov:not([hidden]) .ovp p')).toHaveText('Rank D');
     await expect(details).toContainText('Freezes per week 1');
     await expect(details).toContainText('Max points per task 25');
     await expect(details).toContainText('Multiplier ×0.7');
@@ -154,6 +154,57 @@ test.describe('overlays and notices', () => {
     expect(seen).toBe(true);
   });
 
+  test('shows the penalty summary, traps focus, and acknowledges on Escape', async ({
+    browser,
+  }) => {
+    const page = await openState(browser, 'penalty');
+    const overlay = page.locator('#pen-ov');
+    const panel = page.locator('#pen-ov .ovp.pen');
+    const days = page.locator('.pen-day');
+
+    await expect(overlay).toBeVisible();
+    await expect(panel).toHaveAttribute('role', 'dialog');
+    await expect(panel).toHaveAttribute('aria-modal', 'true');
+    await expect(page.locator('#pen-title')).toHaveText('Penalty applied');
+    await expect(page.locator('#pen-sub')).toHaveText(
+      'Missed quests were closed and the penalty was deducted.'
+    );
+
+    await expect(days).toHaveCount(2);
+    await expect(days.first().locator('h3')).toHaveText('Nov 2 Rank E');
+    await expect(days.first().locator('.pen-miss')).toContainText('Intellect 0 / 1');
+    await expect(days.first().locator('.pen-miss')).toContainText('Social 0 / 1');
+    await expect(days.first().locator('.pen-ded')).toHaveText(
+      'Penalty −10 · deducted −10 XP · −10 coins'
+    );
+    await expect(days.nth(1).locator('.pen-ded')).toHaveText(
+      'Penalty −10 · deducted −10 XP · −6 coins'
+    );
+    await expect(days.nth(1).locator('.pen-note')).toHaveText(
+      'Balances cannot go below 0, so less was deducted than the penalty.'
+    );
+
+    await expect(page.locator('.pen-totals')).toContainText('Lifetime XP 32 → 32');
+    await expect(page.locator('.pen-totals')).toContainText('Wallet 0 → 0');
+    await expect(page.locator('#pen-next')).toHaveText(
+      'Today: Intellect and Social need 2 completions each. The same task can be completed twice.'
+    );
+
+    const close = page.locator('#pen-continue');
+    await expect(close).toHaveText('Continue');
+    await expect(close).toBeFocused();
+
+    await page.keyboard.press('Tab');
+    await expect(close).toBeFocused();
+
+    await page.keyboard.press('Escape');
+    await expect(overlay).toBeHidden();
+
+    const ledger = await page.evaluate(() => localStorage.getItem('daily-tracker:penaltyNotice'));
+
+    expect(ledger).toBeNull();
+  });
+
   test('uses the write-failure banner role and exports', async ({ browser }) => {
     const page = await openState(browser, 'storage');
 
@@ -172,7 +223,7 @@ test.describe('overlays and notices', () => {
 
   test('collapses overlay animation under reduced motion', async ({ browser }) => {
     const page = await openState(browser, 'levelup');
-    const motion = await page.locator('.ovp').evaluate((element) => {
+    const motion = await page.locator('.ov:not([hidden]) .ovp').evaluate((element) => {
       const style = getComputedStyle(element);
       const big = getComputedStyle(element.querySelector('.big') ?? element);
 

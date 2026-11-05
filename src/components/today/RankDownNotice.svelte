@@ -8,7 +8,16 @@
    * unseen rank-down event takes its place.
    */
 
-  const current = $derived(pendingRankDownNotices($app.milestoneEvents)[0] ?? null);
+  const penaltyNotice = app.penaltyNotice;
+  const current = $derived(
+    pendingRankDownNotices($app.milestoneEvents).find(
+      (event) =>
+        !($penaltyNotice?.rankDowns ?? []).some(
+          (down) =>
+            down.localDate === event.localDate && down.from === event.from && down.to === event.to
+        )
+    ) ?? null
+  );
 
   function dismiss(id: string): void {
     app.markMilestoneSeen(id);

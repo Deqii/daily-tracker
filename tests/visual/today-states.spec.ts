@@ -44,6 +44,7 @@ const STATES = [
   'levelup',
   'rankup',
   'rankdown',
+  'penalty',
   'storage',
   'recovery',
 ] as const;

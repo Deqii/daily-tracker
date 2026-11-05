@@ -239,7 +239,7 @@ test.describe('keyboard today overlay', () => {
     await open(page, appUrl(p, 'levelup'));
 
     try {
-      await expect(page.locator('.ov')).toHaveCount(1);
+      await expect(page.locator('.ov:not([hidden])')).toHaveCount(1);
       await expect(page.locator('#ovc')).toBeFocused();
 
       for (let step = 0; step < 3; step += 1) {
@@ -251,7 +251,7 @@ test.describe('keyboard today overlay', () => {
       await expect(page.locator('#ovc'), 'Shift+Tab left the overlay').toBeFocused();
 
       await page.keyboard.press('Escape');
-      await expect(page.locator('.ov')).toHaveCount(0);
+      await expect(page.locator('.ov:not([hidden])')).toHaveCount(0);
     } finally {
       await context.close();
     }

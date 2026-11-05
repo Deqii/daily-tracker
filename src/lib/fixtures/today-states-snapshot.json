@@ -67,6 +67,7 @@
       "message": null,
       "overlay": null,
       "notice": null,
+      "penaltyNotice": null,
       "banner": null
     },
     "tiers": {
@@ -149,6 +150,7 @@
       "message": null,
       "overlay": null,
       "notice": null,
+      "penaltyNotice": null,
       "banner": null
     },
     "freeze2": {
@@ -215,6 +217,7 @@
       "message": null,
       "overlay": null,
       "notice": null,
+      "penaltyNotice": null,
       "banner": null
     },
     "freeze0": {
@@ -281,6 +284,7 @@
       "message": null,
       "overlay": null,
       "notice": null,
+      "penaltyNotice": null,
       "banner": null
     },
     "blocked": {
@@ -347,6 +351,7 @@
       "message": null,
       "overlay": null,
       "notice": null,
+      "penaltyNotice": null,
       "banner": null
     },
     "notitle": {
@@ -413,6 +418,7 @@
       "message": null,
       "overlay": null,
       "notice": null,
+      "penaltyNotice": null,
       "banner": null
     },
     "empty": {
@@ -438,6 +444,7 @@
       "message": null,
       "overlay": null,
       "notice": null,
+      "penaltyNotice": null,
       "banner": null
     },
     "levelup": {
@@ -510,6 +517,7 @@
         "details": []
       },
       "notice": null,
+      "penaltyNotice": null,
       "banner": null
     },
     "rankup": {
@@ -599,6 +607,7 @@
         ]
       },
       "notice": null,
+      "penaltyNotice": null,
       "banner": null
     },
     "rankdown": {
@@ -665,6 +674,151 @@
       "message": null,
       "overlay": null,
       "notice": "Rank dropped to EDismiss",
+      "penaltyNotice": null,
+      "banner": null
+    },
+    "penalty": {
+      "rank": "E",
+      "level": 3,
+      "xp": 65,
+      "wallet": 65,
+      "stats": {
+        "STR": 16,
+        "VIT": 12,
+        "INT": 20,
+        "DISC": 10,
+        "SOC": 7
+      },
+      "multiplier": 0.5,
+      "title": "Hadiah pertama",
+      "freezes": 1,
+      "quests": [
+        {
+          "stat": "STR",
+          "name": "Squat 15x2 set",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "VIT",
+          "name": "Minum air 2L",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "INT",
+          "name": "Baca 10 halaman",
+          "nominal": 5,
+          "need": 1,
+          "done": 0,
+          "tiers": null
+        },
+        {
+          "stat": "DISC",
+          "name": "Ibadah",
+          "nominal": 5,
+          "need": 1,
+          "done": 1,
+          "tiers": null
+        },
+        {
+          "stat": "SOC",
+          "name": "Chat 1 teman",
+          "nominal": 5,
+          "need": 2,
+          "done": 0,
+          "tiers": null
+        }
+      ],
+      "qCount": "3/5",
+      "blocked": null,
+      "emptyTitle": null,
+      "penaltyTitle": "Penalty active",
+      "message": null,
+      "overlay": {
+        "role": null,
+        "label": null,
+        "big": null,
+        "text": "Missed quests were closed and the penalty was deducted.",
+        "details": [
+          [
+            "Lifetime XP",
+            "32 → 32"
+          ],
+          [
+            "Wallet",
+            "0 → 0"
+          ]
+        ]
+      },
+      "notice": null,
+      "penaltyNotice": {
+        "version": 1,
+        "forDate": "2026-11-04",
+        "days": [
+          {
+            "date": "2026-11-02",
+            "rankAtStart": "E",
+            "nominalDeduction": 10,
+            "xpDeducted": 10,
+            "walletDeducted": 10,
+            "freezeUsed": false,
+            "missed": [
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "SOC",
+                "actual": 0,
+                "required": 1
+              }
+            ]
+          },
+          {
+            "date": "2026-11-03",
+            "rankAtStart": "E",
+            "nominalDeduction": 10,
+            "xpDeducted": 10,
+            "walletDeducted": 6,
+            "freezeUsed": false,
+            "missed": [
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "SOC",
+                "actual": 1,
+                "required": 2
+              }
+            ]
+          }
+        ],
+        "balancesBefore": {
+          "xp": 52,
+          "wallet": 16
+        },
+        "balancesAfter": {
+          "xp": 32,
+          "wallet": 0
+        },
+        "levelBefore": 2,
+        "levelAfter": 2,
+        "rankBefore": "E",
+        "rankAfter": "E",
+        "penaltyStats": [
+          "INT",
+          "SOC"
+        ],
+        "rankDowns": []
+      },
       "banner": null
     },
     "storage": {
@@ -731,6 +885,7 @@
       "message": null,
       "overlay": null,
       "notice": null,
+      "penaltyNotice": null,
       "banner": {
         "role": "alert",
         "recovery": false,
@@ -801,6 +956,7 @@
       "message": null,
       "overlay": null,
       "notice": null,
+      "penaltyNotice": null,
       "banner": {
         "role": "status",
         "recovery": true,
