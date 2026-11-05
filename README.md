@@ -126,6 +126,8 @@ tests/visual/    Playwright fidelity suite and harness
 scripts/         checks, fixture generators and the visual test helpers
 ```
 
+The images in `docs/screenshots` are committed manually.
+
 ## Documentation
 
 - [`docs/prototype/`](docs/prototype): the visual specification and [`DEVIATIONS.md`](docs/prototype/DEVIATIONS.md).
