@@ -100,15 +100,15 @@ for (const mode of ['reduced-motion', 'data-motion-off'] as const) {
         const page = await openWithMode(browser, PAGES[0], mode, 'levelup');
 
         try {
-          const overlay = page.locator('.ov');
+          const overlay = page.locator('.ov:not([hidden])');
 
           await expect(overlay).toHaveCount(1);
           await settle(page, 'motion overlay');
 
           const styles = await page.evaluate(() => {
-            const ov = document.querySelector('.ov');
-            const panel = document.querySelector('.ovp');
-            const big = document.querySelector('.ovp .big');
+            const ov = document.querySelector('.ov:not([hidden])');
+            const panel = document.querySelector('.ov:not([hidden]) .ovp');
+            const big = document.querySelector('.ov:not([hidden]) .ovp .big');
 
             if (ov === null || panel === null || big === null) {
               return null;

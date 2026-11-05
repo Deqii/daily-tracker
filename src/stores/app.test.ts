@@ -7,6 +7,7 @@ import {
   createDefaultUserState,
   type StorageSchema,
 } from '../lib/storage';
+import { PENALTY_NOTICE_KEY, type PenaltyNotice } from '../lib/penalty-notice';
 import { emptyTaskFormDraft, type TaskFormDraft } from '../lib/task-form';
 import { emptyRewardFormDraft, type RewardFormDraft } from '../lib/reward-form';
 import type { DailyQuestDay, Reward, Task } from '../lib/types';
@@ -1169,6 +1170,229 @@ describe('createAppStore', () => {
     const state = read<AppState>(store);
 
     expect(state.dailyQuestLog.find((day) => day.date === '2026-10-10')).toEqual(closed);
+
+    store.teardown();
+  });
+});
+
+describe('penalty notice store', () => {
+  const fiveTasks = (): Task[] => [
+    anchorTask(),
+    rotatingTask('task0002', 'Sit up', 'VIT'),
+    rotatingTask('task0003', 'Read', 'INT'),
+    rotatingTask('task0004', 'Journal', 'DISC'),
+    rotatingTask('task0005', 'Call a friend', 'SOC'),
+  ];
+
+  const missedOpenDay = (): DailyQuestDay => ({
+    date: '2026-10-10',
+    selectedTaskIdPerStat: {},
+    requiredCompletions: { STR: 1, VIT: 1, INT: 1, DISC: 1, SOC: 1 },
+    actualCompletions: { STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 },
+    netPointsChange: 0,
+    freezeUsed: false,
+    closed: false,
+    lifetimeXPEnd: null,
+    levelEnd: null,
+    rankEnd: null,
+  });
+
+  const storedNotice = (): PenaltyNotice => ({
+    version: 1,
+    forDate: '2026-10-10',
+    days: [
+      {
+        date: '2026-10-09',
+        rankAtStart: 'E',
+        missed: [{ stat: 'STR', actual: 0, required: 1 }],
+        nominalDeduction: 5,
+        xpDeducted: 5,
+        walletDeducted: 5,
+        freezeUsed: false,
+      },
+    ],
+    balancesBefore: { xp: 100, wallet: 100 },
+    balancesAfter: { xp: 95, wallet: 95 },
+    levelBefore: 3,
+    levelAfter: 3,
+    rankBefore: 'E',
+    rankAfter: 'E',
+    penaltyStats: ['STR'],
+    rankDowns: [],
+  });
+
+  it('creates, exposes, and persists a notice on load', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [anchorTask()],
+      userState: {
+        ...createDefaultUserState('2026-10-10'),
+        lifetimeXP: 100,
+        wallet: 100,
+        lastRolloverDate: '2026-10-10',
+      },
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    const notice = read(store.penaltyNotice);
+
+    expect(notice?.days.map((day) => day.date)).toEqual(['2026-10-10']);
+    expect(JSON.parse(fake.getItem(PENALTY_NOTICE_KEY) ?? 'null')).toEqual(notice);
+
+    store.teardown();
+  });
+
+  it('keeps a notice in memory when only its ledger write fails', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [anchorTask()],
+      userState: {
+        ...createDefaultUserState('2026-10-10'),
+        lifetimeXP: 100,
+        wallet: 100,
+        lastRolloverDate: '2026-10-10',
+      },
+    });
+    const original = fake.setItem.bind(fake);
+    vi.spyOn(fake, 'setItem').mockImplementation((key, value) => {
+      if (key === PENALTY_NOTICE_KEY) {
+        const error = new Error('quota');
+        error.name = 'QuotaExceededError';
+        throw error;
+      }
+
+      original(key, value);
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    expect(read(store.penaltyNotice)).not.toBeNull();
+    expect(read(store.saveError)).toBeNull();
+    expect(fake.getItem(PENALTY_NOTICE_KEY)).toBeNull();
+
+    store.teardown();
+  });
+
+  it('still reports a game-state failure when the notice write succeeds', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [anchorTask()],
+      userState: {
+        ...createDefaultUserState('2026-10-10'),
+        lifetimeXP: 100,
+        wallet: 100,
+        lastRolloverDate: '2026-10-10',
+      },
+    });
+    const original = fake.setItem.bind(fake);
+    vi.spyOn(fake, 'setItem').mockImplementation((key, value) => {
+      if (key === STORAGE_KEYS.userState) {
+        const error = new Error('quota');
+        error.name = 'QuotaExceededError';
+        throw error;
+      }
+
+      original(key, value);
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    expect(read(store.penaltyNotice)).not.toBeNull();
+    expect(read(store.saveError)).toBe('QUOTA');
+
+    store.teardown();
+  });
+
+  it('merges a later rollover into the open notice without duplicates', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: [anchorTask()],
+      userState: {
+        ...createDefaultUserState('2026-10-10'),
+        lifetimeXP: 100,
+        wallet: 100,
+        lastRolloverDate: '2026-10-10',
+      },
+    });
+    const visibility = new FakeVisibility();
+    const store = createAppStore({ visibility, root: null, newId: idFactory() });
+
+    expect(read(store.penaltyNotice)?.days.map((day) => day.date)).toEqual(['2026-10-10']);
+
+    vi.setSystemTime(new Date(2026, 9, 12, 8, 0, 0));
+    visibility.dispatch();
+
+    const notice = read(store.penaltyNotice);
+
+    expect(notice?.days.map((day) => day.date)).toEqual(['2026-10-10', '2026-10-11']);
+    expect(notice?.forDate).toBe('2026-10-12');
+    expect(JSON.parse(fake.getItem(PENALTY_NOTICE_KEY) ?? 'null')).toEqual(notice);
+
+    store.teardown();
+  });
+
+  it('acknowledges the notice, clears the ledger, and marks rank-downs seen', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, {
+      tasks: fiveTasks(),
+      dailyQuestLog: [missedOpenDay()],
+      userState: {
+        ...createDefaultUserState('2026-10-10'),
+        lifetimeXP: 360,
+        wallet: 360,
+        statXP: { STR: 72, VIT: 72, INT: 72, DISC: 72, SOC: 72 },
+        rank: 'D',
+        lastRolloverDate: '2026-10-10',
+      },
+    });
+    const store = createAppStore({ root: null, newId: idFactory() });
+    const notice = read(store.penaltyNotice);
+
+    expect(notice?.rankDowns).toEqual([{ localDate: '2026-10-10', from: 'D', to: 'E' }]);
+
+    const event = read<AppState>(store).milestoneEvents.find((entry) => entry.type === 'rankDown');
+
+    expect(event?.seen).toBe(false);
+
+    store.acknowledgePenaltyNotice();
+
+    expect(read(store.penaltyNotice)).toBeNull();
+    expect(fake.getItem(PENALTY_NOTICE_KEY)).toBeNull();
+    expect(
+      read<AppState>(store).milestoneEvents.find((entry) => entry.type === 'rankDown')?.seen
+    ).toBe(true);
+    expect(
+      (JSON.parse(fake.getItem(STORAGE_KEYS.milestoneEvents) ?? '[]') as { seen: boolean }[])[0]
+        ?.seen
+    ).toBe(true);
+
+    store.teardown();
+  });
+
+  it('reads a pending notice on load and clears it on import', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake);
+    fake.setItem(PENALTY_NOTICE_KEY, JSON.stringify(storedNotice()));
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    expect(read(store.penaltyNotice)).toEqual(storedNotice());
+
+    store.importState({
+      tasks: [],
+      completions: [],
+      dailyQuestLog: [],
+      rewards: [],
+      rewardPurchases: [],
+      userState: createDefaultUserState(TODAY),
+      milestoneEvents: [],
+    });
+
+    expect(read(store.penaltyNotice)).toBeNull();
+    expect(fake.getItem(PENALTY_NOTICE_KEY)).toBeNull();
 
     store.teardown();
   });

@@ -3,6 +3,7 @@ import { closeDayStreak, displayStreak, type StreakState } from '../../engine/st
 import { getRankConfig } from '../../engine/rank';
 import { passesBalanceGate } from '../../engine/balance';
 import { addDays, weekStart } from '../date';
+import { PENALTY_NOTICE_KEY } from '../penalty-notice';
 import { STATS, type DailyQuestDay } from '../types';
 import type { StorageSchema } from '../storage';
 import { FIXTURES, FIXED_TODAY } from './data';
@@ -244,6 +245,7 @@ describe('today state fixtures', () => {
       'freeze0',
       'levelup',
       'notitle',
+      'penalty',
       'rankdown',
       'rankup',
       'recovery',
@@ -251,6 +253,13 @@ describe('today state fixtures', () => {
       'tiers',
     ]);
     expect(states.freeze2).toBeUndefined();
+  });
+
+  it('seeds the penalty ledger from the dumped notice', () => {
+    const extra = states.penalty?.extra?.find((entry) => entry.key === PENALTY_NOTICE_KEY);
+    const dumped = dumps.penalty as { penaltyNotice: unknown };
+
+    expect(extra?.value).toEqual(dumped.penaltyNotice);
   });
 
   it('builds the tier picker from the dumped variants', () => {

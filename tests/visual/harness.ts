@@ -213,6 +213,12 @@ export async function open(page: Page, url: string): Promise<void> {
     await page.evaluate(() => document.getElementById('demo')?.remove());
   }
   await page.addStyleTag({ content: '#fx,.scan{display:none!important}' });
+  // `today.html` keeps `#pen-ov` in the DOM with `hidden`, but its `.ov` rule
+  // sets `display:grid` and overrides the UA `hidden` style. The app carries the
+  // equivalent rule; add it here so both sides compare the intended hidden state.
+  if (url.startsWith(PROTO)) {
+    await page.addStyleTag({ content: '#pen-ov[hidden]{display:none!important}' });
+  }
   // The app mounts after a dynamic import, so wait for its first panel before
   // reading animations; otherwise the frames below commit an empty page.
   await page

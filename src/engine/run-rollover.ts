@@ -1,10 +1,11 @@
 import { eachDay } from '../lib/date';
+import type { PenaltyNotice, PenaltyNoticeDay, PenaltyNoticeRankDown } from '../lib/penalty-notice';
 import type { DailyQuestDay, LocalDate, MilestoneEvent, Rank, Stat, Task } from '../lib/types';
 import { STATS } from '../lib/types';
 import { applyPenalty, buildRequired, evaluateDay, nextPenaltyStats } from './evaluation';
 import { getQuestStats, selectDailyTasks } from './daily';
 import { level } from './level';
-import { resolveRank } from './rank';
+import { getRankConfig, resolveRank } from './rank';
 import type { AppState } from './state';
 import { closeDayStreak, type StreakState } from './streak';
 import { applyTitleUnlocks } from './titles';
@@ -12,6 +13,7 @@ import { applyTitleUnlocks } from './titles';
 export interface RolloverResult {
   readonly state: AppState;
   readonly events: MilestoneEvent[];
+  readonly penaltyNotice: PenaltyNotice | null;
 }
 
 const zeroCounts = (): Record<Stat, number> => ({ STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 });
@@ -56,7 +58,7 @@ export function runRollover(
   const { userState } = state;
 
   if (today < userState.lastRolloverDate) {
-    return { state, events: [] };
+    return { state, events: [], penaltyNotice: null };
   }
 
   const questStats = getQuestStats(state.tasks);
@@ -70,7 +72,7 @@ export function runRollover(
     const hasOpenDay = state.dailyQuestLog.some((day) => day.date === userState.lastRolloverDate);
 
     if (hasOpenDay) {
-      return { state, events: [] };
+      return { state, events: [], penaltyNotice: null };
     }
 
     return {
@@ -79,6 +81,7 @@ export function runRollover(
         dailyQuestLog: [...state.dailyQuestLog, openToday(userState.penaltyStats)],
       },
       events: [],
+      penaltyNotice: null,
     };
   }
 
@@ -91,6 +94,12 @@ export function runRollover(
     freezesUsedThisWeek: userState.freezesUsedThisWeek,
     lastFreezeWeekReset: userState.lastFreezeWeekReset,
   };
+
+  const balancesBefore = { xp: lifetimeXP, wallet };
+  const levelBefore = level(lifetimeXP);
+  const rankBefore = rank;
+  const noticeDays: PenaltyNoticeDay[] = [];
+  const rankDowns: PenaltyNoticeRankDown[] = [];
 
   const closedByDate = new Map(state.dailyQuestLog.map((day) => [day.date, day]));
   const events: MilestoneEvent[] = [];
@@ -108,6 +117,7 @@ export function runRollover(
       { STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 }
     );
 
+    const rankAtStart = rank;
     const { missed, satisfied } = evaluateDay(effectiveRequired, actualCompletions);
 
     const penalty = applyPenalty({ lifetimeXP, wallet }, rank, missed.length);
@@ -139,6 +149,23 @@ export function runRollover(
         from: rank,
         to: resolution.rank,
         seen: false,
+      });
+      rankDowns.push({ localDate: date, from: rank, to: resolution.rank });
+    }
+
+    if (missed.length > 0) {
+      noticeDays.push({
+        date,
+        rankAtStart,
+        missed: missed.map((stat) => ({
+          stat,
+          actual: actualCompletions[stat],
+          required: effectiveRequired[stat],
+        })),
+        nominalDeduction: getRankConfig(rank).penalty * missed.length,
+        xpDeducted: penalty.xpDeducted,
+        walletDeducted: penalty.walletDeducted,
+        freezeUsed: streak.freezeUsed,
       });
     }
 
@@ -190,5 +217,22 @@ export function runRollover(
     userState: { ...afterClose.userState, lastRolloverDate: today },
   };
 
-  return { state: applyTitleUnlocks(withToday), events };
+  const penaltyNotice: PenaltyNotice | null =
+    noticeDays.length === 0
+      ? null
+      : {
+          version: 1,
+          forDate: today,
+          days: noticeDays,
+          balancesBefore,
+          balancesAfter: { xp: lifetimeXP, wallet },
+          levelBefore,
+          levelAfter: level(lifetimeXP),
+          rankBefore,
+          rankAfter: rank,
+          penaltyStats,
+          rankDowns,
+        };
+
+  return { state: applyTitleUnlocks(withToday), events, penaltyNotice };
 }

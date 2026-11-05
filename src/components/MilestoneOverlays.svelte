@@ -58,8 +58,8 @@
       return;
     }
 
-    if (event.key === 'Tab') {
-      const dialog = document.querySelector<HTMLElement>('.ov');
+    if (event.key === 'Tab' && current !== null) {
+      const dialog = document.querySelector<HTMLElement>('.ov:not([hidden])');
 
       if (dialog !== null) trapTab(event, dialog);
     }

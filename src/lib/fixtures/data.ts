@@ -13,6 +13,7 @@ import type {
   UserState,
 } from '../types';
 import { RANKS, STATS, TIERS } from '../types';
+import { PENALTY_NOTICE_KEY, type PenaltyNotice } from '../penalty-notice';
 import { SCHEMA_VERSION, type StorageSchema } from '../storage';
 import historySnapshot from './history-snapshot.json';
 import historyLongSnapshot from './history-long-snapshot.json';
@@ -418,6 +419,7 @@ interface TodayStateDump {
     readonly details: readonly (readonly [string | null, string | null])[];
   } | null;
   readonly notice: string | null;
+  readonly penaltyNotice: PenaltyNotice | null;
   readonly banner: {
     readonly role: string | null;
     readonly recovery: boolean;
@@ -476,6 +478,7 @@ function rankChangeEvent(
 
 interface BuiltTodayState {
   readonly schema: StorageSchema;
+  readonly extra?: { readonly key: string; readonly value: unknown }[];
   readonly post?: 'storage-failure' | 'recovery';
 }
 
@@ -548,15 +551,21 @@ function buildTodayState(name: string, dump: TodayStateDump): BuiltTodayState {
     schema.milestoneEvents = [rankChangeEvent(dump, 'rankDown', `today-${name}`)];
   }
 
+  const extra =
+    name === 'penalty' && dump.penaltyNotice !== null
+      ? [{ key: PENALTY_NOTICE_KEY, value: dump.penaltyNotice }]
+      : [];
+  const built: BuiltTodayState = { schema, ...(extra.length === 0 ? {} : { extra }) };
+
   if (name === 'storage') {
-    return { schema, post: 'storage-failure' };
+    return { ...built, post: 'storage-failure' };
   }
 
   if (name === 'recovery') {
-    return { schema, post: 'recovery' };
+    return { ...built, post: 'recovery' };
   }
 
-  return { schema };
+  return built;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1097,7 +1106,7 @@ for (const [name, dump] of Object.entries(TODAY_STATE_DUMPS)) {
 
   todayStates[name] = {
     schema: built.schema,
-    extra: [{ key: 'daily-tracker:motion', value: 'on' }],
+    extra: [{ key: 'daily-tracker:motion', value: 'on' }, ...(built.extra ?? [])],
     ...(built.post === undefined ? {} : { post: built.post }),
   };
 }

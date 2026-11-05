@@ -8,6 +8,16 @@
  * shared, unlike the page-local animations.
  */
 
+/*
+ * The penalty overlay stays in the DOM while hidden (the prototype keeps the
+ * same static markup). `.ov` sets `display:grid`, which overrides the UA
+ * `hidden` rule, so restore the intended hidden state explicitly. The visual
+ * harness applies the same rule to `today.html`, whose `.ov` has the same
+ * override. Approved normalization for the prototype's `#pen-ov[hidden]`.
+ */
+#pen-ov[hidden] {
+  display: none !important;
+}
 .ov {
   position: fixed;
   inset: 0;
@@ -157,4 +167,97 @@
     padding: 10px 16px;
     flex-wrap: wrap;
   }
+}
+
+/* Penalty overlay: reuses .ov / .ovp / .obtn */
+.ovp.pen {
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+}
+.ovp.pen::before {
+  animation: none;
+  --arm: var(--a0);
+  filter: none;
+} /* no brk-breathe here */
+.pen-sub {
+  margin: 0 0 12px;
+  opacity: 0.8;
+}
+.pen-day {
+  padding: 10px 0;
+  border-top: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+}
+.pen-day h3 {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.pen-day h3 span {
+  opacity: 0.7;
+  font-weight: 400;
+}
+.pen-miss {
+  list-style: none;
+  margin: 0 0 6px;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.pen-ded {
+  margin: 0;
+  color: var(--danger, #e5484d);
+}
+.pen-note {
+  margin: 4px 0 0;
+  font-size: 12px;
+  opacity: 0.75;
+}
+.pen-totals {
+  margin: 12px 0;
+  display: grid;
+  gap: 6px;
+}
+.pen-totals div {
+  display: flex;
+  justify-content: space-between;
+}
+.pen-bal {
+  display: inline-block;
+  min-width: 4ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.pen-next {
+  margin: 0 0 14px;
+}
+
+/* One-shot exit: transform and opacity only */
+.ov.closing {
+  animation: ov-pen-out 180ms ease forwards;
+}
+.ovp.closing {
+  animation: ovp-pen-out 180ms ease forwards;
+}
+@keyframes ov-pen-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes ovp-pen-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ov.closing,
+  .ovp.closing {
+    animation: none;
+  }
+}
+html[data-motion='off'] .ov.closing,
+html[data-motion='off'] .ovp.closing {
+  animation: none;
 }
