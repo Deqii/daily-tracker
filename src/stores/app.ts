@@ -15,6 +15,13 @@ import { displayStreak } from '../engine/streak';
 import { equipTitle as engineEquipTitle, TITLES, type TitleId } from '../engine/titles';
 import { toLocalDate, toTimestamp } from '../lib/date';
 import type { ExportState } from '../lib/export';
+import {
+  clearPenaltyNotice,
+  mergePenaltyNotices,
+  readPenaltyNotice,
+  writePenaltyNotice,
+  type PenaltyNotice,
+} from '../lib/penalty-notice';
 import { buildRewardFromDraft, type RewardFormDraft } from '../lib/reward-form';
 import { selectRewardPreview, type RewardPreviewRow } from '../lib/rewards-preview';
 import {
@@ -126,6 +133,8 @@ export interface AppStore extends Readable<AppState> {
   readonly freezesLeft: Readable<number>;
   readonly questRows: Readable<QuestStatGroup[]>;
   readonly penaltyStats: Readable<Stat[]>;
+  readonly penaltyNotice: Readable<PenaltyNotice | null>;
+  acknowledgePenaltyNotice(): void;
   readonly rewardPreview: Readable<RewardPreviewRow[]>;
 }
 
@@ -320,8 +329,11 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
   const { subscribe, set } = writable<AppState>(initial);
   const saveError = writable<StorageFailure | null>(null);
   const loadReport = writable<StorageReport>(loaded.report);
+  const initialPenaltyNotice = readPenaltyNotice();
+  const penaltyNotice = writable<PenaltyNotice | null>(initialPenaltyNotice);
 
   let current = initial;
+  let pendingPenaltyNotice = initialPenaltyNotice;
   let timer: TimerHandle | null = null;
 
   function applyRank(): void {
@@ -361,9 +373,63 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
 
   function runRollover(): void {
     const rolled = engineRunRollover(current, today(), newId);
+
+    if (rolled.penaltyNotice !== null) {
+      const merged = mergePenaltyNotices(pendingPenaltyNotice, rolled.penaltyNotice);
+
+      if (merged !== pendingPenaltyNotice) {
+        pendingPenaltyNotice = merged;
+        penaltyNotice.set(merged);
+
+        if (merged !== null) {
+          writePenaltyNotice(merged);
+        }
+      }
+    }
+
     commit(rolled.state);
     persist(rolled.state);
     armMidnightTimer();
+  }
+
+  function acknowledgePenaltyNotice(): void {
+    const notice = pendingPenaltyNotice;
+
+    if (notice === null) {
+      return;
+    }
+
+    pendingPenaltyNotice = null;
+    penaltyNotice.set(null);
+    clearPenaltyNotice();
+
+    if (notice.rankDowns.length === 0) {
+      return;
+    }
+
+    const rankDownKeys = new Set(
+      notice.rankDowns.map((down) => `${down.localDate}:${down.from}:${down.to}`)
+    );
+    let changed = false;
+    const milestoneEvents = current.milestoneEvents.map((event): MilestoneEvent => {
+      if (
+        event.type === 'rankDown' &&
+        !event.seen &&
+        rankDownKeys.has(`${event.localDate}:${event.from}:${event.to}`)
+      ) {
+        changed = true;
+        return { ...event, seen: true };
+      }
+
+      return event;
+    });
+
+    if (changed) {
+      const next: AppState = { ...current, milestoneEvents };
+
+      commit(next);
+      persist(next);
+    }
   }
 
   function onVisibilityChange(): void {
@@ -405,6 +471,8 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
       displayStreak(state.userState.currentStreak, hasCompletionToday(state))
     ),
     freezesLeft,
+    penaltyNotice,
+    acknowledgePenaltyNotice,
     questRows: derived(base, toQuestGroups),
     rewardPreview: derived(base, (state) =>
       selectRewardPreview(state.rewards, state.userState.wallet)
@@ -512,6 +580,9 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
       }
     },
     importState(state) {
+      pendingPenaltyNotice = null;
+      penaltyNotice.set(null);
+      clearPenaltyNotice();
       commit(state);
       persist(state);
     },
