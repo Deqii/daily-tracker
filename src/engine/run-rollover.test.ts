@@ -391,6 +391,226 @@ describe('runRollover', () => {
   });
 });
 
+describe('runRollover penaltyNotice', () => {
+  it('returns null when no day closes', () => {
+    const state = makeState();
+    const result = runRollover(state, '2026-10-10', ids());
+
+    expect(result.penaltyNotice).toBeNull();
+  });
+
+  it('returns null when the closed day has no missed stat', () => {
+    const state = makeState({
+      dailyQuestLog: [openDay('2026-10-10', { actualCompletions: requiredAll() })],
+    });
+    const result = runRollover(state, '2026-10-11', ids());
+
+    expect(result.penaltyNotice).toBeNull();
+  });
+
+  it('describes one missed stat with its actual and required counts', () => {
+    const state = makeState({
+      dailyQuestLog: [
+        openDay('2026-10-10', {
+          actualCompletions: { STR: 1, VIT: 1, INT: 1, DISC: 1, SOC: 0 },
+        }),
+      ],
+    });
+    const { penaltyNotice } = runRollover(state, '2026-10-11', ids());
+
+    expect(penaltyNotice).toEqual({
+      version: 1,
+      forDate: '2026-10-11',
+      days: [
+        {
+          date: '2026-10-10',
+          rankAtStart: 'E',
+          missed: [{ stat: 'SOC', actual: 0, required: 1 }],
+          nominalDeduction: 5,
+          xpDeducted: 5,
+          walletDeducted: 5,
+          freezeUsed: false,
+        },
+      ],
+      balancesBefore: { xp: 100, wallet: 100 },
+      balancesAfter: { xp: 95, wallet: 95 },
+      levelBefore: 3,
+      levelAfter: 3,
+      rankBefore: 'E',
+      rankAfter: 'E',
+      penaltyStats: ['SOC'],
+      rankDowns: [],
+    });
+  });
+
+  it('lists two missed stats in fixed stat order', () => {
+    const state = makeState({
+      dailyQuestLog: [
+        openDay('2026-10-10', {
+          actualCompletions: { STR: 1, VIT: 1, INT: 1, DISC: 0, SOC: 0 },
+        }),
+      ],
+    });
+    const { penaltyNotice } = runRollover(state, '2026-10-11', ids());
+
+    expect(penaltyNotice?.days[0]?.missed).toEqual([
+      { stat: 'DISC', actual: 0, required: 1 },
+      { stat: 'SOC', actual: 0, required: 1 },
+    ]);
+    expect(penaltyNotice?.days[0]?.nominalDeduction).toBe(10);
+    expect(penaltyNotice?.balancesAfter).toEqual({ xp: 90, wallet: 90 });
+    expect(penaltyNotice?.penaltyStats).toEqual(['DISC', 'SOC']);
+  });
+
+  it('records 1 of 2 as a miss and 2 of 2 as satisfied', () => {
+    const missed = makeState({
+      userState: { penaltyStats: ['SOC'] },
+      dailyQuestLog: [
+        openDay('2026-10-10', {
+          requiredCompletions: { ...requiredAll(), SOC: 2 },
+          actualCompletions: { STR: 1, VIT: 1, INT: 1, DISC: 1, SOC: 1 },
+        }),
+      ],
+    });
+    const missedNotice = runRollover(missed, '2026-10-11', ids()).penaltyNotice;
+
+    expect(missedNotice?.days[0]?.missed).toEqual([{ stat: 'SOC', actual: 1, required: 2 }]);
+
+    const satisfied = makeState({
+      userState: { penaltyStats: ['SOC'] },
+      dailyQuestLog: [
+        openDay('2026-10-10', {
+          requiredCompletions: { ...requiredAll(), SOC: 2 },
+          actualCompletions: { STR: 1, VIT: 1, INT: 1, DISC: 1, SOC: 2 },
+        }),
+      ],
+    });
+
+    expect(runRollover(satisfied, '2026-10-11', ids()).penaltyNotice).toBeNull();
+  });
+
+  it('records the actual deduction after each pool floor', () => {
+    const state = makeState({
+      userState: { lifetimeXP: 3, wallet: 10 },
+      dailyQuestLog: [
+        openDay('2026-10-10', {
+          actualCompletions: { STR: 1, VIT: 1, INT: 1, DISC: 1, SOC: 0 },
+        }),
+      ],
+    });
+    const { penaltyNotice } = runRollover(state, '2026-10-11', ids());
+
+    expect(penaltyNotice?.days[0]).toMatchObject({
+      nominalDeduction: 5,
+      xpDeducted: 3,
+      walletDeducted: 5,
+    });
+    expect(penaltyNotice?.balancesAfter).toEqual({ xp: 0, wallet: 5 });
+  });
+
+  it('records a day where nothing could be deducted', () => {
+    const state = makeState({
+      userState: { lifetimeXP: 0, wallet: 0 },
+      dailyQuestLog: [openDay('2026-10-10')],
+    });
+    const { penaltyNotice } = runRollover(state, '2026-10-11', ids());
+
+    expect(penaltyNotice?.days[0]).toMatchObject({
+      nominalDeduction: 25,
+      xpDeducted: 0,
+      walletDeducted: 0,
+    });
+    expect(penaltyNotice?.balancesAfter).toEqual({ xp: 0, wallet: 0 });
+  });
+
+  it('summarizes four closed days in one notice', () => {
+    const state = makeState({
+      userState: { lifetimeXP: 60, wallet: 60 },
+      dailyQuestLog: [openDay('2026-10-10')],
+    });
+    const { penaltyNotice } = runRollover(state, '2026-10-14', ids());
+
+    expect(penaltyNotice?.days.map((day) => day.date)).toEqual([
+      '2026-10-10',
+      '2026-10-11',
+      '2026-10-12',
+      '2026-10-13',
+    ]);
+    expect(penaltyNotice?.forDate).toBe('2026-10-14');
+    expect(penaltyNotice?.balancesBefore).toEqual({ xp: 60, wallet: 60 });
+    expect(penaltyNotice?.balancesAfter).toEqual({ xp: 0, wallet: 0 });
+  });
+
+  it('records rank-down descriptors and the rank before and after', () => {
+    const state = makeState({
+      userState: {
+        lifetimeXP: 360,
+        wallet: 360,
+        statXP: { STR: 72, VIT: 72, INT: 72, DISC: 72, SOC: 72 },
+        rank: 'D',
+      },
+      dailyQuestLog: [openDay('2026-10-10')],
+    });
+    const { penaltyNotice } = runRollover(state, '2026-10-11', ids());
+
+    expect(penaltyNotice?.rankBefore).toBe('D');
+    expect(penaltyNotice?.rankAfter).toBe('E');
+    expect(penaltyNotice?.levelBefore).toBe(6);
+    expect(penaltyNotice?.levelAfter).toBe(5);
+    expect(penaltyNotice?.rankDowns).toEqual([{ localDate: '2026-10-10', from: 'D', to: 'E' }]);
+    expect(penaltyNotice?.days[0]).toMatchObject({
+      rankAtStart: 'D',
+      nominalDeduction: 40,
+      xpDeducted: 40,
+      walletDeducted: 40,
+    });
+  });
+
+  it('records the freeze and still applies the full penalty', () => {
+    const state = makeState({
+      userState: {
+        lifetimeXP: 2000,
+        wallet: 2000,
+        rank: 'C',
+        currentStreak: 3,
+        freezesUsedThisWeek: 0,
+      },
+      dailyQuestLog: [openDay('2026-10-10')],
+    });
+    const { penaltyNotice } = runRollover(state, '2026-10-11', ids());
+
+    expect(penaltyNotice?.days[0]).toMatchObject({
+      freezeUsed: true,
+      nominalDeduction: 65,
+      xpDeducted: 65,
+      walletDeducted: 65,
+    });
+    expect(penaltyNotice?.balancesAfter).toEqual({ xp: 1935, wallet: 1935 });
+  });
+
+  it('returns null on the second call with the same today and keeps the state', () => {
+    const state = makeState({
+      userState: { lifetimeXP: 60, wallet: 60 },
+      dailyQuestLog: [openDay('2026-10-10')],
+    });
+    const first = runRollover(state, '2026-10-14', ids());
+    const second = runRollover(first.state, '2026-10-14', ids());
+
+    expect(first.penaltyNotice).not.toBeNull();
+    expect(second.penaltyNotice).toBeNull();
+    expect(second.state).toBe(first.state);
+  });
+
+  it('does not mutate the input while building the notice', () => {
+    const state = makeState({ userState: { lifetimeXP: 60, wallet: 60 } });
+    const snapshot = structuredClone(state);
+
+    runRollover(state, '2026-10-14', ids());
+
+    expect(state).toEqual(snapshot);
+  });
+});
+
 /**
  * Day-boundary coverage for `runRollover`. The engine only ever sees `LocalDate` strings and does
  * UTC calendar arithmetic (`lib/date`), so every assertion here is a plain date sequence and holds
