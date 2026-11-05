@@ -5,6 +5,12 @@ dist-visual
 *.local
 .DS_Store
 .vite
+.vitest
+
+# Local-only agent docs (kept on disk, not published)
+/AGENTS.md
+/docs/*.md
+/docs/agent-prompts/
 
 # Playwright
 /test-results
