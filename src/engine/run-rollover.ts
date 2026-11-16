@@ -1,5 +1,5 @@
 import { eachDay } from '../lib/date';
-import type { PenaltyNotice, PenaltyNoticeDay, PenaltyNoticeRankDown } from '../lib/penalty-notice';
+import type { PenaltyNotice, PenaltyNoticeDay, PenaltyNoticeRankDown } from './penalty-notice';
 import type { DailyQuestDay, LocalDate, MilestoneEvent, Rank, Stat, Task } from '../lib/types';
 import { STATS } from '../lib/types';
 import { applyPenalty, buildRequired, evaluateDay, nextPenaltyStats } from './evaluation';
