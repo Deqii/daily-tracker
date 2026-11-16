@@ -1,5 +1,6 @@
 import type { Completion, MilestoneEvent, Stat, Tier } from '../lib/types';
 import { toLocalDate, toTimestamp } from '../lib/date';
+import { isQuestRow } from './daily';
 import { level } from './level';
 import { pointsAwarded } from './points';
 import { resolveRank } from './rank';
@@ -49,7 +50,7 @@ export function completeTask(
   if (
     task === undefined ||
     openDay.requiredCompletions[task.stat] <= 0 ||
-    (!task.isAnchor && openDay.selectedTaskIdPerStat[task.stat] !== task.id)
+    !isQuestRow(task, openDay.selectedTaskIdPerStat[task.stat])
   ) {
     return { ok: false, error: 'TASK_NOT_IN_QUEST' };
   }

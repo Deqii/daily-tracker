@@ -1,7 +1,7 @@
 import { eachDay } from '../lib/date';
 import type { PenaltyNotice, PenaltyNoticeDay, PenaltyNoticeRankDown } from './penalty-notice';
 import type { DailyQuestDay, LocalDate, MilestoneEvent, Rank, Stat, Task } from '../lib/types';
-import { STATS } from '../lib/types';
+import { completionCount, hasRequiredStats, requiredForActiveStats, zeroCounts } from './day';
 import { applyPenalty, buildRequired, evaluateDay, nextPenaltyStats } from './evaluation';
 import { getQuestStats, selectDailyTasks } from './daily';
 import { level } from './level';
@@ -15,8 +15,6 @@ export interface RolloverResult {
   readonly events: MilestoneEvent[];
   readonly penaltyNotice: PenaltyNotice | null;
 }
-
-const zeroCounts = (): Record<Stat, number> => ({ STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 });
 
 /**
  * The open-day log entry PRD §7.7 step 3: `selectDailyTasks` and `buildRequired` against the current
@@ -62,7 +60,6 @@ export function runRollover(
   }
 
   const questStats = getQuestStats(state.tasks);
-  const questActive = new Set(questStats);
   const daysToClose = eachDay(userState.lastRolloverDate, today);
 
   const openToday = (penaltyStats: readonly Stat[]): DailyQuestDay =>
@@ -109,13 +106,7 @@ export function runRollover(
     const required = stored?.requiredCompletions ?? buildRequired(questStats, penaltyStats);
     const actualCompletions = stored?.actualCompletions ?? zeroCounts();
 
-    const effectiveRequired = STATS.reduce<Record<Stat, number>>(
-      (result, stat) => {
-        result[stat] = questActive.has(stat) ? required[stat] : 0;
-        return result;
-      },
-      { STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 }
-    );
+    const effectiveRequired = requiredForActiveStats(required, questStats);
 
     const rankAtStart = rank;
     const { missed, satisfied } = evaluateDay(effectiveRequired, actualCompletions);
@@ -126,13 +117,12 @@ export function runRollover(
 
     penaltyStats = nextPenaltyStats(penaltyStats, missed, satisfied, questStats);
 
-    const completionCount = STATS.reduce((sum, stat) => sum + actualCompletions[stat], 0);
     const streak = closeDayStreak(
       streakState,
       {
         date,
-        completionCount,
-        hasQuestStats: STATS.some((stat) => effectiveRequired[stat] > 0),
+        completionCount: completionCount(actualCompletions),
+        hasQuestStats: hasRequiredStats(effectiveRequired),
       },
       rank
     );

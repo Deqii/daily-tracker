@@ -1,5 +1,6 @@
 import type { Rank, Stat } from '../lib/types';
 import { STATS } from '../lib/types';
+import { zeroCounts } from './day';
 import { getRankConfig } from './rank';
 
 /**
@@ -14,18 +15,15 @@ export function buildRequired(
   const questActive = new Set(questStats);
   const penalized = new Set(penaltyStats);
 
-  return STATS.reduce<Record<Stat, number>>(
-    (required, stat) => {
-      if (!questActive.has(stat)) {
-        required[stat] = 0;
-      } else {
-        required[stat] = penalized.has(stat) ? 2 : 1;
-      }
+  return STATS.reduce<Record<Stat, number>>((required, stat) => {
+    if (!questActive.has(stat)) {
+      required[stat] = 0;
+    } else {
+      required[stat] = penalized.has(stat) ? 2 : 1;
+    }
 
-      return required;
-    },
-    { STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 }
-  );
+    return required;
+  }, zeroCounts());
 }
 
 export interface DayEvaluation {

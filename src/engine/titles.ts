@@ -1,5 +1,6 @@
 import type { Rank, UserState } from '../lib/types';
-import { RANKS, STATS } from '../lib/types';
+import { RANKS } from '../lib/types';
+import { hasAnyCompletion } from './day';
 import { displayStreak } from './streak';
 import type { AppState, Result } from './state';
 
@@ -82,7 +83,7 @@ export const TITLES: readonly Title[] = [
  * already in `unlockedTitles` is never returned. Appending the result to `unlockedTitles` is the
  * caller's job, which is how a rank-* title unlocks only the first time its rank is reached.
  */
-export function evaluateTitles(input: TitlesInput): string[] {
+export function evaluateTitles(input: TitlesInput): TitleId[] {
   const unlocked = new Set(input.userState.unlockedTitles);
 
   return TITLES.filter((title) => !unlocked.has(title.id) && title.condition(input)).map(
@@ -99,8 +100,7 @@ export function evaluateTitles(input: TitlesInput): string[] {
  */
 export function applyTitleUnlocks(state: AppState): AppState {
   const openDay = state.dailyQuestLog.find((day) => day.date === state.userState.lastRolloverDate);
-  const todayHasCompletion =
-    openDay !== undefined && STATS.some((stat) => openDay.actualCompletions[stat] > 0);
+  const todayHasCompletion = openDay !== undefined && hasAnyCompletion(openDay.actualCompletions);
   const unlockedTitleIds = evaluateTitles({
     userState: state.userState,
     displayedStreak: displayStreak(state.userState.currentStreak, todayHasCompletion),

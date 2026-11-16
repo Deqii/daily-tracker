@@ -13,6 +13,8 @@ import type { AppState } from '../engine/state';
 import { syncOpenDay } from '../engine/sync-open-day';
 import { displayStreak } from '../engine/streak';
 import { equipTitle as engineEquipTitle, TITLES, type TitleId } from '../engine/titles';
+import { isQuestRow } from '../engine/daily';
+import { hasAnyCompletion, penalizedStats } from '../engine/day';
 import { toLocalDate, toTimestamp } from '../lib/date';
 import type { ExportState } from '../lib/export';
 import {
@@ -206,7 +208,7 @@ function openDayOf(state: AppState) {
 function hasCompletionToday(state: AppState): boolean {
   const openDay = openDayOf(state);
 
-  return openDay !== undefined && STATS.some((stat) => openDay.actualCompletions[stat] > 0);
+  return openDay !== undefined && hasAnyCompletion(openDay.actualCompletions);
 }
 
 function toLevelProgress(state: AppState): LevelProgress {
@@ -278,7 +280,7 @@ function toQuestGroups(state: AppState): QuestStatGroup[] {
     const rank = state.userState.rank;
 
     const rows = state.tasks
-      .filter((task) => task.stat === stat && (task.isAnchor || task.id === rotatingTaskId))
+      .filter((task) => task.stat === stat && isQuestRow(task, rotatingTaskId))
       .map((task) => {
         const options = toQuestOptions(task, rank);
 
@@ -484,7 +486,7 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
         return [];
       }
 
-      return STATS.filter((stat) => openDay.requiredCompletions[stat] === 2);
+      return penalizedStats(openDay.requiredCompletions);
     }),
     completeTask(taskId, variantTier) {
       const result = engineCompleteTask(current, { taskId, variantTier }, now(), newId);
