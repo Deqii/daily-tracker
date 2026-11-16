@@ -308,14 +308,16 @@ function toQuestGroups(state: AppState): QuestStatGroup[] {
 }
 
 /**
- * The persisted application store (PRD §5, §2.2; decisions D7, D16). One composed store holds the
- * whole `AppState` and persists it after every mutation through `lib/storage`, writing `userState`
- * last. Mutations only delegate to the engine orchestrators (`completeTask`, `runRollover`,
- * `purchaseReward`); no game rule lives here. Rollover runs on load, when the tab becomes visible
- * again, and from a timer set for the next local midnight that is re-armed after every run. A failed
- * write keeps the in-memory state and sets `saveError`; the next successful write clears it. The
- * clock, timer, visibility target, root element, and id generator are parameters with browser
- * defaults so tests need no DOM.
+ * The persisted application store (PRD §5, §2.2; decisions D7, D16, D23, D24). One composed store
+ * holds the whole `AppState` and persists it after every mutation through `lib/storage`, writing
+ * `userState` last. Mutations only delegate to the engine orchestrators (`completeTask`,
+ * `runRollover`, `purchaseReward`); no game rule lives here. Rollover runs on load, when the tab
+ * becomes visible again, and from a timer set for the next local midnight that is re-armed after
+ * every run. The post-rollover notice lives in `lib/penalty-notice`, outside the game state, and
+ * is written before the game state so a crash between the two writes is deduplicated later. A
+ * failed write keeps the in-memory state and sets `saveError`; the next successful write clears
+ * it. The clock, timer, visibility target, root element, and id generator are parameters with
+ * browser defaults so tests need no DOM.
  */
 export function createAppStore(deps: AppDeps = {}): AppStore {
   const now = deps.now ?? (() => new Date());

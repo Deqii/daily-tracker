@@ -40,13 +40,15 @@ const openDayEntry = (
 
 /**
  * Closes every day from `lastRolloverDate` up to the day before `today`, then opens `today`
- * (PRD §7.7, decisions D3, D7). A day without a stored entry is created with all-zero counts.
+ * (PRD §7.7, decisions D3, D7, D24). A day without a stored entry is created with all-zero counts.
  * Each day applies the missed-stat penalty with the rank held at the start of that day, recomputes
  * the streak, and closes with end-of-day snapshots; a rank drop emits a `rankDown` event dated that
- * day. Newly unlocked titles are stored through the title helper. Returns `{ state, events }` where
- * `events` are the milestone events created by this call. `today` at or before `lastRolloverDate`
- * changes nothing except ensuring the open day's log entry exists, so a second call with the same
- * `today` returns the same state. The input state is never mutated.
+ * day. Newly unlocked titles are stored through the title helper. Returns `{ state, events,
+ * penaltyNotice }` where `events` are the milestone events created by this call and
+ * `penaltyNotice` is the pure summary of the days that were missed (persistence and merging stay
+ * in the store). `today` at or before `lastRolloverDate` changes nothing except ensuring the open
+ * day's log entry exists, so a second call with the same `today` returns the same state. The input
+ * state is never mutated.
  */
 export function runRollover(
   state: AppState,

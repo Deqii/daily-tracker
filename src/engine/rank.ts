@@ -73,6 +73,7 @@ const RANK_PARAMS = [
   },
 ] as const satisfies readonly RankParams[];
 
+/** Per-rank thresholds and rewards from PRD §2.1; `maxLevel` is derived from the next rank's floor. */
 export const RANK_CONFIGS: readonly RankConfig[] = RANK_PARAMS.map((params, index) => {
   const next = RANK_PARAMS[index + 1];
 
@@ -82,6 +83,7 @@ export const RANK_CONFIGS: readonly RankConfig[] = RANK_PARAMS.map((params, inde
   });
 });
 
+/** The config for one rank; an unknown rank is a programming error and throws a `RangeError`. */
 export function getRankConfig(target: Rank): RankConfig {
   const config = RANK_CONFIGS.find((candidate) => candidate.rank === target);
 
@@ -109,7 +111,7 @@ export interface RankResolution {
 }
 
 /**
- * Resolves the effective rank from the level rank and the balance gate (PRD §7.6, decisions D3).
+ * Resolves the effective rank from the level rank and the balance gate (PRD §7.6, decisions D5).
  * A rank drop is immediate and ungated. A rank-up would climb one step at a time toward the level
  * rank, each step gated; because the gate depends only on `statXP` (never on rank), one gate check
  * settles the whole climb. When it fails the rank stays and `blocked` is set.
