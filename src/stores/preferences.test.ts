@@ -45,6 +45,13 @@ describe('createMotionPreference', () => {
     expect(get(store)).toBe('off');
   });
 
+  it('is off when the OS prefers reduced motion even if the stored value is on', () => {
+    const deps = recorder({ [MOTION_PREFERENCE_KEY]: 'on' });
+    const store = createMotionPreference({ ...deps, reducedMotion: () => true });
+
+    expect(get(store)).toBe('off');
+  });
+
   it('persists and applies a toggle', () => {
     const deps = recorder();
     const store = createMotionPreference({ ...deps, reducedMotion: () => false });
@@ -54,6 +61,17 @@ describe('createMotionPreference', () => {
     expect(get(store)).toBe('off');
     expect(deps.applied).toEqual(['on', 'off']);
     expect(deps.writes).toEqual([{ key: MOTION_PREFERENCE_KEY, value: 'off' }]);
+  });
+
+  it('persists and applies an explicit on', () => {
+    const deps = recorder({ [MOTION_PREFERENCE_KEY]: 'off' });
+    const store = createMotionPreference({ ...deps, reducedMotion: () => false });
+
+    store.setPreference('on');
+
+    expect(get(store)).toBe('on');
+    expect(deps.applied).toEqual(['off', 'on']);
+    expect(deps.writes).toEqual([{ key: MOTION_PREFERENCE_KEY, value: 'on' }]);
   });
 });
 
@@ -74,5 +92,15 @@ describe('createSoundPreference', () => {
     const deps = recorder({ [SOUND_PREFERENCE_KEY]: 'on' });
 
     expect(get(createSoundPreference(deps))).toBe('on');
+  });
+
+  it('toggles from a stored on value to off and persists it', () => {
+    const deps = recorder({ [SOUND_PREFERENCE_KEY]: 'on' });
+    const store = createSoundPreference(deps);
+
+    store.toggle();
+
+    expect(get(store)).toBe('off');
+    expect(deps.writes).toEqual([{ key: SOUND_PREFERENCE_KEY, value: 'off' }]);
   });
 });

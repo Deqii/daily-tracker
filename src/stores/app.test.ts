@@ -10,7 +10,7 @@ import {
 import { PENALTY_NOTICE_KEY, type PenaltyNotice } from '../lib/penalty-notice';
 import { emptyTaskFormDraft, type TaskFormDraft } from '../lib/task-form';
 import { emptyRewardFormDraft, type RewardFormDraft } from '../lib/reward-form';
-import type { DailyQuestDay, Reward, Task } from '../lib/types';
+import type { DailyQuestDay, Reward, RewardPurchase, Task } from '../lib/types';
 import {
   createAppStore,
   millisecondsUntilNextMidnight,
@@ -749,6 +749,45 @@ describe('createAppStore', () => {
         createdAt: '2026-10-01T08:00:00+07:00',
       },
     ]);
+
+    store.teardown();
+  });
+
+  it('deletes a reward and persists the change without touching purchase history', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    const purchase: RewardPurchase = {
+      id: 'buy00001',
+      rewardId: 'rew00001',
+      rewardTitle: 'Kopi susu',
+      costAtPurchase: 10,
+      purchasedAt: '2026-10-10T09:00:00+07:00',
+      localDate: '2026-10-10',
+    };
+    seed(fake, { rewards: [aReward()], rewardPurchases: [purchase] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    store.deleteReward('rew00001');
+
+    const state = read<AppState>(store);
+
+    expect(state.rewards).toEqual([]);
+    expect(state.rewardPurchases).toEqual([purchase]);
+    expect(JSON.parse(fake.getItem(STORAGE_KEYS.rewards) ?? '[]')).toEqual([]);
+    expect(JSON.parse(fake.getItem(STORAGE_KEYS.rewardPurchases) ?? '[]')).toEqual([purchase]);
+
+    store.teardown();
+  });
+
+  it('ignores a delete for an unknown reward id', () => {
+    vi.setSystemTime(new Date(2026, 9, 11, 9, 0, 0));
+    const fake = stubStorage();
+    seed(fake, { rewards: [aReward()] });
+    const store = createAppStore({ root: null, newId: idFactory() });
+
+    store.deleteReward('does-not-exist');
+
+    expect(read<AppState>(store).rewards).toEqual([aReward()]);
 
     store.teardown();
   });
