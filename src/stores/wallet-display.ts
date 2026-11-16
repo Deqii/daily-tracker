@@ -1,4 +1,4 @@
-import { readable } from 'svelte/store';
+import { readable, type Readable } from 'svelte/store';
 import { app } from './app';
 import { tween } from '../lib/tween';
 
@@ -16,28 +16,46 @@ import { tween } from '../lib/tween';
  */
 export const WALLET_TWEEN_MS = 500;
 
-export const walletDisplay = readable(0, (set) => {
-  let current = 0;
-  let started = false;
+/** The subset of the app state a wallet display needs to read. */
+export interface WalletState {
+  readonly userState: { readonly wallet: number };
+}
 
-  return app.subscribe((state) => {
-    const next = state.userState.wallet;
+export type Tween = (apply: (progress: number) => void, ms?: number) => void;
 
-    if (!started) {
-      started = true;
-      current = next;
-      set(next);
+/**
+ * Builds the tweened wallet readable from any app-state source. The factory keeps
+ * the animation testable without the singleton and without a real DOM.
+ */
+export function createWalletDisplay(
+  source: Readable<WalletState>,
+  tweenFn: Tween = tween
+): Readable<number> {
+  return readable(0, (set) => {
+    let current = 0;
+    let started = false;
 
-      return;
-    }
+    return source.subscribe((state) => {
+      const next = state.userState.wallet;
 
-    if (next === current) return;
+      if (!started) {
+        started = true;
+        current = next;
+        set(next);
 
-    const from = current;
+        return;
+      }
 
-    tween((progress) => {
-      current = Math.round(from + (next - from) * progress);
-      set(current);
-    }, WALLET_TWEEN_MS);
+      if (next === current) return;
+
+      const from = current;
+
+      tweenFn((progress) => {
+        current = Math.round(from + (next - from) * progress);
+        set(current);
+      }, WALLET_TWEEN_MS);
+    });
   });
-});
+}
+
+export const walletDisplay = createWalletDisplay(app);
