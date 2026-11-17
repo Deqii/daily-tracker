@@ -17,7 +17,9 @@ import type { Stat } from '../lib/types';
 import { createAppStore, type AppStore, type RankRoot, type VisibilityTarget } from './app';
 
 const FIXTURE_URL = new URL('./__fixtures__/golden-run.json', import.meta.url);
-const GENERATE = process.env.GOLDEN_RUN_GENERATE === '1';
+const GENERATE =
+  (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
+    ?.GOLDEN_RUN_GENERATE === '1';
 
 const counts = (overrides: Partial<Record<Stat, number>> = {}): Record<Stat, number> => ({
   STR: 0,
