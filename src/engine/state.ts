@@ -1,3 +1,4 @@
+import type { Result } from '../lib/result';
 import type {
   Completion,
   DailyQuestDay,
@@ -7,6 +8,8 @@ import type {
   Task,
   UserState,
 } from '../lib/types';
+
+export type { Result };
 
 /** The whole persisted application state (PRD §6, §7). */
 export interface AppState {
@@ -18,6 +21,3 @@ export interface AppState {
   userState: UserState;
   milestoneEvents: MilestoneEvent[];
 }
-
-/** The engine result shape (PRD §7): resolvable errors are values, never thrown exceptions. */
-export type Result<T, E extends string> = { ok: true; value: T } | { ok: false; error: E };

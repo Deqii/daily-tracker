@@ -10,7 +10,7 @@ export interface BalanceGateResult {
 }
 
 /**
- * Stats that have at least one completion ever, i.e. `statXP > 0` (PRD §2.1, decisions D5).
+ * Stats that have at least one completion ever, i.e. `statXP > 0` (PRD §2.1, decisions D8).
  * Follows the fixed stat order STR, VIT, INT, DISC, SOC.
  */
 export function getTrackedStats(statXP: Readonly<StatXP>): Stat[] {

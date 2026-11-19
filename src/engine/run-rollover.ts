@@ -1,7 +1,7 @@
 import { eachDay } from '../lib/date';
-import type { PenaltyNotice, PenaltyNoticeDay, PenaltyNoticeRankDown } from '../lib/penalty-notice';
+import type { PenaltyNotice, PenaltyNoticeDay, PenaltyNoticeRankDown } from './penalty-notice';
 import type { DailyQuestDay, LocalDate, MilestoneEvent, Rank, Stat, Task } from '../lib/types';
-import { STATS } from '../lib/types';
+import { completionCount, hasRequiredStats, requiredForActiveStats, zeroCounts } from './day';
 import { applyPenalty, buildRequired, evaluateDay, nextPenaltyStats } from './evaluation';
 import { getQuestStats, selectDailyTasks } from './daily';
 import { level } from './level';
@@ -15,8 +15,6 @@ export interface RolloverResult {
   readonly events: MilestoneEvent[];
   readonly penaltyNotice: PenaltyNotice | null;
 }
-
-const zeroCounts = (): Record<Stat, number> => ({ STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 });
 
 /**
  * The open-day log entry PRD §7.7 step 3: `selectDailyTasks` and `buildRequired` against the current
@@ -42,13 +40,15 @@ const openDayEntry = (
 
 /**
  * Closes every day from `lastRolloverDate` up to the day before `today`, then opens `today`
- * (PRD §7.7, decisions D3, D7). A day without a stored entry is created with all-zero counts.
+ * (PRD §7.7, decisions D3, D7, D24). A day without a stored entry is created with all-zero counts.
  * Each day applies the missed-stat penalty with the rank held at the start of that day, recomputes
  * the streak, and closes with end-of-day snapshots; a rank drop emits a `rankDown` event dated that
- * day. Newly unlocked titles are stored through the title helper. Returns `{ state, events }` where
- * `events` are the milestone events created by this call. `today` at or before `lastRolloverDate`
- * changes nothing except ensuring the open day's log entry exists, so a second call with the same
- * `today` returns the same state. The input state is never mutated.
+ * day. Newly unlocked titles are stored through the title helper. Returns `{ state, events,
+ * penaltyNotice }` where `events` are the milestone events created by this call and
+ * `penaltyNotice` is the pure summary of the days that were missed (persistence and merging stay
+ * in the store). `today` at or before `lastRolloverDate` changes nothing except ensuring the open
+ * day's log entry exists, so a second call with the same `today` returns the same state. The input
+ * state is never mutated.
  */
 export function runRollover(
   state: AppState,
@@ -62,7 +62,6 @@ export function runRollover(
   }
 
   const questStats = getQuestStats(state.tasks);
-  const questActive = new Set(questStats);
   const daysToClose = eachDay(userState.lastRolloverDate, today);
 
   const openToday = (penaltyStats: readonly Stat[]): DailyQuestDay =>
@@ -109,13 +108,7 @@ export function runRollover(
     const required = stored?.requiredCompletions ?? buildRequired(questStats, penaltyStats);
     const actualCompletions = stored?.actualCompletions ?? zeroCounts();
 
-    const effectiveRequired = STATS.reduce<Record<Stat, number>>(
-      (result, stat) => {
-        result[stat] = questActive.has(stat) ? required[stat] : 0;
-        return result;
-      },
-      { STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 }
-    );
+    const effectiveRequired = requiredForActiveStats(required, questStats);
 
     const rankAtStart = rank;
     const { missed, satisfied } = evaluateDay(effectiveRequired, actualCompletions);
@@ -126,13 +119,12 @@ export function runRollover(
 
     penaltyStats = nextPenaltyStats(penaltyStats, missed, satisfied, questStats);
 
-    const completionCount = STATS.reduce((sum, stat) => sum + actualCompletions[stat], 0);
     const streak = closeDayStreak(
       streakState,
       {
         date,
-        completionCount,
-        hasQuestStats: STATS.some((stat) => effectiveRequired[stat] > 0),
+        completionCount: completionCount(actualCompletions),
+        hasQuestStats: hasRequiredStats(effectiveRequired),
       },
       rank
     );

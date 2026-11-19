@@ -1,0 +1,1547 @@
+{
+  "steps": [
+    {
+      "name": "boot",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{},\"requiredCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:rewardPurchases": "[]",
+        "daily-tracker:rewards": "[]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":100,\"wallet\":100,\"statXP\":{\"STR\":20,\"VIT\":20,\"INT\":20,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":0,\"lastFreezeWeekReset\":\"2026-10-05\",\"penaltyStats\":[],\"equippedTitle\":null,\"unlockedTitles\":[],\"totalCompletions\":0,\"totalPurchases\":0,\"lastRolloverDate\":\"2026-10-11\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": null,
+      "timerEvents": [
+        {
+          "kind": "set",
+          "delay": 54000000
+        }
+      ]
+    },
+    {
+      "name": "add tasks",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState",
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState",
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState",
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:rewardPurchases": "[]",
+        "daily-tracker:rewards": "[]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0003\",\"familyName\":\"Inbox zero\",\"stat\":\"DISC\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":100,\"wallet\":100,\"statXP\":{\"STR\":20,\"VIT\":20,\"INT\":20,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":0,\"lastFreezeWeekReset\":\"2026-10-05\",\"penaltyStats\":[],\"equippedTitle\":null,\"unlockedTitles\":[],\"totalCompletions\":0,\"totalPurchases\":0,\"lastRolloverDate\":\"2026-10-11\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": null,
+      "timerEvents": []
+    },
+    {
+      "name": "complete three tasks",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState",
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState",
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":11,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:rewardPurchases": "[]",
+        "daily-tracker:rewards": "[]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0003\",\"familyName\":\"Inbox zero\",\"stat\":\"DISC\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":111,\"wallet\":111,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":0,\"lastFreezeWeekReset\":\"2026-10-05\",\"penaltyStats\":[],\"equippedTitle\":null,\"unlockedTitles\":[],\"totalCompletions\":3,\"totalPurchases\":0,\"lastRolloverDate\":\"2026-10-11\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": null,
+      "timerEvents": []
+    },
+    {
+      "name": "rollover to day 2",
+      "writes": [
+        "daily-tracker:penaltyNotice",
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:penaltyNotice": "{\"version\":1,\"forDate\":\"2026-10-12\",\"days\":[{\"date\":\"2026-10-11\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"DISC\",\"actual\":0,\"required\":1}],\"nominalDeduction\":5,\"xpDeducted\":5,\"walletDeducted\":5,\"freezeUsed\":false}],\"balancesBefore\":{\"xp\":111,\"wallet\":111},\"balancesAfter\":{\"xp\":106,\"wallet\":106},\"levelBefore\":3,\"levelAfter\":3,\"rankBefore\":\"E\",\"rankAfter\":\"E\",\"penaltyStats\":[\"DISC\"],\"rankDowns\":[]}",
+        "daily-tracker:rewardPurchases": "[]",
+        "daily-tracker:rewards": "[]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0003\",\"familyName\":\"Inbox zero\",\"stat\":\"DISC\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":106,\"wallet\":106,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":1,\"freezesUsedThisWeek\":0,\"lastFreezeWeekReset\":\"2026-10-05\",\"penaltyStats\":[\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[],\"totalCompletions\":3,\"totalPurchases\":0,\"lastRolloverDate\":\"2026-10-12\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": {
+        "version": 1,
+        "forDate": "2026-10-12",
+        "days": [
+          {
+            "date": "2026-10-11",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 1
+              }
+            ],
+            "nominalDeduction": 5,
+            "xpDeducted": 5,
+            "walletDeducted": 5,
+            "freezeUsed": false
+          }
+        ],
+        "balancesBefore": {
+          "xp": 111,
+          "wallet": 111
+        },
+        "balancesAfter": {
+          "xp": 106,
+          "wallet": 106
+        },
+        "levelBefore": 3,
+        "levelAfter": 3,
+        "rankBefore": "E",
+        "rankAfter": "E",
+        "penaltyStats": ["DISC"],
+        "rankDowns": []
+      },
+      "timerEvents": [
+        {
+          "kind": "clear"
+        },
+        {
+          "kind": "set",
+          "delay": 54000000
+        }
+      ]
+    },
+    {
+      "name": "miss day 2 and rollover",
+      "writes": [
+        "daily-tracker:penaltyNotice",
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:penaltyNotice": "{\"version\":1,\"forDate\":\"2026-10-13\",\"days\":[{\"date\":\"2026-10-11\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"DISC\",\"actual\":0,\"required\":1}],\"nominalDeduction\":5,\"xpDeducted\":5,\"walletDeducted\":5,\"freezeUsed\":false},{\"date\":\"2026-10-12\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":1},{\"stat\":\"VIT\",\"actual\":0,\"required\":1},{\"stat\":\"INT\",\"actual\":0,\"required\":1},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":true}],\"balancesBefore\":{\"xp\":111,\"wallet\":111},\"balancesAfter\":{\"xp\":86,\"wallet\":86},\"levelBefore\":3,\"levelAfter\":3,\"rankBefore\":\"E\",\"rankAfter\":\"E\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"rankDowns\":[]}",
+        "daily-tracker:rewardPurchases": "[]",
+        "daily-tracker:rewards": "[]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0003\",\"familyName\":\"Inbox zero\",\"stat\":\"DISC\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":86,\"wallet\":86,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":1,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[],\"totalCompletions\":3,\"totalPurchases\":0,\"lastRolloverDate\":\"2026-10-13\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": {
+        "version": 1,
+        "forDate": "2026-10-13",
+        "days": [
+          {
+            "date": "2026-10-11",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 1
+              }
+            ],
+            "nominalDeduction": 5,
+            "xpDeducted": 5,
+            "walletDeducted": 5,
+            "freezeUsed": false
+          },
+          {
+            "date": "2026-10-12",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": true
+          }
+        ],
+        "balancesBefore": {
+          "xp": 111,
+          "wallet": 111
+        },
+        "balancesAfter": {
+          "xp": 86,
+          "wallet": 86
+        },
+        "levelBefore": 3,
+        "levelAfter": 3,
+        "rankBefore": "E",
+        "rankAfter": "E",
+        "penaltyStats": ["STR", "VIT", "INT", "DISC"],
+        "rankDowns": []
+      },
+      "timerEvents": [
+        {
+          "kind": "clear"
+        },
+        {
+          "kind": "set",
+          "delay": 54000000
+        }
+      ]
+    },
+    {
+      "name": "miss day 3 and rollover",
+      "writes": [
+        "daily-tracker:penaltyNotice",
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:penaltyNotice": "{\"version\":1,\"forDate\":\"2026-10-14\",\"days\":[{\"date\":\"2026-10-11\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"DISC\",\"actual\":0,\"required\":1}],\"nominalDeduction\":5,\"xpDeducted\":5,\"walletDeducted\":5,\"freezeUsed\":false},{\"date\":\"2026-10-12\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":1},{\"stat\":\"VIT\",\"actual\":0,\"required\":1},{\"stat\":\"INT\",\"actual\":0,\"required\":1},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":true},{\"date\":\"2026-10-13\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":2},{\"stat\":\"VIT\",\"actual\":0,\"required\":2},{\"stat\":\"INT\",\"actual\":0,\"required\":2},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":false}],\"balancesBefore\":{\"xp\":111,\"wallet\":111},\"balancesAfter\":{\"xp\":66,\"wallet\":66},\"levelBefore\":3,\"levelAfter\":3,\"rankBefore\":\"E\",\"rankAfter\":\"E\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"rankDowns\":[]}",
+        "daily-tracker:rewardPurchases": "[]",
+        "daily-tracker:rewards": "[]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0003\",\"familyName\":\"Inbox zero\",\"stat\":\"DISC\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":66,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[],\"totalCompletions\":3,\"totalPurchases\":0,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": {
+        "version": 1,
+        "forDate": "2026-10-14",
+        "days": [
+          {
+            "date": "2026-10-11",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 1
+              }
+            ],
+            "nominalDeduction": 5,
+            "xpDeducted": 5,
+            "walletDeducted": 5,
+            "freezeUsed": false
+          },
+          {
+            "date": "2026-10-12",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": true
+          },
+          {
+            "date": "2026-10-13",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": false
+          }
+        ],
+        "balancesBefore": {
+          "xp": 111,
+          "wallet": 111
+        },
+        "balancesAfter": {
+          "xp": 66,
+          "wallet": 66
+        },
+        "levelBefore": 3,
+        "levelAfter": 3,
+        "rankBefore": "E",
+        "rankAfter": "E",
+        "penaltyStats": ["STR", "VIT", "INT", "DISC"],
+        "rankDowns": []
+      },
+      "timerEvents": [
+        {
+          "kind": "clear"
+        },
+        {
+          "kind": "set",
+          "delay": 54000000
+        }
+      ]
+    },
+    {
+      "name": "add reward",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:penaltyNotice": "{\"version\":1,\"forDate\":\"2026-10-14\",\"days\":[{\"date\":\"2026-10-11\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"DISC\",\"actual\":0,\"required\":1}],\"nominalDeduction\":5,\"xpDeducted\":5,\"walletDeducted\":5,\"freezeUsed\":false},{\"date\":\"2026-10-12\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":1},{\"stat\":\"VIT\",\"actual\":0,\"required\":1},{\"stat\":\"INT\",\"actual\":0,\"required\":1},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":true},{\"date\":\"2026-10-13\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":2},{\"stat\":\"VIT\",\"actual\":0,\"required\":2},{\"stat\":\"INT\",\"actual\":0,\"required\":2},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":false}],\"balancesBefore\":{\"xp\":111,\"wallet\":111},\"balancesAfter\":{\"xp\":66,\"wallet\":66},\"levelBefore\":3,\"levelAfter\":3,\"rankBefore\":\"E\",\"rankAfter\":\"E\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"rankDowns\":[]}",
+        "daily-tracker:rewardPurchases": "[]",
+        "daily-tracker:rewards": "[{\"id\":\"id0007\",\"title\":\"Coffee\",\"cost\":5,\"createdAt\":\"2026-10-14T09:00:00+07:00\"}]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0003\",\"familyName\":\"Inbox zero\",\"stat\":\"DISC\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":66,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[],\"totalCompletions\":3,\"totalPurchases\":0,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": {
+        "version": 1,
+        "forDate": "2026-10-14",
+        "days": [
+          {
+            "date": "2026-10-11",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 1
+              }
+            ],
+            "nominalDeduction": 5,
+            "xpDeducted": 5,
+            "walletDeducted": 5,
+            "freezeUsed": false
+          },
+          {
+            "date": "2026-10-12",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": true
+          },
+          {
+            "date": "2026-10-13",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": false
+          }
+        ],
+        "balancesBefore": {
+          "xp": 111,
+          "wallet": 111
+        },
+        "balancesAfter": {
+          "xp": 66,
+          "wallet": 66
+        },
+        "levelBefore": 3,
+        "levelAfter": 3,
+        "rankBefore": "E",
+        "rankAfter": "E",
+        "penaltyStats": ["STR", "VIT", "INT", "DISC"],
+        "rankDowns": []
+      },
+      "timerEvents": []
+    },
+    {
+      "name": "purchase reward",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:penaltyNotice": "{\"version\":1,\"forDate\":\"2026-10-14\",\"days\":[{\"date\":\"2026-10-11\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"DISC\",\"actual\":0,\"required\":1}],\"nominalDeduction\":5,\"xpDeducted\":5,\"walletDeducted\":5,\"freezeUsed\":false},{\"date\":\"2026-10-12\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":1},{\"stat\":\"VIT\",\"actual\":0,\"required\":1},{\"stat\":\"INT\",\"actual\":0,\"required\":1},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":true},{\"date\":\"2026-10-13\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":2},{\"stat\":\"VIT\",\"actual\":0,\"required\":2},{\"stat\":\"INT\",\"actual\":0,\"required\":2},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":false}],\"balancesBefore\":{\"xp\":111,\"wallet\":111},\"balancesAfter\":{\"xp\":66,\"wallet\":66},\"levelBefore\":3,\"levelAfter\":3,\"rankBefore\":\"E\",\"rankAfter\":\"E\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"rankDowns\":[]}",
+        "daily-tracker:rewardPurchases": "[{\"id\":\"id0008\",\"rewardId\":\"id0007\",\"rewardTitle\":\"Coffee\",\"costAtPurchase\":5,\"purchasedAt\":\"2026-10-14T09:00:00+07:00\",\"localDate\":\"2026-10-14\"}]",
+        "daily-tracker:rewards": "[{\"id\":\"id0007\",\"title\":\"Coffee\",\"cost\":5,\"createdAt\":\"2026-10-14T09:00:00+07:00\"}]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0003\",\"familyName\":\"Inbox zero\",\"stat\":\"DISC\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":61,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[\"first-reward\"],\"totalCompletions\":3,\"totalPurchases\":1,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": {
+        "version": 1,
+        "forDate": "2026-10-14",
+        "days": [
+          {
+            "date": "2026-10-11",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 1
+              }
+            ],
+            "nominalDeduction": 5,
+            "xpDeducted": 5,
+            "walletDeducted": 5,
+            "freezeUsed": false
+          },
+          {
+            "date": "2026-10-12",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": true
+          },
+          {
+            "date": "2026-10-13",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": false
+          }
+        ],
+        "balancesBefore": {
+          "xp": 111,
+          "wallet": 111
+        },
+        "balancesAfter": {
+          "xp": 66,
+          "wallet": 66
+        },
+        "levelBefore": 3,
+        "levelAfter": 3,
+        "rankBefore": "E",
+        "rankAfter": "E",
+        "penaltyStats": ["STR", "VIT", "INT", "DISC"],
+        "rankDowns": []
+      },
+      "timerEvents": []
+    },
+    {
+      "name": "edit reward",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:penaltyNotice": "{\"version\":1,\"forDate\":\"2026-10-14\",\"days\":[{\"date\":\"2026-10-11\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"DISC\",\"actual\":0,\"required\":1}],\"nominalDeduction\":5,\"xpDeducted\":5,\"walletDeducted\":5,\"freezeUsed\":false},{\"date\":\"2026-10-12\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":1},{\"stat\":\"VIT\",\"actual\":0,\"required\":1},{\"stat\":\"INT\",\"actual\":0,\"required\":1},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":true},{\"date\":\"2026-10-13\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":2},{\"stat\":\"VIT\",\"actual\":0,\"required\":2},{\"stat\":\"INT\",\"actual\":0,\"required\":2},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":false}],\"balancesBefore\":{\"xp\":111,\"wallet\":111},\"balancesAfter\":{\"xp\":66,\"wallet\":66},\"levelBefore\":3,\"levelAfter\":3,\"rankBefore\":\"E\",\"rankAfter\":\"E\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"rankDowns\":[]}",
+        "daily-tracker:rewardPurchases": "[{\"id\":\"id0008\",\"rewardId\":\"id0007\",\"rewardTitle\":\"Coffee\",\"costAtPurchase\":5,\"purchasedAt\":\"2026-10-14T09:00:00+07:00\",\"localDate\":\"2026-10-14\"}]",
+        "daily-tracker:rewards": "[{\"id\":\"id0007\",\"title\":\"Tea\",\"cost\":7,\"createdAt\":\"2026-10-14T09:00:00+07:00\"}]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0003\",\"familyName\":\"Inbox zero\",\"stat\":\"DISC\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":61,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[\"first-reward\"],\"totalCompletions\":3,\"totalPurchases\":1,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": {
+        "version": 1,
+        "forDate": "2026-10-14",
+        "days": [
+          {
+            "date": "2026-10-11",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 1
+              }
+            ],
+            "nominalDeduction": 5,
+            "xpDeducted": 5,
+            "walletDeducted": 5,
+            "freezeUsed": false
+          },
+          {
+            "date": "2026-10-12",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": true
+          },
+          {
+            "date": "2026-10-13",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": false
+          }
+        ],
+        "balancesBefore": {
+          "xp": 111,
+          "wallet": 111
+        },
+        "balancesAfter": {
+          "xp": 66,
+          "wallet": 66
+        },
+        "levelBefore": 3,
+        "levelAfter": 3,
+        "rankBefore": "E",
+        "rankAfter": "E",
+        "penaltyStats": ["STR", "VIT", "INT", "DISC"],
+        "rankDowns": []
+      },
+      "timerEvents": []
+    },
+    {
+      "name": "delete reward",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:penaltyNotice": "{\"version\":1,\"forDate\":\"2026-10-14\",\"days\":[{\"date\":\"2026-10-11\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"DISC\",\"actual\":0,\"required\":1}],\"nominalDeduction\":5,\"xpDeducted\":5,\"walletDeducted\":5,\"freezeUsed\":false},{\"date\":\"2026-10-12\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":1},{\"stat\":\"VIT\",\"actual\":0,\"required\":1},{\"stat\":\"INT\",\"actual\":0,\"required\":1},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":true},{\"date\":\"2026-10-13\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":2},{\"stat\":\"VIT\",\"actual\":0,\"required\":2},{\"stat\":\"INT\",\"actual\":0,\"required\":2},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":false}],\"balancesBefore\":{\"xp\":111,\"wallet\":111},\"balancesAfter\":{\"xp\":66,\"wallet\":66},\"levelBefore\":3,\"levelAfter\":3,\"rankBefore\":\"E\",\"rankAfter\":\"E\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"rankDowns\":[]}",
+        "daily-tracker:rewardPurchases": "[{\"id\":\"id0008\",\"rewardId\":\"id0007\",\"rewardTitle\":\"Coffee\",\"costAtPurchase\":5,\"purchasedAt\":\"2026-10-14T09:00:00+07:00\",\"localDate\":\"2026-10-14\"}]",
+        "daily-tracker:rewards": "[]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0003\",\"familyName\":\"Inbox zero\",\"stat\":\"DISC\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":61,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[\"first-reward\"],\"totalCompletions\":3,\"totalPurchases\":1,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": {
+        "version": 1,
+        "forDate": "2026-10-14",
+        "days": [
+          {
+            "date": "2026-10-11",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 1
+              }
+            ],
+            "nominalDeduction": 5,
+            "xpDeducted": 5,
+            "walletDeducted": 5,
+            "freezeUsed": false
+          },
+          {
+            "date": "2026-10-12",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": true
+          },
+          {
+            "date": "2026-10-13",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": false
+          }
+        ],
+        "balancesBefore": {
+          "xp": 111,
+          "wallet": 111
+        },
+        "balancesAfter": {
+          "xp": 66,
+          "wallet": 66
+        },
+        "levelBefore": 3,
+        "levelAfter": 3,
+        "rankBefore": "E",
+        "rankAfter": "E",
+        "penaltyStats": ["STR", "VIT", "INT", "DISC"],
+        "rankDowns": []
+      },
+      "timerEvents": []
+    },
+    {
+      "name": "edit task",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:penaltyNotice": "{\"version\":1,\"forDate\":\"2026-10-14\",\"days\":[{\"date\":\"2026-10-11\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"DISC\",\"actual\":0,\"required\":1}],\"nominalDeduction\":5,\"xpDeducted\":5,\"walletDeducted\":5,\"freezeUsed\":false},{\"date\":\"2026-10-12\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":1},{\"stat\":\"VIT\",\"actual\":0,\"required\":1},{\"stat\":\"INT\",\"actual\":0,\"required\":1},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":true},{\"date\":\"2026-10-13\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":2},{\"stat\":\"VIT\",\"actual\":0,\"required\":2},{\"stat\":\"INT\",\"actual\":0,\"required\":2},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":false}],\"balancesBefore\":{\"xp\":111,\"wallet\":111},\"balancesAfter\":{\"xp\":66,\"wallet\":66},\"levelBefore\":3,\"levelAfter\":3,\"rankBefore\":\"E\",\"rankAfter\":\"E\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"rankDowns\":[]}",
+        "daily-tracker:rewardPurchases": "[{\"id\":\"id0008\",\"rewardId\":\"id0007\",\"rewardTitle\":\"Coffee\",\"costAtPurchase\":5,\"purchasedAt\":\"2026-10-14T09:00:00+07:00\",\"localDate\":\"2026-10-14\"}]",
+        "daily-tracker:rewards": "[]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank v2\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":7}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0003\",\"familyName\":\"Inbox zero\",\"stat\":\"DISC\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":61,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[\"first-reward\"],\"totalCompletions\":3,\"totalPurchases\":1,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": {
+        "version": 1,
+        "forDate": "2026-10-14",
+        "days": [
+          {
+            "date": "2026-10-11",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 1
+              }
+            ],
+            "nominalDeduction": 5,
+            "xpDeducted": 5,
+            "walletDeducted": 5,
+            "freezeUsed": false
+          },
+          {
+            "date": "2026-10-12",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": true
+          },
+          {
+            "date": "2026-10-13",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": false
+          }
+        ],
+        "balancesBefore": {
+          "xp": 111,
+          "wallet": 111
+        },
+        "balancesAfter": {
+          "xp": 66,
+          "wallet": 66
+        },
+        "levelBefore": 3,
+        "levelAfter": 3,
+        "rankBefore": "E",
+        "rankAfter": "E",
+        "penaltyStats": ["STR", "VIT", "INT", "DISC"],
+        "rankDowns": []
+      },
+      "timerEvents": []
+    },
+    {
+      "name": "delete task",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":0,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:penaltyNotice": "{\"version\":1,\"forDate\":\"2026-10-14\",\"days\":[{\"date\":\"2026-10-11\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"DISC\",\"actual\":0,\"required\":1}],\"nominalDeduction\":5,\"xpDeducted\":5,\"walletDeducted\":5,\"freezeUsed\":false},{\"date\":\"2026-10-12\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":1},{\"stat\":\"VIT\",\"actual\":0,\"required\":1},{\"stat\":\"INT\",\"actual\":0,\"required\":1},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":true},{\"date\":\"2026-10-13\",\"rankAtStart\":\"E\",\"missed\":[{\"stat\":\"STR\",\"actual\":0,\"required\":2},{\"stat\":\"VIT\",\"actual\":0,\"required\":2},{\"stat\":\"INT\",\"actual\":0,\"required\":2},{\"stat\":\"DISC\",\"actual\":0,\"required\":2}],\"nominalDeduction\":20,\"xpDeducted\":20,\"walletDeducted\":20,\"freezeUsed\":false}],\"balancesBefore\":{\"xp\":111,\"wallet\":111},\"balancesAfter\":{\"xp\":66,\"wallet\":66},\"levelBefore\":3,\"levelAfter\":3,\"rankBefore\":\"E\",\"rankAfter\":\"E\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"rankDowns\":[]}",
+        "daily-tracker:rewardPurchases": "[{\"id\":\"id0008\",\"rewardId\":\"id0007\",\"rewardTitle\":\"Coffee\",\"costAtPurchase\":5,\"purchasedAt\":\"2026-10-14T09:00:00+07:00\",\"localDate\":\"2026-10-14\"}]",
+        "daily-tracker:rewards": "[]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank v2\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":7}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":61,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[\"first-reward\"],\"totalCompletions\":3,\"totalPurchases\":1,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": {
+        "version": 1,
+        "forDate": "2026-10-14",
+        "days": [
+          {
+            "date": "2026-10-11",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 1
+              }
+            ],
+            "nominalDeduction": 5,
+            "xpDeducted": 5,
+            "walletDeducted": 5,
+            "freezeUsed": false
+          },
+          {
+            "date": "2026-10-12",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 1
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": true
+          },
+          {
+            "date": "2026-10-13",
+            "rankAtStart": "E",
+            "missed": [
+              {
+                "stat": "STR",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "VIT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "INT",
+                "actual": 0,
+                "required": 2
+              },
+              {
+                "stat": "DISC",
+                "actual": 0,
+                "required": 2
+              }
+            ],
+            "nominalDeduction": 20,
+            "xpDeducted": 20,
+            "walletDeducted": 20,
+            "freezeUsed": false
+          }
+        ],
+        "balancesBefore": {
+          "xp": 111,
+          "wallet": 111
+        },
+        "balancesAfter": {
+          "xp": 66,
+          "wallet": 66
+        },
+        "levelBefore": 3,
+        "levelAfter": 3,
+        "rankBefore": "E",
+        "rankAfter": "E",
+        "penaltyStats": ["STR", "VIT", "INT", "DISC"],
+        "rankDowns": []
+      },
+      "timerEvents": []
+    },
+    {
+      "name": "acknowledge penalty notice",
+      "writes": [],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":0,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:rewardPurchases": "[{\"id\":\"id0008\",\"rewardId\":\"id0007\",\"rewardTitle\":\"Coffee\",\"costAtPurchase\":5,\"purchasedAt\":\"2026-10-14T09:00:00+07:00\",\"localDate\":\"2026-10-14\"}]",
+        "daily-tracker:rewards": "[]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank v2\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":7}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":61,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[\"first-reward\"],\"totalCompletions\":3,\"totalPurchases\":1,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": null,
+      "timerEvents": []
+    },
+    {
+      "name": "import state",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":0,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:rewardPurchases": "[{\"id\":\"id0008\",\"rewardId\":\"id0007\",\"rewardTitle\":\"Coffee\",\"costAtPurchase\":5,\"purchasedAt\":\"2026-10-14T09:00:00+07:00\",\"localDate\":\"2026-10-14\"}]",
+        "daily-tracker:rewards": "[]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank v2\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":7}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":50,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[\"first-reward\"],\"totalCompletions\":3,\"totalPurchases\":1,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": null,
+      "timerEvents": []
+    },
+    {
+      "name": "quota failure on third write",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":0,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:rewardPurchases": "[{\"id\":\"id0008\",\"rewardId\":\"id0007\",\"rewardTitle\":\"Coffee\",\"costAtPurchase\":5,\"purchasedAt\":\"2026-10-14T09:00:00+07:00\",\"localDate\":\"2026-10-14\"}]",
+        "daily-tracker:rewards": "[{\"id\":\"id0009\",\"title\":\"Quota\",\"cost\":1,\"createdAt\":\"2026-10-14T09:00:00+07:00\"}]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank v2\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":7}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":50,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[\"first-reward\"],\"totalCompletions\":3,\"totalPurchases\":1,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": "QUOTA",
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": null,
+      "timerEvents": []
+    },
+    {
+      "name": "recover after quota failure",
+      "writes": [
+        "daily-tracker:tasks",
+        "daily-tracker:completions",
+        "daily-tracker:dailyQuestLog",
+        "daily-tracker:rewards",
+        "daily-tracker:rewardPurchases",
+        "daily-tracker:milestoneEvents",
+        "daily-tracker:userState"
+      ],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":0,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:rewardPurchases": "[{\"id\":\"id0008\",\"rewardId\":\"id0007\",\"rewardTitle\":\"Coffee\",\"costAtPurchase\":5,\"purchasedAt\":\"2026-10-14T09:00:00+07:00\",\"localDate\":\"2026-10-14\"}]",
+        "daily-tracker:rewards": "[{\"id\":\"id0009\",\"title\":\"Quota\",\"cost\":1,\"createdAt\":\"2026-10-14T09:00:00+07:00\"},{\"id\":\"id0010\",\"title\":\"Recovery\",\"cost\":1,\"createdAt\":\"2026-10-14T09:00:00+07:00\"}]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank v2\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":7}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":50,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[\"first-reward\"],\"totalCompletions\":3,\"totalPurchases\":1,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": null,
+      "timerEvents": []
+    },
+    {
+      "name": "teardown",
+      "writes": [],
+      "storage": {
+        "daily-tracker:completions": "[{\"id\":\"id0004\",\"taskId\":\"id0000\",\"taskName\":\"Morning plank\",\"stat\":\"STR\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0005\",\"taskId\":\"id0001\",\"taskName\":\"Evening walk\",\"stat\":\"VIT\",\"variantTier\":null,\"pointsAwarded\":3,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"},{\"id\":\"id0006\",\"taskId\":\"id0002\",\"taskName\":\"Read a chapter\",\"stat\":\"INT\",\"variantTier\":null,\"pointsAwarded\":5,\"completedAt\":\"2026-10-11T09:00:00+07:00\",\"localDate\":\"2026-10-11\"}]",
+        "daily-tracker:dailyQuestLog": "[{\"date\":\"2026-10-11\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":1,\"SOC\":0},\"actualCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":0,\"SOC\":0},\"netPointsChange\":6,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":106,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-12\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":1,\"VIT\":1,\"INT\":1,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":true,\"closed\":true,\"lifetimeXPEnd\":86,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-13\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\",\"DISC\":\"id0003\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":2,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":-20,\"freezeUsed\":false,\"closed\":true,\"lifetimeXPEnd\":66,\"levelEnd\":3,\"rankEnd\":\"E\"},{\"date\":\"2026-10-14\",\"selectedTaskIdPerStat\":{\"VIT\":\"id0001\"},\"requiredCompletions\":{\"STR\":2,\"VIT\":2,\"INT\":2,\"DISC\":0,\"SOC\":0},\"actualCompletions\":{\"STR\":0,\"VIT\":0,\"INT\":0,\"DISC\":0,\"SOC\":0},\"netPointsChange\":0,\"freezeUsed\":false,\"closed\":false,\"lifetimeXPEnd\":null,\"levelEnd\":null,\"rankEnd\":null}]",
+        "daily-tracker:milestoneEvents": "[]",
+        "daily-tracker:rewardPurchases": "[{\"id\":\"id0008\",\"rewardId\":\"id0007\",\"rewardTitle\":\"Coffee\",\"costAtPurchase\":5,\"purchasedAt\":\"2026-10-14T09:00:00+07:00\",\"localDate\":\"2026-10-14\"}]",
+        "daily-tracker:rewards": "[{\"id\":\"id0009\",\"title\":\"Quota\",\"cost\":1,\"createdAt\":\"2026-10-14T09:00:00+07:00\"},{\"id\":\"id0010\",\"title\":\"Recovery\",\"cost\":1,\"createdAt\":\"2026-10-14T09:00:00+07:00\"}]",
+        "daily-tracker:schemaVersion": "2",
+        "daily-tracker:tasks": "[{\"id\":\"id0000\",\"familyName\":\"Morning plank v2\",\"stat\":\"STR\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":7}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0001\",\"familyName\":\"Evening walk\",\"stat\":\"VIT\",\"isAnchor\":false,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":5}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"},{\"id\":\"id0002\",\"familyName\":\"Read a chapter\",\"stat\":\"INT\",\"isAnchor\":true,\"variants\":[{\"tier\":\"easy\",\"description\":\"one\",\"points\":10}],\"createdAt\":\"2026-10-11T09:00:00+07:00\"}]",
+        "daily-tracker:theme": "\"dark\"",
+        "daily-tracker:userState": "{\"lifetimeXP\":66,\"wallet\":50,\"statXP\":{\"STR\":23,\"VIT\":23,\"INT\":25,\"DISC\":20,\"SOC\":20},\"rank\":\"E\",\"currentStreak\":0,\"freezesUsedThisWeek\":1,\"lastFreezeWeekReset\":\"2026-10-12\",\"penaltyStats\":[\"STR\",\"VIT\",\"INT\",\"DISC\"],\"equippedTitle\":null,\"unlockedTitles\":[\"first-reward\"],\"totalCompletions\":3,\"totalPurchases\":1,\"lastRolloverDate\":\"2026-10-14\"}"
+      },
+      "saveError": null,
+      "loadReport": {
+        "firstRun": false,
+        "recoveredKeys": [],
+        "backupKeys": [],
+        "schemaMismatch": null
+      },
+      "rankAttr": "E",
+      "milestoneEvents": [],
+      "penaltyNotice": null,
+      "timerEvents": [
+        {
+          "kind": "clear"
+        }
+      ]
+    }
+  ],
+  "allWrites": [
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:penaltyNotice",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:penaltyNotice",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:penaltyNotice",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState",
+    "daily-tracker:tasks",
+    "daily-tracker:completions",
+    "daily-tracker:dailyQuestLog",
+    "daily-tracker:rewards",
+    "daily-tracker:rewardPurchases",
+    "daily-tracker:milestoneEvents",
+    "daily-tracker:userState"
+  ]
+}

@@ -1,39 +1,37 @@
 import { derived, writable, type Readable } from 'svelte/store';
-import { passesBalanceGate } from '../engine/balance';
 import {
   completeTask as engineCompleteTask,
   type CompleteTaskResult,
 } from '../engine/complete-task';
-import { level as levelOf, xpForLevel } from '../engine/level';
-import { pointsAwarded } from '../engine/points';
 import { purchaseReward as enginePurchaseReward, type PurchaseResult } from '../engine/purchase';
-import { getRankConfig, rank as levelRankOf, resolveRank } from '../engine/rank';
-import { runRollover as engineRunRollover } from '../engine/run-rollover';
 import type { AppState } from '../engine/state';
 import { syncOpenDay } from '../engine/sync-open-day';
-import { displayStreak } from '../engine/streak';
-import { equipTitle as engineEquipTitle, TITLES, type TitleId } from '../engine/titles';
+import { equipTitle as engineEquipTitle, type TitleId } from '../engine/titles';
 import { toLocalDate, toTimestamp } from '../lib/date';
 import type { ExportState } from '../lib/export';
-import {
-  clearPenaltyNotice,
-  mergePenaltyNotices,
-  readPenaltyNotice,
-  writePenaltyNotice,
-  type PenaltyNotice,
-} from '../lib/penalty-notice';
+import { clearPenaltyNotice, readPenaltyNotice, type PenaltyNotice } from '../lib/penalty-notice';
 import { buildRewardFromDraft, type RewardFormDraft } from '../lib/reward-form';
-import { selectRewardPreview, type RewardPreviewRow } from '../lib/rewards-preview';
-import {
-  loadState,
-  write,
-  type StorageFailure,
-  type StorageReport,
-  type StorageSchema,
-} from '../lib/storage';
+import type { RewardPreviewRow } from '../lib/rewards-preview';
+import type { StorageFailure, StorageReport } from '../lib/storage';
 import { buildTaskVariants, type TaskFormDraft } from '../lib/task-form';
 import type { MilestoneEvent, Rank, Reward, Stat, Task, Tier } from '../lib/types';
-import { STATS } from '../lib/types';
+import {
+  derivations,
+  type LevelProgress,
+  type RankGateStatus,
+  type QuestStatGroup,
+} from './app-derivations';
+import { loadAppState, persistState } from './app-persistence';
+import { createRolloverController } from './app-rollover';
+
+export type {
+  LevelProgress,
+  QuestRow,
+  QuestRowPoints,
+  QuestStatGroup,
+  QuestVariantOption,
+  RankGateStatus,
+} from './app-derivations';
 
 export type TimerHandle = ReturnType<typeof setTimeout>;
 export type SetTimer = (handler: () => void, delay: number) => TimerHandle;
@@ -49,54 +47,6 @@ export interface VisibilityTarget {
 /** The slice of an element the `data-rank` writer needs, so tests can pass a plain object. */
 export interface RankRoot {
   setAttribute(name: string, value: string): void;
-}
-
-/** In-level XP progress: `xpIntoLevel / xpForThisLevel` is what the Today XP bar fills. */
-export interface LevelProgress {
-  readonly level: number;
-  readonly xpIntoLevel: number;
-  readonly xpForThisLevel: number;
-  readonly ratio: number;
-}
-
-/** The rank-up balance gate as shown on Today (PRD §7.6). */
-export interface RankGateStatus {
-  readonly blocked: boolean;
-  readonly levelRank: Rank;
-  readonly weakest: Stat | null;
-  readonly threshold: number;
-  readonly current: number | null;
-}
-
-/** The points a quest row awards (after cap and multiplier), lowest to highest across its variants. */
-export interface QuestRowPoints {
-  readonly min: number;
-  readonly max: number;
-}
-
-/** One effort variant of a quest row, with the points it will award (after cap and multiplier). */
-export interface QuestVariantOption {
-  readonly tier: Tier;
-  readonly description: string;
-  readonly points: number;
-}
-
-/** One row of the open day's Daily Quest (an anchor task or that day's rotating pick). */
-export interface QuestRow {
-  readonly task: Task;
-  readonly isAnchor: boolean;
-  readonly isRotating: boolean;
-  readonly completionCount: number;
-  readonly points: QuestRowPoints;
-  readonly options: QuestVariantOption[];
-}
-
-/** The open day's quest rows for one quest-active stat. */
-export interface QuestStatGroup {
-  readonly stat: Stat;
-  readonly required: number;
-  readonly completed: number;
-  readonly rows: QuestRow[];
 }
 
 export interface AppDeps {
@@ -187,133 +137,17 @@ function defaultRoot(): RankRoot | null {
   return typeof document === 'undefined' ? null : document.documentElement;
 }
 
-function toAppState(schema: StorageSchema): AppState {
-  return {
-    tasks: schema.tasks,
-    completions: schema.completions,
-    dailyQuestLog: schema.dailyQuestLog,
-    rewards: schema.rewards,
-    rewardPurchases: schema.rewardPurchases,
-    userState: schema.userState,
-    milestoneEvents: schema.milestoneEvents,
-  };
-}
-
-function openDayOf(state: AppState) {
-  return state.dailyQuestLog.find((day) => day.date === state.userState.lastRolloverDate);
-}
-
-function hasCompletionToday(state: AppState): boolean {
-  const openDay = openDayOf(state);
-
-  return openDay !== undefined && STATS.some((stat) => openDay.actualCompletions[stat] > 0);
-}
-
-function toLevelProgress(state: AppState): LevelProgress {
-  const xp = state.userState.lifetimeXP;
-  const level = levelOf(xp);
-  const levelFloor = xpForLevel(level);
-  const xpForThisLevel = xpForLevel(level + 1) - levelFloor;
-  const xpIntoLevel = xp - levelFloor;
-
-  return {
-    level,
-    xpIntoLevel,
-    xpForThisLevel,
-    ratio: xpForThisLevel > 0 ? xpIntoLevel / xpForThisLevel : 0,
-  };
-}
-
-function toRankGate(state: AppState): RankGateStatus {
-  const level = levelOf(state.userState.lifetimeXP);
-  const resolution = resolveRank(state.userState.rank, level, state.userState.statXP);
-  const gate = passesBalanceGate(state.userState.statXP);
-
-  return {
-    blocked: resolution.blocked,
-    levelRank: levelRankOf(level),
-    weakest: gate.weakest,
-    threshold: gate.threshold,
-    current: gate.weakest === null ? null : state.userState.statXP[gate.weakest],
-  };
-}
-
-function equippedTitleName(id: string | null): string | null {
-  if (id === null) {
-    return null;
-  }
-
-  return TITLES.find((title) => title.id === id)?.name ?? null;
-}
-
-function toQuestOptions(task: Task, rank: Rank): QuestVariantOption[] {
-  return task.variants.map((variant) => ({
-    tier: variant.tier,
-    description: variant.description,
-    points: pointsAwarded(variant.points, rank),
-  }));
-}
-
-function toQuestRowPoints(options: QuestVariantOption[]): QuestRowPoints {
-  const awarded = options.map((option) => option.points);
-
-  return { min: Math.min(...awarded), max: Math.max(...awarded) };
-}
-
-function toQuestGroups(state: AppState): QuestStatGroup[] {
-  const openDay = openDayOf(state);
-
-  if (openDay === undefined) {
-    return [];
-  }
-
-  const groups: QuestStatGroup[] = [];
-
-  for (const stat of STATS) {
-    if (openDay.requiredCompletions[stat] <= 0) {
-      continue;
-    }
-
-    const rotatingTaskId = openDay.selectedTaskIdPerStat[stat];
-    const rank = state.userState.rank;
-
-    const rows = state.tasks
-      .filter((task) => task.stat === stat && (task.isAnchor || task.id === rotatingTaskId))
-      .map((task) => {
-        const options = toQuestOptions(task, rank);
-
-        return {
-          task,
-          isAnchor: task.isAnchor,
-          isRotating: !task.isAnchor && task.id === rotatingTaskId,
-          completionCount: state.completions.filter(
-            (completion) => completion.localDate === openDay.date && completion.taskId === task.id
-          ).length,
-          points: toQuestRowPoints(options),
-          options,
-        };
-      });
-
-    groups.push({
-      stat,
-      required: openDay.requiredCompletions[stat],
-      completed: openDay.actualCompletions[stat],
-      rows,
-    });
-  }
-
-  return groups;
-}
-
 /**
- * The persisted application store (PRD §5, §2.2; decisions D7, D16). One composed store holds the
- * whole `AppState` and persists it after every mutation through `lib/storage`, writing `userState`
- * last. Mutations only delegate to the engine orchestrators (`completeTask`, `runRollover`,
- * `purchaseReward`); no game rule lives here. Rollover runs on load, when the tab becomes visible
- * again, and from a timer set for the next local midnight that is re-armed after every run. A failed
- * write keeps the in-memory state and sets `saveError`; the next successful write clears it. The
- * clock, timer, visibility target, root element, and id generator are parameters with browser
- * defaults so tests need no DOM.
+ * The persisted application store (PRD §5, §2.2; decisions D7, D16, D23, D24). One composed store
+ * holds the whole `AppState` and persists it after every mutation through `lib/storage`, writing
+ * `userState` last. Mutations only delegate to the engine orchestrators (`completeTask`,
+ * `runRollover`, `purchaseReward`); no game rule lives here. Rollover runs on load, when the tab
+ * becomes visible again, and from a timer set for the next local midnight that is re-armed after
+ * every run. The post-rollover notice lives in `lib/penalty-notice`, outside the game state, and
+ * is written before the game state so a crash between the two writes is deduplicated later. A
+ * failed write keeps the in-memory state and sets `saveError`; the next successful write clears
+ * it. The clock, timer, visibility target, root element, and id generator are parameters with
+ * browser defaults so tests need no DOM.
  */
 export function createAppStore(deps: AppDeps = {}): AppStore {
   const now = deps.now ?? (() => new Date());
@@ -324,8 +158,8 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
   const newId = deps.newId ?? defaultNewId;
   const today = (): string => toLocalDate(now());
 
-  const loaded = loadState(today());
-  const initial = toAppState(loaded.state);
+  const loaded = loadAppState(today());
+  const initial = loaded.state;
   const { subscribe, set } = writable<AppState>(initial);
   const saveError = writable<StorageFailure | null>(null);
   const loadReport = writable<StorageReport>(loaded.report);
@@ -349,18 +183,7 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
   }
 
   function persist(state: AppState): void {
-    const writes = [
-      write('tasks', state.tasks),
-      write('completions', state.completions),
-      write('dailyQuestLog', state.dailyQuestLog),
-      write('rewards', state.rewards),
-      write('rewardPurchases', state.rewardPurchases),
-      write('milestoneEvents', state.milestoneEvents),
-      write('userState', state.userState),
-    ];
-
-    const failure = writes.find((result) => !result.ok);
-    saveError.set(failure !== undefined && !failure.ok ? failure.error : null);
+    saveError.set(persistState(state));
   }
 
   function armMidnightTimer(): void {
@@ -368,124 +191,56 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
       clearTimer(timer);
     }
 
-    timer = setTimer(runRollover, millisecondsUntilNextMidnight(now()));
-  }
-
-  function runRollover(): void {
-    const rolled = engineRunRollover(current, today(), newId);
-
-    if (rolled.penaltyNotice !== null) {
-      const merged = mergePenaltyNotices(pendingPenaltyNotice, rolled.penaltyNotice);
-
-      if (merged !== pendingPenaltyNotice) {
-        pendingPenaltyNotice = merged;
-        penaltyNotice.set(merged);
-
-        if (merged !== null) {
-          writePenaltyNotice(merged);
-        }
-      }
-    }
-
-    commit(rolled.state);
-    persist(rolled.state);
-    armMidnightTimer();
-  }
-
-  function acknowledgePenaltyNotice(): void {
-    const notice = pendingPenaltyNotice;
-
-    if (notice === null) {
-      return;
-    }
-
-    pendingPenaltyNotice = null;
-    penaltyNotice.set(null);
-    clearPenaltyNotice();
-
-    if (notice.rankDowns.length === 0) {
-      return;
-    }
-
-    const rankDownKeys = new Set(
-      notice.rankDowns.map((down) => `${down.localDate}:${down.from}:${down.to}`)
-    );
-    let changed = false;
-    const milestoneEvents = current.milestoneEvents.map((event): MilestoneEvent => {
-      if (
-        event.type === 'rankDown' &&
-        !event.seen &&
-        rankDownKeys.has(`${event.localDate}:${event.from}:${event.to}`)
-      ) {
-        changed = true;
-        return { ...event, seen: true };
-      }
-
-      return event;
-    });
-
-    if (changed) {
-      const next: AppState = { ...current, milestoneEvents };
-
-      commit(next);
-      persist(next);
-    }
+    timer = setTimer(() => rolloverController.run(), millisecondsUntilNextMidnight(now()));
   }
 
   function onVisibilityChange(): void {
     if (visibility !== null && visibility.visibilityState === 'visible') {
-      runRollover();
+      rolloverController.run();
     }
   }
 
+  const rolloverController = createRolloverController({
+    getState: () => current,
+    getToday: today,
+    newId,
+    getPendingPenaltyNotice: () => pendingPenaltyNotice,
+    setPendingPenaltyNotice: (notice) => {
+      pendingPenaltyNotice = notice;
+      penaltyNotice.set(notice);
+    },
+    commit,
+    persist,
+    armMidnightTimer,
+  });
+
   applyRank();
-  runRollover();
+  rolloverController.run();
 
   if (visibility !== null) {
     visibility.addEventListener('visibilitychange', onVisibilityChange);
   }
 
   const base: Readable<AppState> = { subscribe };
-  const level = derived(base, (state) => levelOf(state.userState.lifetimeXP));
-  const rank = derived(base, (state) => state.userState.rank);
-  const levelRank = derived(base, (state) => levelRankOf(levelOf(state.userState.lifetimeXP)));
-  const freezesLeft = derived(base, (state) =>
-    Math.max(
-      0,
-      getRankConfig(state.userState.rank).freezesPerWeek - state.userState.freezesUsedThisWeek
-    )
-  );
 
   return {
     subscribe,
     saveError,
     loadReport,
-    level,
-    levelProgress: derived(base, toLevelProgress),
-    rank,
-    levelRank,
-    rankGate: derived(base, toRankGate),
-    statXP: derived(base, (state) => state.userState.statXP),
-    equippedTitle: derived(base, (state) => equippedTitleName(state.userState.equippedTitle)),
-    streak: derived(base, (state) =>
-      displayStreak(state.userState.currentStreak, hasCompletionToday(state))
-    ),
-    freezesLeft,
+    level: derived(base, derivations.level),
+    levelProgress: derived(base, derivations.levelProgress),
+    rank: derived(base, derivations.rank),
+    levelRank: derived(base, derivations.levelRank),
+    rankGate: derived(base, derivations.rankGate),
+    statXP: derived(base, derivations.statXP),
+    equippedTitle: derived(base, derivations.equippedTitle),
+    streak: derived(base, derivations.streak),
+    freezesLeft: derived(base, derivations.freezesLeft),
     penaltyNotice,
-    acknowledgePenaltyNotice,
-    questRows: derived(base, toQuestGroups),
-    rewardPreview: derived(base, (state) =>
-      selectRewardPreview(state.rewards, state.userState.wallet)
-    ),
-    penaltyStats: derived(base, (state) => {
-      const openDay = openDayOf(state);
-
-      if (openDay === undefined) {
-        return [];
-      }
-
-      return STATS.filter((stat) => openDay.requiredCompletions[stat] === 2);
-    }),
+    acknowledgePenaltyNotice: rolloverController.acknowledge,
+    questRows: derived(base, derivations.questRows),
+    rewardPreview: derived(base, derivations.rewardPreview),
+    penaltyStats: derived(base, derivations.penaltyStats),
     completeTask(taskId, variantTier) {
       const result = engineCompleteTask(current, { taskId, variantTier }, now(), newId);
 
@@ -601,7 +356,7 @@ export function createAppStore(deps: AppDeps = {}): AppStore {
       commit(next);
       persist(next);
     },
-    rollover: runRollover,
+    rollover: rolloverController.run,
     teardown() {
       if (timer !== null) {
         clearTimer(timer);

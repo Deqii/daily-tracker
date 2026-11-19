@@ -13,6 +13,11 @@ export function getQuestStats(tasks: readonly Task[]): Stat[] {
   return STATS.filter((stat) => withTasks.has(stat));
 }
 
+/** Whether a task is one of the open day's quest rows: an anchor, or that stat's rotating pick. */
+export function isQuestRow(task: Task, rotatingTaskId: string | undefined): boolean {
+  return task.isAnchor || task.id === rotatingTaskId;
+}
+
 /**
  * One rotating-task pick per quest-active stat that has any rotating task, seeded by
  * `fnv1a32("${date}:${stat}")` into mulberry32 (PRD §7.3). Candidates are sorted by id and the
