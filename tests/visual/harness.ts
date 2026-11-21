@@ -438,6 +438,41 @@ export async function openApp(
   return page;
 }
 
+export type ScrollSlice = { scrollY: number; image: PNG };
+
+/**
+ * Stitches scroll slices into one full-page image.
+ *
+ * Slices arrive in increasing scroll order. A slice must never overwrite a row
+ * an earlier slice already wrote: the final slice is clamped to
+ * `pageHeight - viewportHeight`, so it re-captures up to a viewport of rows that
+ * are already in the image. Those rows were captured at an aligned offset and
+ * are the reference; only rows beyond the highest row written so far may come
+ * from the clamped slice. See `captureFullPage`.
+ */
+export function stitchSlices(slices: readonly ScrollSlice[], width: number, height: number): PNG {
+  const out = new PNG({ width, height });
+  let written = 0;
+
+  for (const { scrollY, image } of slices) {
+    // Skip the overlap with everything already written.
+    const start = Math.max(0, written - scrollY);
+    const end = Math.min(image.height, height - scrollY);
+
+    for (let row = start; row < end; row++) {
+      const from = row * image.width * 4;
+      const to = (scrollY + row) * width * 4;
+      const span = Math.min(image.width, width) * 4;
+
+      image.data.copy(out.data, to, from, from + span);
+    }
+
+    written = Math.max(written, scrollY + end);
+  }
+
+  return out;
+}
+
 /**
  * Full-page capture by scrolling, not by `fullPage: true`.
  *
@@ -454,6 +489,10 @@ export async function openApp(
  * is exactly what a reader scrolling the page sees. It is also deterministic.
  * Both sides of every comparison go through this function, so the diff stays
  * apples-to-apples.
+ *
+ * The final slice is clamped to `height - vh`, so it overlaps rows an aligned
+ * slice already captured. `stitchSlices` keeps those aligned rows and takes
+ * only the tail beyond the last written row from the clamped slice.
  */
 export async function captureFullPage(page: Page): Promise<PNG> {
   const viewport = page.viewportSize();
@@ -467,7 +506,7 @@ export async function captureFullPage(page: Page): Promise<PNG> {
 
   const width = Math.max(doc.width, vw);
   const height = Math.max(doc.height, vh);
-  const out = new PNG({ width, height });
+  const slices: ScrollSlice[] = [];
 
   for (let y = 0; y < height; y += vh) {
     // Clamp the last slice so the tail of a tall page is still captured.
@@ -476,20 +515,15 @@ export async function captureFullPage(page: Page): Promise<PNG> {
     await page.evaluate((v) => window.scrollTo(0, v), scrollY);
     await settleFrames(page);
 
-    const slice = PNG.sync.read(await page.screenshot({ animations: 'disabled' }));
-
-    for (let row = 0; row < slice.height && scrollY + row < height; row++) {
-      const from = row * slice.width * 4;
-      const to = (scrollY + row) * width * 4;
-      const span = Math.min(slice.width, width) * 4;
-
-      slice.data.copy(out.data, to, from, from + span);
-    }
+    slices.push({
+      scrollY,
+      image: PNG.sync.read(await page.screenshot({ animations: 'disabled' })),
+    });
   }
 
   await page.evaluate(() => window.scrollTo(0, 0));
 
-  return out;
+  return stitchSlices(slices, width, height);
 }
 
 export async function fullPagePng(page: Page): Promise<PNG> {
