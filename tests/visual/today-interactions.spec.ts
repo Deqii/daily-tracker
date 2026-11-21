@@ -4,8 +4,15 @@ import { PNG } from 'pngjs';
 import { passesBalanceGate } from '../../src/engine/balance';
 import { level as levelOf, xpForLevel } from '../../src/engine/level';
 import { pointsAwarded } from '../../src/engine/points';
-import { STATS, type Stat } from '../../src/lib/types';
+import { STATS, type Stat, type Task } from '../../src/lib/types';
 import {
+  SCHEMA_VERSION,
+  STORAGE_KEYS,
+  createDefaultUserState,
+  type StorageSchema,
+} from '../../src/lib/storage';
+import {
+  APP,
   CONTEXT_OPTIONS,
   MAX_DIFF_RATIO,
   PAGES,
@@ -14,6 +21,8 @@ import {
   comparePixels,
   compareStyleReports,
   fullPagePng,
+  newIsolatedContext,
+  open,
   openApp,
   openPrototype,
   overlapNote,
@@ -341,3 +350,179 @@ for (const theme of THEMES) {
     }
   });
 }
+
+/**
+ * Per-row check state (issue #183).
+ *
+ * A stat can own several quest rows (its anchors plus the day's rotating pick).
+ * The check, `aria-checked`, `.done` and the check animation must follow that
+ * row's own completion, never the stat's total. The click limit stays the
+ * engine's: `actualCompletions[stat] >= requiredCompletions[stat]` rejects the
+ * next click with `ROW_LIMIT_REACHED`, which is per stat.
+ *
+ * These cases seed app-only localStorage: no fixture state has two rows in one
+ * stat, and the fixture registry is part of the checked baseline.
+ */
+
+/** The harness clock's local day (Asia/Jakarta), matching `FIXED_TIME` in `harness.ts`. */
+const TODAY_DATE = '2026-10-15';
+const TODAY_TIMESTAMP = '2026-10-15T09:00:00+07:00';
+
+const EMPTY_COUNTS: Record<Stat, number> = { STR: 0, VIT: 0, INT: 0, DISC: 0, SOC: 0 };
+
+function anchor(id: string, familyName: string, stat: Stat): Task {
+  return {
+    id,
+    familyName,
+    stat,
+    isAnchor: true,
+    variants: [{ tier: 'easy', description: familyName, points: 5 }],
+    createdAt: TODAY_TIMESTAMP,
+  };
+}
+
+/** A Today schema with two STR anchors and one VIT row, and no completions today. */
+function twoRowSchema(required: 1 | 2): StorageSchema {
+  const userState = createDefaultUserState(TODAY_DATE);
+
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    tasks: [
+      anchor('t-str', 'Squat 15x2 set', 'STR'),
+      anchor('t-str-2', 'Pull up 10x', 'STR'),
+      anchor('t-vit', 'Minum air 2L', 'VIT'),
+    ],
+    completions: [],
+    dailyQuestLog: [
+      {
+        date: TODAY_DATE,
+        selectedTaskIdPerStat: {},
+        requiredCompletions: { ...EMPTY_COUNTS, STR: required, VIT: 1 },
+        actualCompletions: { ...EMPTY_COUNTS },
+        netPointsChange: 0,
+        freezeUsed: false,
+        closed: false,
+        lifetimeXPEnd: null,
+        levelEnd: null,
+        rankEnd: null,
+      },
+    ],
+    rewards: [],
+    rewardPurchases: [],
+    userState: { ...userState, penaltyStats: required === 2 ? ['STR'] : [] },
+    milestoneEvents: [],
+    theme: 'dark',
+  };
+}
+
+/** Opens the app on a schema seeded into an isolated context, bypassing the fixture writer. */
+async function openSeeded(
+  browser: Parameters<typeof openApp>[0],
+  schema: StorageSchema,
+  motion: 'off' | null = null
+): Promise<Page> {
+  const context = await newIsolatedContext(browser, VIEWPORT, 'dark');
+  const values: Record<string, string> = {};
+
+  for (const key of Object.keys(STORAGE_KEYS) as (keyof StorageSchema)[]) {
+    values[STORAGE_KEYS[key]] = JSON.stringify(schema[key]);
+  }
+
+  await context.addInitScript(
+    ({ stored, motionValue }) => {
+      for (const [key, value] of Object.entries(stored)) localStorage.setItem(key, value);
+
+      if (motionValue !== null) {
+        localStorage.setItem('daily-tracker:motion', JSON.stringify(motionValue));
+      }
+    },
+    { stored: values, motionValue: motion }
+  );
+
+  const page = await context.newPage();
+
+  await open(page, `${APP}/#/today`);
+
+  return page;
+}
+
+/** How many of today's stored completions belong to a task. */
+async function todayCompletions(page: Page, taskId: string): Promise<number> {
+  const raw = await page.evaluate(() => localStorage.getItem('daily-tracker:completions'));
+  const stored = raw === null ? [] : (JSON.parse(raw) as { taskId: string; localDate: string }[]);
+
+  return stored.filter(
+    (completion) => completion.taskId === taskId && completion.localDate === TODAY_DATE
+  ).length;
+}
+
+test.describe('per-row check state', () => {
+  test('checks only the clicked row in a two-row stat (required 1)', async ({ browser }) => {
+    const page = await openSeeded(browser, twoRowSchema(1));
+    const first = page.locator('.qrow[data-i="0"]');
+    const second = page.locator('.qrow[data-i="1"]');
+
+    await expect(first).not.toHaveClass(/done/);
+    await expect(second).not.toHaveClass(/done/);
+
+    await first.click();
+
+    // The first row is checked before the second row is ever clicked.
+    await expect(first).toHaveClass(/done/);
+    await expect(first).toHaveAttribute('aria-checked', 'true');
+    await expect(second).not.toHaveClass(/done/);
+    await expect(second).toHaveAttribute('aria-checked', 'false');
+
+    // The engine caps this stat at one completion, so the second click is a no-op.
+    await second.click();
+    await expect(second).not.toHaveClass(/done/);
+    await expect(second).toHaveAttribute('aria-checked', 'false');
+    expect(await todayCompletions(page, 't-str')).toBe(1);
+    expect(await todayCompletions(page, 't-str-2')).toBe(0);
+  });
+
+  test('checks only the clicked row in a two-row penalised stat (required 2)', async ({
+    browser,
+  }) => {
+    const page = await openSeeded(browser, twoRowSchema(2));
+    const first = page.locator('.qrow[data-i="0"]');
+    const second = page.locator('.qrow[data-i="1"]');
+
+    await first.click();
+
+    await expect(first).toHaveClass(/done/);
+    await expect(first).toHaveAttribute('aria-checked', 'true');
+    await expect(second).not.toHaveClass(/done/);
+    await expect(second).toHaveAttribute('aria-checked', 'false');
+
+    // Still one completion short, so the second row is accepted and checks itself.
+    await second.click();
+    await expect(second).toHaveClass(/done/);
+    await expect(second).toHaveAttribute('aria-checked', 'true');
+    expect(await todayCompletions(page, 't-str')).toBe(1);
+    expect(await todayCompletions(page, 't-str-2')).toBe(1);
+  });
+
+  test('keeps a single-row stat checked after its click', async ({ browser }) => {
+    const page = await openSeeded(browser, twoRowSchema(1));
+    const single = page.locator('.qrow[data-i="2"]');
+
+    await expect(single).not.toHaveClass(/done/);
+    await single.click();
+    await expect(single).toHaveClass(/done/);
+    await expect(single).toHaveAttribute('aria-checked', 'true');
+  });
+
+  test('reaches the same static state with data-motion="off"', async ({ browser }) => {
+    const page = await openSeeded(browser, twoRowSchema(1), 'off');
+    const first = page.locator('.qrow[data-i="0"]');
+    const second = page.locator('.qrow[data-i="1"]');
+
+    await first.click();
+
+    await expect(first).toHaveClass(/done/);
+    await expect(first).toHaveAttribute('aria-checked', 'true');
+    await expect(second).not.toHaveClass(/done/);
+    await expect(second).toHaveAttribute('aria-checked', 'false');
+  });
+});

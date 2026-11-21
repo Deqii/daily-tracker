@@ -41,6 +41,7 @@
     readonly stat: Stat;
     readonly required: number;
     readonly completed: number;
+    readonly completionCount: number;
     readonly pointsMin: number;
     readonly pointsMax: number;
     readonly awarded: number | null;
@@ -57,7 +58,7 @@
         group.rows.map((row) => {
           let awarded: number | null = null;
 
-          if (row.options.length > 1 && group.completed >= group.required) {
+          if (row.options.length > 1 && row.completionCount > 0) {
             for (const completion of $app.completions) {
               if (
                 completion.localDate === $app.userState.lastRolloverDate &&
@@ -75,6 +76,7 @@
             stat: group.stat,
             required: group.required,
             completed: group.completed,
+            completionCount: row.completionCount,
             pointsMin: row.points.min,
             pointsMax: row.points.max,
             awarded,
@@ -207,10 +209,11 @@
    * Completing a row is `app.completeTask` and nothing else: the engine owns the
    * points, the cap, the level and the rank (PRD §7.7). A chosen tier is passed
    * as the variant; a single-variant row passes `null`, as the prototype does.
-   * A row already at its requirement does nothing.
+   * A stat already at its required completions rejects further clicks, exactly
+   * like the engine's `ROW_LIMIT_REACHED`; that limit is per stat, not per row.
    */
-  function complete(row: Row, done: boolean, event: MouseEvent, tier: Tier | null): void {
-    if (done) return;
+  function complete(row: Row, atLimit: boolean, event: MouseEvent, tier: Tier | null): void {
+    if (atLimit) return;
 
     const result = app.completeTask(row.taskId, tier);
 
@@ -221,8 +224,8 @@
     showToast(`${row.name} completed`);
   }
 
-  function activate(row: Row, done: boolean, event: MouseEvent): void {
-    if (done) return;
+  function activate(row: Row, atLimit: boolean, event: MouseEvent): void {
+    if (atLimit) return;
 
     if (row.options.length > 1) {
       openTier = openTier === row.index ? null : row.index;
@@ -230,11 +233,16 @@
       return;
     }
 
-    complete(row, done, event, null);
+    complete(row, atLimit, event, null);
   }
 
-  async function chooseTier(row: Row, tier: Tier, event: MouseEvent): Promise<void> {
-    complete(row, false, event, tier);
+  async function chooseTier(
+    row: Row,
+    atLimit: boolean,
+    tier: Tier,
+    event: MouseEvent
+  ): Promise<void> {
+    complete(row, atLimit, event, tier);
     await tick();
   }
 
@@ -290,34 +298,35 @@
       </div>
     {:else}
       {#each rows as row (row.taskId)}
-        {@const done = row.completed >= row.required}
+        {@const rowDone = row.completionCount > 0}
+        {@const atLimit = row.completed >= row.required}
         {#if row.options.length > 1}
           <div class="qgroup">
             <button
               class="qrow"
-              class:done
+              class:done={rowDone}
               style={`--c: var(${statColorToken(row.stat)})`}
               data-i={row.index}
-              role={done ? 'checkbox' : undefined}
-              aria-checked={done ? 'true' : undefined}
-              aria-expanded={done ? undefined : openTier === row.index}
-              aria-controls={done ? undefined : `tiers-${row.index}`}
-              onclick={(event) => activate(row, done, event)}
+              role={rowDone ? 'checkbox' : undefined}
+              aria-checked={rowDone ? 'true' : undefined}
+              aria-expanded={rowDone ? undefined : openTier === row.index}
+              aria-controls={rowDone ? undefined : `tiers-${row.index}`}
+              onclick={(event) => activate(row, atLimit, event)}
             >
               <span class="box"
                 ><svg viewBox="0 0 14 14"><path d="M2 7.5l3.2 3L12 3.500" /></svg></span
               >
               <span class="nm">{row.name}<small>{statLabel(row.stat)}</small></span>
               <span class="pts"
-                >{done
+                >{rowDone
                   ? `+${row.awarded ?? row.pointsMax}`
                   : questPointsLabel(row.pointsMin, row.pointsMax)}</span
               >
-              {#if !done}
+              {#if !rowDone}
                 <span class="chev" aria-hidden="true"></span>
               {/if}
             </button>
-            {#if !done && openTier === row.index}
+            {#if !rowDone && openTier === row.index}
               <div
                 class="tiers"
                 id={`tiers-${row.index}`}
@@ -331,7 +340,7 @@
                     data-i={row.index}
                     data-t={option.tier}
                     style={`--tc: var(--tier-${tierColorKey(option.tier)})`}
-                    onclick={(event) => chooseTier(row, option.tier, event)}
+                    onclick={(event) => chooseTier(row, atLimit, option.tier, event)}
                   >
                     <span>{tierLabel(option.tier)}</span><small>{option.description}</small><b
                       >+{option.points}</b
@@ -344,12 +353,12 @@
         {:else}
           <button
             class="qrow"
-            class:done
+            class:done={rowDone}
             style={`--c: var(${statColorToken(row.stat)})`}
             data-i={row.index}
             role="checkbox"
-            aria-checked={done}
-            onclick={(event) => complete(row, done, event, null)}
+            aria-checked={rowDone}
+            onclick={(event) => complete(row, atLimit, event, null)}
           >
             <span class="box"
               ><svg viewBox="0 0 14 14"><path d="M2 7.5l3.2 3L12 3.500" /></svg></span
