@@ -1,4 +1,5 @@
 import { expect, test } from './harness';
+import { PNG } from 'pngjs';
 import {
   CONTEXT_OPTIONS,
   FIXED_TIME,
@@ -15,6 +16,7 @@ import {
   newIsolatedContext,
   open,
   protoUrl,
+  stitchSlices,
 } from './harness';
 
 /**
@@ -48,6 +50,83 @@ test.use(CONTEXT_OPTIONS);
 
 /** The subtree `shell.spec.ts` captures; see the test below. */
 const HEADER = 'header';
+
+function solid(
+  width: number,
+  height: number,
+  rgba: readonly [number, number, number, number]
+): PNG {
+  const image = new PNG({ width, height });
+  const [r, g, b, a] = rgba;
+
+  for (let i = 0; i < image.data.length; i += 4) {
+    image.data[i] = r;
+    image.data[i + 1] = g;
+    image.data[i + 2] = b;
+    image.data[i + 3] = a;
+  }
+
+  return image;
+}
+
+function pixelAt(image: PNG, x: number, y: number): number[] {
+  const start = (y * image.width + x) * 4;
+
+  return Array.from(image.data.subarray(start, start + 4));
+}
+
+/**
+ * Regression pin for Issue #185 (`tasks @ 390 light`).
+ *
+ * `captureFullPage` clamps its final slice to `height - vh`, so that slice
+ * re-captures rows an aligned slice already wrote. The rule this test pins is
+ * that those rows keep the aligned capture and only the tail beyond the last
+ * written row comes from the clamped slice.
+ *
+ * A real page of plain colour bands renders identically in every slice, so it
+ * would pass on the old overwrite logic too. Synthetic slices with a deliberate
+ * difference in the overlap make the old and new behaviours distinguishable,
+ * and the test is pure pixel arithmetic, so it is deterministic on every runner.
+ */
+test('clamped final slice never overwrites rows captured at an aligned offset', () => {
+  const width = 3;
+  const viewportHeight = 4;
+  const pageHeight = 10;
+
+  const out = stitchSlices(
+    [
+      { scrollY: 0, image: solid(width, viewportHeight, [10, 0, 0, 255]) },
+      { scrollY: 4, image: solid(width, viewportHeight, [20, 0, 0, 255]) },
+      {
+        scrollY: pageHeight - viewportHeight,
+        image: solid(width, viewportHeight, [30, 0, 0, 255]),
+      },
+    ],
+    width,
+    pageHeight
+  );
+
+  for (const y of [0, 3]) expect(pixelAt(out, 0, y)).toEqual([10, 0, 0, 255]);
+  // Rows 6-7 are the overlap. The old code wrote [30, ...] here.
+  for (const y of [4, 5, 6, 7]) expect(pixelAt(out, 0, y)).toEqual([20, 0, 0, 255]);
+  for (const y of [8, 9]) expect(pixelAt(out, 0, y)).toEqual([30, 0, 0, 255]);
+});
+
+test('stitches non-overlapping slices in scroll order', () => {
+  const width = 2;
+
+  const out = stitchSlices(
+    [
+      { scrollY: 0, image: solid(width, 4, [1, 2, 3, 255]) },
+      { scrollY: 4, image: solid(width, 4, [4, 5, 6, 255]) },
+    ],
+    width,
+    8
+  );
+
+  expect(pixelAt(out, 1, 0)).toEqual([1, 2, 3, 255]);
+  expect(pixelAt(out, 1, 7)).toEqual([4, 5, 6, 255]);
+});
 
 for (const vp of VIEWPORTS) {
   for (const p of PAGES) {
